@@ -7,6 +7,7 @@ from App1.models import UserProfile
 
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as save_logged_in
+from django.contrib.auth import logout as logout_user
 
 @api_view(['GET', 'POST'])
 def login (request):
@@ -51,6 +52,17 @@ def signup (request):
         return Response ({"username": username,
                           "email": email},
                          status = status.HTTP_200_OK)
+        
+        
+@api_view(['GET', 'POST'])
+def logout (request):
+    try:
+        logout_user (request)
+        return Response ({"message": "1"},
+                         status = status.HTTP_200_OK)
+    except:
+        return Response ({"message": "0"},
+                         status = status.HTTP_400_BAD_REQUEST)
         
         
 @api_view(['GET', 'POST'])
