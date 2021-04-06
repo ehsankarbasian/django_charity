@@ -15,7 +15,8 @@ def login (request):
         username = request.data["username"]
         password = request.data["password"]
     except:
-        return Response ({"error": "Fill all fields please."},
+        return Response ({"error": "requiredParams",
+                          "success": "0"},
                          status = status.HTTP_400_BAD_REQUEST)
     else:
         user = authenticate (
@@ -23,13 +24,15 @@ def login (request):
                 password = password
                 )
         if user is None:
-            return Response ({"error": "Wrong username or password."},
+            return Response ({"error": "wrongUsernameOrPass",
+                              "success": "0"},
                              status = status.HTTP_401_UNAUTHORIZED)
         else:
             save_logged_in (request, user)
             user = User.objects.get (username = username)
             return Response ({"username": user.username,
-                              "email": user.email},
+                              "email": user.email,
+                              "success": "1"},
                              status = status.HTTP_200_OK)
 
 
@@ -47,16 +50,19 @@ def signup (request):
         if (len(User.objects.filter(username = username))
         and len(User.objects.filter (email = email))):
             #Ununique username and email:
-            return Response ({"status": "This username and email are used both"},
-                            status = status.HTTP_200_OK)
+            return Response ({"status": "emailUsernameError",
+                              "success": "0"},
+                            status = status.HTTP_400_BAD_REQUEST)
         elif len(User.objects.filter (username = username)):
             #Ununique username:
-            return Response ({"status": "This username is used"},
-                            status = status.HTTP_200_OK)
+            return Response ({"status": "usernameError",
+                              "success": "0"},
+                            status = status.HTTP_400_BAD_REQUEST)
         elif len(User.objects.filter (email = email)):
             #Ununique  email:
-            return Response ({"status": "This email is used"},
-                            status = status.HTTP_200_OK)
+            return Response ({"status": "emailError",
+                              "success": "0"},
+                            status = status.HTTP_400_BAD_REQUEST)
         else:
             User.objects.create_user(
                     username = username,
@@ -65,7 +71,8 @@ def signup (request):
                     )
             save_logged_in (request, User.objects.get(username = username))
             return Response ({"username": username,
-                              "email": email},
+                              "email": email,
+                              "success": "1"},
                             status = status.HTTP_200_OK)
         
             
@@ -73,10 +80,10 @@ def signup (request):
 def logout (request):
     try:
         logout_user (request)
-        return Response ({"message": "1"},
+        return Response ({"success": "1"},
                          status = status.HTTP_200_OK)
     except:
-        return Response ({"message": "0"},
+        return Response ({"success": "0"},
                          status = status.HTTP_400_BAD_REQUEST)
         
         
@@ -84,18 +91,20 @@ def logout (request):
 def LoadUserProfile (request):
     try:
         if not request.user_is_authenticated:
-            return Response ({"error": "User is not logged in."},
-                             status = status.HTTP_400_BAD_REQUEST)
+            return Response ({"error": "notLoggedIn",
+                              "success": "0"},
+                             status = status.HTTP_401_UNAUTHORIZED)
         username = request.data("username")
         current_user = request.user
         if username != current_user.username:
             return Response ({"error": "current_user in backend is "
                               + "different with current_user logged "
-                              + "in in fronrend !!!"},
+                              + "in in fronrend !!!",
+                              "success": "0"},
                              status = status.HTTP_400_BAD_REQUEST)
     except:
-        return Response ({"error": "Some of required"
-                         + " fields are not send"},
+        return Response ({"error": "requiredParams",
+                          "success": "0"},
                         status = status.HTTP_400_BAD_REQUEST)
     else:
         #Send current_user.details to front:
@@ -115,7 +124,8 @@ def LoadUserProfile (request):
                           "birth_date": current_user.birth_date,
                           "verified_needy": current_user.verified_needy,
                           "verified_mobile": current_user.verified_mobile,
-                          "verified_email": current_user.verified_email
+                          "verified_email": current_user.verified_email,
+                          "success": "1"
                           },
                         status = status.HTTP_200_OK)
 
@@ -132,11 +142,15 @@ def SubmitUserProfile (request):
         mobile_number = request.data("mobile_number")
         gender = request.data("gender")
     except:
-        return Response ({"error": "Some of required fields are not send."},
+        return Response ({"error": "requiredParams",
+                          "success": "0"},
                          status = status.HTTP_400_BAD_REQUEST)
     else:
         try:
             #NOT reqiured fields:
+            
+            #TODO: handle exiting from try ond going to
+            #except wiyhout going to the else block
             job = request.data("job")
             address = request.data("address")
             house_phone = request.data("house_phone")
@@ -144,8 +158,7 @@ def SubmitUserProfile (request):
             married = request.data("married")
             birth_date = request.data("birth_date")
         except:
-            return Response ({"error": "Some of not required "
-                              + "fields are not send"},
+            return Response ({"error": "unriquiredParams"},
                             status = status.HTTP_400_BAD_REQUEST)
         else:
             #create UserProfile if not exists
@@ -189,6 +202,7 @@ def SubmitUserProfile (request):
                         birth_date = birth_date
                         )
             return Response ({"username": username,
-                             "user_type": user_type},
+                             "user_type": user_type,
+                             "success": "1"},
                              status = status.HTTP_200_OK)
             
