@@ -43,17 +43,32 @@ def signup (request):
         return Response ({"error": "Fill all fields please."},
                          status = status.HTTP_400_BAD_REQUEST)
     else:
-        User.objects.create_user(
-                username = username,
-                email = email,
-                password = password
-                )
-        save_logged_in (User.objects.get(username = username))
-        return Response ({"username": username,
-                          "email": email},
-                         status = status.HTTP_200_OK)
+        #Handle ununique username or emails:
+        if (len(User.objects.filter(username = username))
+        and len(User.objects.filter (email = email))):
+            #Ununique username and email:
+            return Response ({"status": "This username and email are used both"},
+                            status = status.HTTP_200_OK)
+        elif len(User.objects.filter (username = username)):
+            #Ununique username:
+            return Response ({"status": "This username is used"},
+                            status = status.HTTP_200_OK)
+        elif len(User.objects.filter (email = email)):
+            #Ununique  email:
+            return Response ({"status": "This email is used"},
+                            status = status.HTTP_200_OK)
+        else:
+            User.objects.create_user(
+                    username = username,
+                    email = email,
+                    password = password
+                    )
+            save_logged_in (request, User.objects.get(username = username))
+            return Response ({"username": username,
+                              "email": email},
+                            status = status.HTTP_200_OK)
         
-        
+            
 @api_view(['GET', 'POST'])
 def logout (request):
     try:
