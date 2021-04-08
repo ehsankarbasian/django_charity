@@ -17,7 +17,7 @@ def login (request):
     except:
         return Response ({"error": "requiredParams",
                           "success": "0"},
-                         status = status.HTTP_400_BAD_REQUEST)
+                         status = status.HTTP_200_OK)
     else:
         user = authenticate (
                 username = username,
@@ -26,7 +26,7 @@ def login (request):
         if user is None:
             return Response ({"error": "wrongUsernameOrPass",
                               "success": "0"},
-                             status = status.HTTP_401_UNAUTHORIZED)
+                             status = status.HTTP_200_OK)
         else:
             save_logged_in (request, user)
             user = User.objects.get (username = username)
@@ -43,8 +43,8 @@ def signup (request):
         email = request.data["email"]
         password = request.data["password"]
     except:
-        return Response ({"error": "Fill all fields please."},
-                         status = status.HTTP_400_BAD_REQUEST)
+        return Response ({"error": "requiredParams"},
+                         status = status.HTTP_200_OK)
     else:
         #Handle ununique username or emails:
         if (len(User.objects.filter(username = username))
@@ -52,17 +52,17 @@ def signup (request):
             #Ununique username and email:
             return Response ({"status": "emailUsernameError",
                               "success": "0"},
-                            status = status.HTTP_400_BAD_REQUEST)
+                            status = status.HTTP_200_OK)
         elif len(User.objects.filter (username = username)):
             #Ununique username:
             return Response ({"status": "usernameError",
                               "success": "0"},
-                            status = status.HTTP_400_BAD_REQUEST)
+                            status = status.HTTP_200_OK)
         elif len(User.objects.filter (email = email)):
             #Ununique  email:
             return Response ({"status": "emailError",
                               "success": "0"},
-                            status = status.HTTP_400_BAD_REQUEST)
+                            status = status.HTTP_200_OK)
         else:
             User.objects.create_user(
                     username = username,
@@ -84,7 +84,7 @@ def logout (request):
                          status = status.HTTP_200_OK)
     except:
         return Response ({"success": "0"},
-                         status = status.HTTP_400_BAD_REQUEST)
+                         status = status.HTTP_200_OK)
         
         
 @api_view(['GET', 'POST'])
@@ -93,7 +93,7 @@ def LoadUserProfile (request):
         if not request.user_is_authenticated:
             return Response ({"error": "notLoggedIn",
                               "success": "0"},
-                             status = status.HTTP_401_UNAUTHORIZED)
+                             status = status.HTTP_200_OK)
         username = request.data("username")
         current_user = request.user
         if username != current_user.username:
@@ -101,11 +101,11 @@ def LoadUserProfile (request):
                               + "different with current_user logged "
                               + "in in fronrend !!!",
                               "success": "0"},
-                             status = status.HTTP_400_BAD_REQUEST)
+                             status = status.HTTP_200_OK)
     except:
         return Response ({"error": "requiredParams",
                           "success": "0"},
-                        status = status.HTTP_400_BAD_REQUEST)
+                        status = status.HTTP_200_OK)
     else:
         #Send current_user.details to front:
         return Response ({"username": username,
@@ -129,6 +129,7 @@ def LoadUserProfile (request):
                           },
                         status = status.HTTP_200_OK)
 
+
 @api_view(['GET', 'POST'])
 def SubmitUserProfile (request):
     try:
@@ -144,7 +145,7 @@ def SubmitUserProfile (request):
     except:
         return Response ({"error": "requiredParams",
                           "success": "0"},
-                         status = status.HTTP_400_BAD_REQUEST)
+                         status = status.HTTP_200_OK)
     else:
         try:
             #NOT reqiured fields:
@@ -159,7 +160,7 @@ def SubmitUserProfile (request):
             birth_date = request.data("birth_date")
         except:
             return Response ({"error": "unriquiredParams"},
-                            status = status.HTTP_400_BAD_REQUEST)
+                            status = status.HTTP_200_OK)
         else:
             #create UserProfile if not exists
             #If it exists, so edit it!
