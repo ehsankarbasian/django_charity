@@ -35,7 +35,8 @@ class UserProfile(models.Model):
                                    + ' for the first time.+'
             )
     user_type = models.IntegerField(
-            choices = USER_TYPE_CHOICES
+            choices = USER_TYPE_CHOICES,
+            default = -1
             )
     verified_needy = models.BooleanField(
             null = True
@@ -53,6 +54,10 @@ class UserProfile(models.Model):
             max_length = 15
             )
     email = models.EmailField()
+    email_tags = models.CharField(
+            max_length = 255,
+            blank = True
+            )
     verified_email = models.BooleanField(
             default = False
             )
@@ -78,13 +83,16 @@ class UserProfile(models.Model):
             blank = True
             )
     gender = models.BooleanField(
-            choices = GENDER_CHOICES
+            choices = GENDER_CHOICES,
+            default = 1
             )
     married = models.BooleanField(
             blank = True,
-            choices = MARRIED_CHOICES
+            choices = MARRIED_CHOICES,
+            default = 0
             )
     birth_date = models.DateField(
+            null = True,
             blank = True
             )
     signup_date = models.DateTimeField(

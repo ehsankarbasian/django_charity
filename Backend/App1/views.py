@@ -9,24 +9,33 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as save_logged_in
 from django.contrib.auth import logout as logout_user
 
+from re import search as validateRegex
+
+
+# Statics:
+EMAIL_REGEX = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
+
+
+def error (message):
+    return Response ({"status": message,
+                      "success": "0"},
+                    status = status.HTTP_200_OK)
+
+
 @api_view(['GET', 'POST'])
 def login (request):
     try:
         username = request.data["username"]
         password = request.data["password"]
     except:
-        return Response ({"error": "requiredParams",
-                          "success": "0"},
-                         status = status.HTTP_200_OK)
+        return error ("requiredParams")
     else:
         user = authenticate (
                 username = username,
                 password = password
                 )
         if user is None:
-            return Response ({"error": "wrongUsernameOrPass",
-                              "success": "0"},
-                             status = status.HTTP_200_OK)
+            return error ("wrongUsernameOrPass")
         else:
             save_logged_in (request, user)
             user = User.objects.get (username = username)
@@ -43,33 +52,43 @@ def signup (request):
         email = request.data["email"]
         password = request.data["password"]
     except:
-        return Response ({"error": "requiredParams"},
-                         status = status.HTTP_200_OK)
+        return error ("requiredParams")
     else:
+        try:
+            # Handle email tags and dot thrick:
+            email_tags_string = "+".join(email.split("@")[0].split("+")[1:])
+            email = "".join(
+                            email.split("@")[0]
+                            .split("+")[0].split(".")
+                        ) + "@" + email.split("@")[1]
+        except:
+            return error ("invalidEmailError")
+        #Validate email using regex:
+        if not validateRegex(EMAIL_REGEX, email):
+            return error ("invalidEmailError")
         #Handle ununique username or emails:
-        if (len(User.objects.filter(username = username))
+        elif (len(User.objects.filter(username = username))
         and len(User.objects.filter (email = email))):
             #Ununique username and email:
-            return Response ({"status": "emailUsernameError",
-                              "success": "0"},
-                            status = status.HTTP_200_OK)
+            return error ("emailUsernameError")
         elif len(User.objects.filter (username = username)):
             #Ununique username:
-            return Response ({"status": "usernameError",
-                              "success": "0"},
-                            status = status.HTTP_200_OK)
+            return error ("usernameError")
         elif len(User.objects.filter (email = email)):
             #Ununique  email:
-            return Response ({"status": "emailError",
-                              "success": "0"},
-                            status = status.HTTP_200_OK)
+            return error ("emailError")
         else:
-            User.objects.create_user(
+            user = User.objects.create_user(
                     username = username,
                     email = email,
                     password = password
                     )
-            save_logged_in (request, User.objects.get(username = username))
+            UserProfile.objects.create(
+                    user = user,
+                    email = email,
+                    email_tags = email_tags_string
+                    )
+            save_logged_in (request, user)
             return Response ({"username": username,
                               "email": email,
                               "success": "1"},
@@ -83,8 +102,7 @@ def logout (request):
         return Response ({"success": "1"},
                          status = status.HTTP_200_OK)
     except:
-        return Response ({"success": "0"},
-                         status = status.HTTP_200_OK)
+        return error ("")
         
         
 @api_view(['GET', 'POST'])
