@@ -22,6 +22,13 @@ def error (message):
                     status = status.HTTP_200_OK)
 
 
+def get_data_or_none (request, key):
+    try:
+        return request.data(key)
+    except:
+        return None
+
+
 @api_view(['GET', 'POST'])
 def login (request):
     try:
@@ -39,8 +46,10 @@ def login (request):
         else:
             save_logged_in (request, user)
             user = User.objects.get (username = username)
+            user_profile = UserProfile.objects.get (user = user)
             return Response ({"username": user.username,
                               "email": user.email,
+                              "user_type": user_profile.user_type,
                               "success": "1"},
                              status = status.HTTP_200_OK)
 
@@ -51,9 +60,11 @@ def signup (request):
         username = request.data["username"]
         email = request.data["email"]
         password = request.data["password"]
+        user_type = int (request.data["user_type"])
     except:
         return error ("requiredParams")
     else:
+        original_email = email
         try:
             # Handle email tags and dot thrick:
             email_tags_string = "+".join(email.split("@")[0].split("+")[1:])
@@ -77,20 +88,24 @@ def signup (request):
         elif len(User.objects.filter (email = email)):
             #Ununique  email:
             return error ("emailError")
+        elif not user_type in [3, 4]:
+            return error ("notAllowedUserTypeError")
         else:
             user = User.objects.create_user(
                     username = username,
-                    email = email,
+                    email = original_email,
                     password = password
                     )
             UserProfile.objects.create(
                     user = user,
                     email = email,
-                    email_tags = email_tags_string
+                    email_tags = email_tags_string,
+                    user_type = user_type
                     )
             save_logged_in (request, user)
             return Response ({"username": username,
                               "email": email,
+                              "user_type": user_type,
                               "success": "1"},
                             status = status.HTTP_200_OK)
         
@@ -109,21 +124,13 @@ def logout (request):
 def LoadUserProfile (request):
     try:
         if not request.user_is_authenticated:
-            return Response ({"error": "notLoggedIn",
-                              "success": "0"},
-                             status = status.HTTP_200_OK)
+            return error ("notLoggedIn")
         username = request.data("username")
         current_user = request.user
         if username != current_user.username:
-            return Response ({"error": "current_user in backend is "
-                              + "different with current_user logged "
-                              + "in in fronrend !!!",
-                              "success": "0"},
-                             status = status.HTTP_200_OK)
+            return error("current_user in backend is different with current_user logged in in frontend !!!")
     except:
-        return Response ({"error": "requiredParams",
-                          "success": "0"},
-                        status = status.HTTP_200_OK)
+        return error("requiredParams")
     else:
         #Send current_user.details to front:
         return Response ({"username": username,
@@ -151,7 +158,7 @@ def LoadUserProfile (request):
 @api_view(['GET', 'POST'])
 def SubmitUserProfile (request):
     try:
-        #required fields:
+        # Required fields:
         username = request.data("username")
         user_type = request.data("user_type")
         first_name = request.data("first_name")
@@ -161,67 +168,56 @@ def SubmitUserProfile (request):
         mobile_number = request.data("mobile_number")
         gender = request.data("gender")
     except:
-        return Response ({"error": "requiredParams",
-                          "success": "0"},
-                         status = status.HTTP_200_OK)
+        return error ("requiredParams")
     else:
-        try:
-            #NOT reqiured fields:
-            
-            #TODO: handle exiting from try ond going to
-            #except wiyhout going to the else block
-            job = request.data("job")
-            address = request.data("address")
-            house_phone = request.data("house_phone")
-            workplace_phone = request.data("workplace_phone")
-            married = request.data("married")
-            birth_date = request.data("birth_date")
-        except:
-            return Response ({"error": "unriquiredParams"},
-                            status = status.HTTP_200_OK)
+        # NOT required fields:
+        job = get_data_or_none(request, "job")
+        address = get_data_or_none(request, "address")
+        house_phone = get_data_or_none(request, "house_phone")
+        workplace_phone = get_data_or_none(request, "workplace_phone")
+        married = get_data_or_none(request, "married")
+        birth_date = get_data_or_none(request, "birth_date")
+
+        # Create UserProfile if not exists. If it exists, so edit it!
+        user = User.objects.get(username = username)
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
+        userProfile = UserProfile.objects.get(user = user)
+        if userProfile is None:
+            UserProfile.objects.create(
+                    user = user,
+                    user_type = user_type,
+                    first_name = first_name,
+                    last_name = last_name,
+                    melli_code = melli_code,
+                    email = email,
+                    mobile_number = mobile_number,
+                    gender = gender,
+                    job = job,
+                    address = address,
+                    house_phone = house_phone,
+                    workplace_phone = workplace_phone,
+                    married = married,
+                    birth_date = birth_date
+                    ).save()
         else:
-            #create UserProfile if not exists
-            #If it exists, so edit it!
-            user = User.objects.get(username = username)
-            user.first_name = first_name
-            user.last_name = last_name
-            user.save()
-            userProfile = UserProfile.objects.get(user = user)
-            if userProfile is None:
-                UserProfile.objects.create(
-                        user = user,
-                        user_type = user_type,
-                        first_name = first_name,
-                        last_name = last_name,
-                        melli_code = melli_code,
-                        email = email,
-                        mobile_number = mobile_number,
-                        dender = gender,
-                        job = job,
-                        address = address,
-                        house_phone = house_phone,
-                        workplace_phone = workplace_phone,
-                        married = married,
-                        birth_date = birth_date
-                        ).save()
-            else:
-                userProfile.update(
-                        user_type = user_type,
-                        first_name = first_name,
-                        last_name = last_name,
-                        melli_code = melli_code,
-                        email = email,
-                        mobile_number = mobile_number,
-                        dender = gender,
-                        job = job,
-                        address = address,
-                        house_phone = house_phone,
-                        workplace_phone = workplace_phone,
-                        married = married,
-                        birth_date = birth_date
-                        )
-            return Response ({"username": username,
-                             "user_type": user_type,
-                             "success": "1"},
-                             status = status.HTTP_200_OK)
-            
+            userProfile.update(
+                    user_type = user_type,
+                    first_name = first_name,
+                    last_name = last_name,
+                    melli_code = melli_code,
+                    email = email,
+                    mobile_number = mobile_number,
+                    gender = gender,
+                    job = job,
+                    address = address,
+                    house_phone = house_phone,
+                    workplace_phone = workplace_phone,
+                    married = married,
+                    birth_date = birth_date
+                    )
+        return Response ({"username": username,
+                         "user_type": user_type,
+                         "success": "1"},
+                         status = status.HTTP_200_OK)
