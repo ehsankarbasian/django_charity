@@ -16,8 +16,8 @@ class UserProfile(models.Model):
             (0, 'female')
             ]
     MARRIED_CHOICES = [
-            (1, 'married'),
-            (0, 'not married')
+            (0, 'not married'),
+            (1, 'married')
             ]
     
     # Attributes:
@@ -97,6 +97,9 @@ class UserProfile(models.Model):
             )
     signup_date = models.DateTimeField(
             auto_now = True
+            )
+    completed = models.BooleanField(
+            default = False
             )
     
     def __str__(self):
