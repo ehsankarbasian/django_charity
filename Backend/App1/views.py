@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from App1.models import UserProfile
 
 from django.contrib.auth import authenticate
+from django.shortcuts import get_object_or_404
 
 from re import search as validateRegex
 
@@ -179,24 +180,34 @@ def LoadUserProfile(request):
 
 @api_view(['GET', 'POST'])
 def SubmitUserProfile(request):
+    if not request.session.get('user_id', False):
+        return error("notLoggedIn")
+
     try:
         # Required fields:
-        username = request.data("username")
-        user_type = request.data("user_type")
-        first_name = request.data("first_name")
-        last_name = request.data("last_name")
-        melli_code = request.data("melli_code")
-        email = request.data("email")
-        mobile_number = request.data("mobile_number")
+        username = request.data["username"]
+        user_type = request.data["user_type"]
+        first_name = request.data["first_name"]
+        last_name = request.data["last_name"]
+        melli_code = request.data["melli_code"]
+        mobile_number = request.data["mobile_number"]
     except:
         return error("requiredParams")
     else:
+        # Check user:
+        user = get_object_or_404(User, username=username)
+        userProfile = get_object_or_404(UserProfile, user=user)
+        valid_user = bool(request.session.get('user_id', None) == user.id)
+        valid_type = bool(userProfile.user_type == user_type)
+        if not (valid_user and valid_type):
+            return error("DisputeError")
+
         # NOT required fields:
         job = get_data_or_none(request, "job")
         address = get_data_or_none(request, "address")
         house_phone = get_data_or_none(request, "house_phone")
         workplace_phone = get_data_or_none(request, "workplace_phone")
-        gender = request.get_data_or_none("gender")
+        gender = get_data_or_none(request, "gender")
         married = get_data_or_none(request, "married")
         birth_date = get_data_or_none(request, "birth_date")
 
@@ -208,23 +219,21 @@ def SubmitUserProfile(request):
 
         # Update UserProfile:
         userProfile = UserProfile.objects.get(user=user)
-        if userProfile.user_type != user_type:
-            return error("WrongUserType")
-        userProfile.update(
-            first_name=first_name,
-            last_name=last_name,
-            melli_code=melli_code,
-            email=email,
-            mobile_number=mobile_number,
-            gender=gender,
-            job=job,
-            address=address,
-            house_phone=house_phone,
-            workplace_phone=workplace_phone,
-            married=married,
-            birth_date=birth_date
-        )
+        userProfile.first_name = first_name
+        userProfile.last_name = last_name
+        userProfile.melli_code = melli_code
+        userProfile.mobile_number = mobile_number
+        userProfile.gender = gender
+        userProfile.job = job
+        userProfile.address = address
+        userProfile.house_phone = house_phone
+        userProfile.workplace_phone = workplace_phone
+        userProfile.married = married
+        userProfile.birth_date = birth_date
+
         userProfile.completed = True
+        userProfile.save()
+
         return Response({"username": username,
                          "user_type": user_type,
                          "success": "1"},

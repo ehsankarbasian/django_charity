@@ -63,12 +63,15 @@ class UserProfile(models.Model):
             )
     job = models.CharField(
             max_length = 127,
+            null=True,
             blank = True
             )
     address = models.TextField(
+            null=True,
             blank = True
             )
     mobile_number = models.CharField(
+            null=True,
             max_length = 31
             )
     verified_mobile = models.BooleanField(
@@ -76,18 +79,22 @@ class UserProfile(models.Model):
             )
     house_phone = models.CharField(
             max_length = 31,
+            null=True,
             blank = True
             )
     workplace_phone = models.CharField(
             max_length = 31,
+            null=True,
             blank = True
             )
     gender = models.BooleanField(
             choices = GENDER_CHOICES,
+            null=True,
             default = 1
             )
     married = models.BooleanField(
             blank = True,
+            null=True,
             choices = MARRIED_CHOICES,
             default = 0
             )
@@ -103,4 +110,4 @@ class UserProfile(models.Model):
             )
     
     def __str__(self):
-        return "TODO"
+        return "type:" + str(self.user_type) + " / email:" + self.email
