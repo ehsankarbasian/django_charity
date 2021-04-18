@@ -84,7 +84,7 @@ DATABASES = {
 }
 
 
-#RestFramework details:
+# RestFramework details:
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',

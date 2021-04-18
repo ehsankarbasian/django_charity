@@ -1,3 +1,4 @@
+from rest_framework.decorators import throttle_classes as limiter
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,9 +10,11 @@ from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 
 from re import search as validateRegex
+from App1.custom_limiter import *
 
 # Statics:
 EMAIL_REGEX = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
+API_TOKEN = 'TOSET'
 
 
 # Helper functions:
@@ -19,7 +22,6 @@ def error(message):
     return Response({"status": message,
                      "success": "0"},
                     status=status.HTTP_200_OK)
-
 
 def get_data_or_none(request, key):
     try:
@@ -29,7 +31,8 @@ def get_data_or_none(request, key):
 
 
 # API functions:
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
+@limiter([LoginLimiter])
 def login(request):
     if request.session.get('user_id', None) is not None:
         return error("loggedInBefore")
@@ -62,6 +65,7 @@ def login(request):
 
 
 @api_view(['POST'])
+@limiter([SignUpLimiter])
 def signup(request):
     try:
         username = request.data["username"]
@@ -123,6 +127,7 @@ def signup(request):
 
 
 @api_view(['GET', 'POST'])
+@limiter([LogOutLimiter])
 def logout(request):
     if request.session.get('user_id', None) is None:
         return error("notLoggedIn")
@@ -135,6 +140,7 @@ def logout(request):
 
 
 @api_view(['GET', 'POST'])
+@limiter([LoadProfileLimiter])
 def LoadUserProfile(request):
     try:
         if not request.session.get('user_id', False):
@@ -179,6 +185,7 @@ def LoadUserProfile(request):
 
 
 @api_view(['GET', 'POST'])
+@limiter([SubmitProfileLimiter])
 def SubmitUserProfile(request):
     if not request.session.get('user_id', False):
         return error("notLoggedIn")
