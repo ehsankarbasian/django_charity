@@ -14,7 +14,6 @@ from App1.custom_limiter import *
 
 # Statics:
 EMAIL_REGEX = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
-API_TOKEN = 'TOSET'
 
 
 # Helper functions:
@@ -31,7 +30,7 @@ def get_data_or_none(request, key):
 
 
 # API functions:
-@api_view(['POST', 'GET'])
+@api_view(['POST'])
 @limiter([LoginLimiter])
 def login(request):
     if request.session.get('user_id', None) is not None:
@@ -126,7 +125,7 @@ def signup(request):
                             status=status.HTTP_200_OK)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 @limiter([LogOutLimiter])
 def logout(request):
     if request.session.get('user_id', None) is None:
@@ -139,7 +138,7 @@ def logout(request):
         return error("unsuccessfulLogout")
 
 
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 @limiter([LoadProfileLimiter])
 def LoadUserProfile(request):
     try:
@@ -184,7 +183,7 @@ def LoadUserProfile(request):
                         status=status.HTTP_200_OK)
 
 
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 @limiter([SubmitProfileLimiter])
 def SubmitUserProfile(request):
     if not request.session.get('user_id', False):

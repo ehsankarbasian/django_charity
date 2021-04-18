@@ -16,7 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+TOKEN_API = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MTg3MTYzOTEsImV"
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('App1/', include('App1.urls')),
+    path('App1/' + TOKEN_API + '/', include('App1.urls')),
+
+    # TODO: delete it after front matched
+    path('App1/', include('App1.urls'))
 ]
