@@ -10,9 +10,21 @@ from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 
 from re import search as validateRegex
+from secrets import token_hex
 from App1.custom_limiter import *
 
+from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import get_template
+from django.template import Context
+
+# TODO: delete it
+from django.http import HttpResponse
+
 # Statics:
+from Backend.urls import TOKEN_API, EMAIL_TOKEN_API
+HOST = '127.0.0.1'
+PORT = '8000'
 EMAIL_REGEX = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
 
 
@@ -21,6 +33,23 @@ def error(message):
     return Response({"status": message,
                      "success": "0"},
                     status=status.HTTP_200_OK)
+
+
+def simplify_email(email):
+    try:
+        # Handle email tags and dot trick:
+        email_tags_string = "+".join(email.split("@")[0].split("+")[1:])
+        simplified_email = "".join(
+            email.split("@")[0]
+                .split("+")[0].split(".")
+        ) + "@" + email.split("@")[1]
+
+        return {'success': 1,
+                'email': simplified_email,
+                'tags': email_tags_string}
+    except:
+        return {'success': 0}
+
 
 def get_data_or_none(request, key):
     try:
@@ -75,15 +104,11 @@ def signup(request):
         return error("requiredParams")
     else:
         original_email = email
-        try:
-            # Handle email tags and dot trick:
-            email_tags_string = "+".join(email.split("@")[0].split("+")[1:])
-            email = "".join(
-                email.split("@")[0]
-                    .split("+")[0].split(".")
-            ) + "@" + email.split("@")[1]
-        except:
+        result = simplify_email(original_email)
+        if not result['success']:
             return error("invalidEmailError")
+        email = result['email']
+        email_tags_string = result['tags']
 
         # Validate email using regex:
         if not validateRegex(EMAIL_REGEX, email):
@@ -125,6 +150,81 @@ def signup(request):
                             status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+@limiter([ForgotPasswordLimiter])
+def forgotPassword(request):
+    try:
+        email = request.data["email"]
+    except:
+        return error("RequiredParams")
+
+    email = simplify_email(email)
+
+    if not email['success']:
+        return error("invalidEmailError")
+
+    to_email = email['email']
+
+    # Check if email verified:
+    user = UserProfile.objects.get(email=to_email)
+    if user is None:
+        return error("noSuchUser")
+    elif not user.verified_email:
+        return error("notVerifiedEmailError")
+
+    # TODO:create token and link and send email
+    token = token_hex(128)
+    user.reset_pass_token = token
+    user.save()
+
+    html_content = get_template('ResetPass.html').render(context={
+        'HOST': HOST,
+        'PORT': PORT,
+        'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
+        'email': to_email,
+        'private_token': token
+    })
+    msg = EmailMultiAlternatives('charity reset password',
+                                 'message',
+                                 settings.EMAIL_HOST_USER,
+                                 ['ehsankarbasian@gmail.com'])  # <---- TODO: change the email to [to_email]
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+    return Response({"success": "1"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST', 'GET'])
+@limiter([ResetPasswordLimiter])
+def resetPassword(request):
+    pass1 = request.POST["pass1"]
+    pass2 = request.POST["pass2"]
+
+    token = request.POST["token"]
+    email = request.POST["email"]
+
+    if pass1 != pass2:
+        return error("differentPasswords")
+
+    # Find user:
+    userProfile = UserProfile.objects.get(email=email)
+    user = User.objects.get(user=userProfile)
+
+    # Check token:
+    if not userProfile.reset_pass_token == token:
+        return error("privateTokenError")
+
+    # Change private token and password
+    userProfile.reset_pass_token = token_hex(64)
+    userProfile.save()
+    user.set_password(pass1)
+    user.save()
+
+    return Response({"success": "1"},
+                    status=status.HTTP_200_OK)
+
+
 @api_view(['GET'])
 @limiter([LogOutLimiter])
 def logout(request):
@@ -140,7 +240,7 @@ def logout(request):
 
 @api_view(['POST'])
 @limiter([LoadProfileLimiter])
-def LoadUserProfile(request):
+def loadUserProfile(request):
     try:
         if not request.session.get('user_id', False):
             return error("notLoggedIn")
@@ -185,7 +285,7 @@ def LoadUserProfile(request):
 
 @api_view(['POST'])
 @limiter([SubmitProfileLimiter])
-def SubmitUserProfile(request):
+def submitUserProfile(request):
     if not request.session.get('user_id', False):
         return error("notLoggedIn")
 
@@ -241,6 +341,7 @@ def SubmitUserProfile(request):
         userProfile.save()
 
         return Response({"username": username,
+                         "email": userProfile.email,
                          "user_type": user_type,
                          "success": "1"},
                         status=status.HTTP_200_OK)

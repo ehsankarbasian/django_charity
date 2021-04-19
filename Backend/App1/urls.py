@@ -1,11 +1,12 @@
-from django.urls import path, include
-from django.http import HttpResponse
+from django.urls import path
 from . import views
 
 urlpatterns = [
     path('login', views.login),
     path('signup', views.signup),
     path('logout', views.logout),
-    path('LoadUserProfile', views.LoadUserProfile),
-    path('SubmitUserProfile', views.SubmitUserProfile),
+    path('LoadUserProfile', views.loadUserProfile),
+    path('SubmitUserProfile', views.submitUserProfile),
+    path('ForgotPassword', views.forgotPassword),
+    #path('ResetPassword', views.resetPassword),
 ]

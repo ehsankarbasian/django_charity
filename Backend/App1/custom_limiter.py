@@ -14,6 +14,8 @@ from rest_framework.throttling import UserRateThrottle as UserRateLimiter
 LOGIN_RATE = '15/minute'
 SIGN_UP_RATE = '3/minute'
 LOG_OUT_RATE = '20/minute'
+RESET_PASS_RATE = '20/hour'
+FORGOT_PASS_RATE = '1/minute'
 LOAD_PROFILE_RATE = '10/minute'
 SUBMIT_PROFILE_RATE = '10/minute'
 
@@ -35,6 +37,20 @@ class SignUpLimiter(UserRateLimiter):
 
 class LogOutLimiter(UserRateLimiter):
     rate = LOG_OUT_RATE
+
+    def allow_request(self, request, view):
+        return super().allow_request(request, view)
+
+
+class ForgotPasswordLimiter(UserRateLimiter):
+    rate = FORGOT_PASS_RATE
+
+    def allow_request(self, request, view):
+        return super().allow_request(request, view)
+
+
+class ResetPasswordLimiter(UserRateLimiter):
+    rate = RESET_PASS_RATE
 
     def allow_request(self, request, view):
         return super().allow_request(request, view)

@@ -17,11 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 
 TOKEN_API = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJPbmxpbmUgSldUIEJ1aWxkZXIiLCJpYXQiOjE2MTg3MTYzOTEsImV"
+EMAIL_TOKEN_API = "0xAjE2MT6eiOi538574I1NiJ467f4378A9iOiJ821A5IiLC695e6b88FFxkZ1a997F"
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('App1/' + TOKEN_API + '/', include('App1.urls')),
+    path('App1/' + EMAIL_TOKEN_API + '/', include('App1.email_urls')),
 
-    # TODO: delete it after front matched
-    path('App1/', include('App1.urls'))
+    # TODO: delete these after front matched
+    path('App1/', include('App1.urls')),
+    path('App1/', include('App1.email_urls'))
 ]
