@@ -109,9 +109,12 @@ class UserProfile(models.Model):
     completed = models.BooleanField(
         default=False
     )
-
     reset_pass_token = models.CharField(
         max_length=128,
+        default=""
+    )
+    verify_email_token = models.CharField(
+        max_length=64,
         default=""
     )
 

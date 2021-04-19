@@ -14,4 +14,5 @@ from . import views
 
 urlpatterns = [
     path('ResetPassword', views.resetPassword),
+    path('VerifyEmail', views.verifyEmail),
 ]

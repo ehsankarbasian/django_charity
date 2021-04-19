@@ -25,6 +25,5 @@ urlpatterns = [
     path('App1/' + EMAIL_TOKEN_API + '/', include('App1.email_urls')),
 
     # TODO: delete these after front matched
-    path('App1/', include('App1.urls')),
-    path('App1/', include('App1.email_urls'))
+    path('App1/', include('App1.urls'))
 ]

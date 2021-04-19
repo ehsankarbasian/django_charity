@@ -2,15 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af27e988-ae8e-4f7b-97d5-75b5231538fe" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/App1/email_urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/App1/migrations/0012_userprofile_reset_pass_token.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/App1/templates/ResetPass.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/App1/migrations/0013_userprofile_verify_email_token.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/App1/templates/EmailVerification.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App1/custom_limiter.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/custom_limiter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App1/email_urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/email_urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App1/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App1/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App1/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -67,7 +66,8 @@
       <option name="presentableId" value="Default" />
       <updated>1618484143072</updated>
       <workItem from="1618484144252" duration="17499000" />
-      <workItem from="1618655167671" duration="59562000" />
+      <workItem from="1618655167671" duration="60720000" />
+      <workItem from="1618862972855" duration="7414000" />
     </task>
     <servers />
   </component>

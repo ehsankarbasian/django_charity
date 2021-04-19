@@ -8,5 +8,4 @@ urlpatterns = [
     path('LoadUserProfile', views.loadUserProfile),
     path('SubmitUserProfile', views.submitUserProfile),
     path('ForgotPassword', views.forgotPassword),
-    #path('ResetPassword', views.resetPassword),
 ]

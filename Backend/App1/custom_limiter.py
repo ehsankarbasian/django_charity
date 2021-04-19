@@ -15,9 +15,12 @@ LOGIN_RATE = '15/minute'
 SIGN_UP_RATE = '3/minute'
 LOG_OUT_RATE = '20/minute'
 RESET_PASS_RATE = '20/hour'
-FORGOT_PASS_RATE = '1/minute'
-LOAD_PROFILE_RATE = '10/minute'
-SUBMIT_PROFILE_RATE = '10/minute'
+FORGOT_PASS_RATE = '2/minute'
+PROFILE_RATE = '10/minute'
+
+"""
+SIGN_UP_RATE is used for email verification too
+"""
 
 
 # Custom request_count limiter per time classes:
@@ -56,15 +59,8 @@ class ResetPasswordLimiter(UserRateLimiter):
         return super().allow_request(request, view)
 
 
-class LoadProfileLimiter(UserRateLimiter):
-    rate = LOAD_PROFILE_RATE
-
-    def allow_request(self, request, view):
-        return super().allow_request(request, view)
-
-
-class SubmitProfileLimiter(UserRateLimiter):
-    rate = SUBMIT_PROFILE_RATE
+class ProfileLimiter(UserRateLimiter):
+    rate = PROFILE_RATE
 
     def allow_request(self, request, view):
         return super().allow_request(request, view)

@@ -18,13 +18,11 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import get_template
 from django.template import Context
 
-# TODO: delete it
-from django.http import HttpResponse
 
 # Statics:
-from Backend.urls import TOKEN_API, EMAIL_TOKEN_API
 HOST = '127.0.0.1'
 PORT = '8000'
+from Backend.urls import TOKEN_API, EMAIL_TOKEN_API
 EMAIL_REGEX = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
 
 
@@ -49,6 +47,15 @@ def simplify_email(email):
                 'tags': email_tags_string}
     except:
         return {'success': 0}
+
+
+def send_email (subject, message, to_list, html_content):
+    msg = EmailMultiAlternatives(subject,
+                                 message,
+                                 settings.EMAIL_HOST_USER,
+                                 to_list)
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
 
 
 def get_data_or_none(request, key):
@@ -132,6 +139,8 @@ def signup(request):
             return error("notAllowedUserTypeError")
 
         else:
+            verify_email_token = token_hex(64)
+
             user = User.objects.create_user(
                 username=username,
                 email=original_email,
@@ -141,8 +150,23 @@ def signup(request):
                 user=user,
                 email=email,
                 email_tags=email_tags_string,
-                user_type=user_type
+                user_type=user_type,
+                verify_email_token=verify_email_token
             )
+
+            # Sending html based email to user to verify his/her email:
+            html_content = get_template('EmailVerification.html').render(context={
+                'HOST': HOST,
+                'PORT': PORT,
+                'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
+                'email': email,
+                'private_token': verify_email_token
+            })
+            send_email(subject='NTM charity email verification',
+                       message='Email verification',
+                       to_list=[email],
+                       html_content=html_content)
+
             return Response({"username": username,
                              "email": email,
                              "user_type": user_type,
@@ -151,12 +175,32 @@ def signup(request):
 
 
 @api_view(['POST'])
+@limiter([SignUpLimiter])
+def verifyEmail(request):
+    try:
+        private_token = request.data["token"]
+        email = request.data["email"]
+    except:
+        return error("requiredParams")
+
+    userProfile = UserProfile.objects.get(email=email)
+    if userProfile.verify_email_token == private_token:
+        userProfile.verified_email = True
+        userProfile.save()
+        return Response({"message": "email verification was successful, you can login now!",
+                         "success": "1"},
+                        status=status.HTTP_200_OK)
+    else:
+        return error("privateTokenError")
+
+
+@api_view(['GET'])
 @limiter([ForgotPasswordLimiter])
 def forgotPassword(request):
     try:
         email = request.data["email"]
     except:
-        return error("RequiredParams")
+        return error("requiredParams")
 
     email = simplify_email(email)
 
@@ -172,7 +216,6 @@ def forgotPassword(request):
     elif not user.verified_email:
         return error("notVerifiedEmailError")
 
-    # TODO:create token and link and send email
     token = token_hex(128)
     user.reset_pass_token = token
     user.save()
@@ -184,25 +227,28 @@ def forgotPassword(request):
         'email': to_email,
         'private_token': token
     })
-    msg = EmailMultiAlternatives('charity reset password',
-                                 'message',
-                                 settings.EMAIL_HOST_USER,
-                                 ['ehsankarbasian@gmail.com'])  # <---- TODO: change the email to [to_email]
-    msg.attach_alternative(html_content, "text/html")
-    msg.send()
 
-    return Response({"success": "1"},
+    send_email(subject='charity reset password',
+               message='message',
+               to_list=[to_email],
+               html_content=html_content
+               )
+
+    return Response({"message": "email sent",
+                    "success": "1"},
                     status=status.HTTP_200_OK)
 
 
-@api_view(['POST', 'GET'])
+@api_view(['POST'])
 @limiter([ResetPasswordLimiter])
 def resetPassword(request):
-    pass1 = request.POST["pass1"]
-    pass2 = request.POST["pass2"]
-
-    token = request.POST["token"]
-    email = request.POST["email"]
+    try:
+        pass1 = request.POST["pass1"]
+        pass2 = request.POST["pass2"]
+        token = request.POST["token"]
+        email = request.POST["email"]
+    except:
+        return error("requiredParams")
 
     if pass1 != pass2:
         return error("differentPasswords")
@@ -221,7 +267,8 @@ def resetPassword(request):
     user.set_password(pass1)
     user.save()
 
-    return Response({"success": "1"},
+    return Response({"message": "password changed",
+                    "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -232,14 +279,15 @@ def logout(request):
         return error("notLoggedIn")
     try:
         request.session['user_id'] = None
-        return Response({"success": "1"},
+        return Response({"message": "successfully logged out",
+                        "success": "1"},
                         status=status.HTTP_200_OK)
     except:
         return error("unsuccessfulLogout")
 
 
 @api_view(['POST'])
-@limiter([LoadProfileLimiter])
+@limiter([ProfileLimiter])
 def loadUserProfile(request):
     try:
         if not request.session.get('user_id', False):
@@ -284,7 +332,7 @@ def loadUserProfile(request):
 
 
 @api_view(['POST'])
-@limiter([SubmitProfileLimiter])
+@limiter([ProfileLimiter])
 def submitUserProfile(request):
     if not request.session.get('user_id', False):
         return error("notLoggedIn")
