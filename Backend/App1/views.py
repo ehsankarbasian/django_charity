@@ -58,6 +58,16 @@ def send_email (subject, message, to_list, html_content):
     msg.send()
 
 
+def unique_user_token():
+    token = token_hex(64)
+    unique = not bool(UserProfile.objects.filter(token=token))
+
+    if unique:
+        return token
+    else:
+        unique_user_token()
+
+
 def get_data_or_none(request, key):
     try:
         return request.data(key)
@@ -94,6 +104,7 @@ def login(request):
             request.session['user_id'] = user.id
             return Response({"username": user.username,
                              "email": user_profile.email,
+                             "token": user_profile.token,
                              "user_type": user_profile.user_type,
                              "success": "1"},
                             status=status.HTTP_200_OK)
@@ -140,6 +151,7 @@ def signup(request):
 
         else:
             verify_email_token = token_hex(64)
+            token = unique_user_token()
 
             user = User.objects.create_user(
                 username=username,
@@ -149,6 +161,7 @@ def signup(request):
             UserProfile.objects.create(
                 user=user,
                 email=email,
+                token=token,
                 email_tags=email_tags_string,
                 user_type=user_type,
                 verify_email_token=verify_email_token
@@ -260,12 +273,12 @@ def resetPassword(request):
     # Check token:
     if not userProfile.reset_pass_token == token:
         return error("privateTokenError")
-
-    # Change private token and password
-    userProfile.reset_pass_token = token_hex(64)
-    userProfile.save()
-    user.set_password(pass1)
-    user.save()
+    else:
+        # Change private token and password
+        userProfile.reset_pass_token = token_hex(64)
+        userProfile.save()
+        user.set_password(pass1)
+        user.save()
 
     return Response({"message": "password changed",
                     "success": "1"},
@@ -392,4 +405,30 @@ def submitUserProfile(request):
                          "email": userProfile.email,
                          "user_type": user_type,
                          "success": "1"},
+                        status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@limiter([BioLimiter])
+def userBio(request):
+    try:
+        username = request.data["username"]
+    except:
+        return error("requiredParams")
+
+    try:
+        user = User.objects.get(username=username)
+        current_user = UserProfile.objects.get(user=user)
+    except:
+        return error("DoesNotExist")
+    else:
+        # Send current_user.bio to front:
+        return Response({"username": username,
+                         "user_type": current_user.user_type,
+                         "first_name": current_user.first_name,
+                         "last_name": current_user.last_name,
+                         "email": current_user.email,
+                         "verified_needy": current_user.verified_needy,
+                         "success": "1"
+                         },
                         status=status.HTTP_200_OK)

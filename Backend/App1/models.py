@@ -117,6 +117,10 @@ class UserProfile(models.Model):
         max_length=64,
         default=""
     )
+    token = models.CharField(
+        max_length=64,
+        default=""
+    )
 
     def __str__(self):
         return "type:" + str(self.user_type) + " / email:" + self.email

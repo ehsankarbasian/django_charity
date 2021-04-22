@@ -12,11 +12,12 @@ from rest_framework.throttling import UserRateThrottle as UserRateLimiter
 
 
 LOGIN_RATE = '15/minute'
-SIGN_UP_RATE = '3/minute'
-LOG_OUT_RATE = '20/minute'
+SIGN_UP_RATE = '15/minute'
+LOG_OUT_RATE = '10/minute'
 RESET_PASS_RATE = '20/hour'
-FORGOT_PASS_RATE = '2/minute'
-PROFILE_RATE = '10/minute'
+FORGOT_PASS_RATE = '5/minute'
+PROFILE_RATE = '100/minute'
+BIO_RATE = '30/minute'
 
 """
 SIGN_UP_RATE is used for email verification too
@@ -61,6 +62,13 @@ class ResetPasswordLimiter(UserRateLimiter):
 
 class ProfileLimiter(UserRateLimiter):
     rate = PROFILE_RATE
+
+    def allow_request(self, request, view):
+        return super().allow_request(request, view)
+
+
+class BioLimiter(UserRateLimiter):
+    rate = BIO_RATE
 
     def allow_request(self, request, view):
         return super().allow_request(request, view)
