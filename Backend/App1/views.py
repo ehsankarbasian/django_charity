@@ -9,6 +9,7 @@ from App1.models import UserProfile
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 
+from random import randint
 from re import search as validateRegex
 from secrets import token_hex
 from App1.custom_limiter import *
@@ -132,12 +133,18 @@ def login(request):
             # Check verified_email:
             if not user_profile.verified_email:
                 # Sending html based email to user to verify his/her email:
-                verify_email_token = token_hex(64)
+                verify_email_code = randint(100000, 999999)
+
+                verify_email_token = user_profile.verify_email_token
+                user_profile.verify_email_code = verify_email_code
+                user_profile.save()
+
                 html_content = get_template('EmailVerification.html').render(context={
                     'HOST': HOST,
                     'PORT': PORT,
                     'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
                     'email': user_profile.email,
+                    'private_code': verify_email_code,
                     'private_token': verify_email_token
                 })
                 send_email(subject='NTM charity email verification',
@@ -195,6 +202,7 @@ def signup(request):
             return error("notAllowedUserTypeError")
 
         else:
+            verify_email_code = randint(100000, 999999)
             verify_email_token = token_hex(64)
             token = unique_user_token()
 
@@ -209,6 +217,7 @@ def signup(request):
                 token=token,
                 email_tags=email_tags_string,
                 user_type=user_type,
+                verify_email_code=verify_email_code,
                 verify_email_token=verify_email_token
             )
 
@@ -218,6 +227,7 @@ def signup(request):
                 'PORT': PORT,
                 'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
                 'email': email,
+                'private_code': verify_email_code,
                 'private_token': verify_email_token
             })
             send_email(subject='NTM charity email verification',
@@ -234,7 +244,7 @@ def signup(request):
 
 @api_view(['POST'])
 @limiter([SignUpLimiter])
-def verifyEmail(request):
+def verifyEmailTokenBased(request):
     try:
         private_token = request.data["token"]
         email = request.data["email"]
@@ -250,6 +260,26 @@ def verifyEmail(request):
                         status=status.HTTP_200_OK)
     else:
         return error("privateTokenError")
+
+
+@api_view(['POST'])
+@limiter([SignUpLimiter])
+def verifyEmailCodeBased(request):
+    try:
+        private_code = int(request.data["code"])
+        email = request.data["email"]
+    except:
+        return error("requiredParams")
+    else:
+        userProfile = UserProfile.objects.get(email=email)
+        if userProfile.verify_email_code == private_code:
+            userProfile.verified_email = True
+            userProfile.save()
+            return Response({"message": "email verification was successful, you can login now!",
+                             "success": "1"},
+                            status=status.HTTP_200_OK)
+        else:
+            return error("privateCodeError")
 
 
 @api_view(['GET'])

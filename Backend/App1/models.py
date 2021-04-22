@@ -25,7 +25,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(
         User,
         related_name='user',
-        default=-1,
+        null=True,
         on_delete=models.CASCADE
     )
     creator = models.OneToOneField(
@@ -53,6 +53,7 @@ class UserProfile(models.Model):
         blank=True
     )
     melli_code = models.CharField(
+        blank=True,
         max_length=15
     )
     email = models.EmailField()
@@ -74,6 +75,7 @@ class UserProfile(models.Model):
     )
     mobile_number = models.CharField(
         null=True,
+        blank=True,
         max_length=31
     )
     verified_mobile = models.BooleanField(
@@ -112,14 +114,22 @@ class UserProfile(models.Model):
     )
     reset_pass_token = models.CharField(
         max_length=128,
+        null=True,
+        blank=True,
         default=""
     )
     verify_email_token = models.CharField(
-        max_length=64,
-        default=""
+        max_length=128,
+        null=True,
+        blank=True
+    )
+    verify_email_code = models.IntegerField(
+        null=True,
+        blank=True
     )
     token = models.CharField(
-        max_length=64,
+        max_length=128,
+        null=True,
         default=""
     )
 

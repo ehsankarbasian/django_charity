@@ -12,7 +12,7 @@ from rest_framework.throttling import UserRateThrottle as UserRateLimiter
 
 
 LOGIN_RATE = '15/minute'
-SIGN_UP_RATE = '15/minute'
+SIGN_UP_RATE = '30/minute'
 LOG_OUT_RATE = '10/minute'
 RESET_PASS_RATE = '20/hour'
 FORGOT_PASS_RATE = '5/minute'

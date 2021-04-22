@@ -40,14 +40,17 @@
                                         <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
                                             Dear user!<br>
 											welcome to NTM charity<br>
-											please click the button below to verify your email<br>
+											please use the code <b>{{private_code}}</b> to verify your email.<br>
 											Then, you can use this email to reset your password too.
                                         </p>
 										<p></br>
 											If you don't verify your email, you'd not to be able to login.
 										</p>
+                                        <p></br>
+											You can use the button below to do so too!
+										</p>
 										
-										<form action="http://{{HOST}}:{{PORT}}/App1/{{EMAIL_TOKEN_API}}/VerifyEmail" method="post">
+										<form action="http://{{HOST}}:{{PORT}}/App1/{{EMAIL_TOKEN_API}}/VerifyEmailTokenBased" method="post">
 										<input type="hidden" name="token" value="{{private_token}}" size ="40" />
 										<input type="hidden" name="email" value="{{email}}" size ="40" />
 										<input type="submit" value="Go!"
