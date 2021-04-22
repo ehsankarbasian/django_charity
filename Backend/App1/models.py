@@ -35,6 +35,7 @@ class UserProfile(models.Model):
         related_name='The one who signed the user up'
                      + ' for the first time.+'
     )
+    # TODO:image_url
     user_type = models.IntegerField(
         choices=USER_TYPE_CHOICES,
         default=-1
@@ -123,4 +124,41 @@ class UserProfile(models.Model):
     )
 
     def __str__(self):
-        return "type:" + str(self.user_type) + " / email:" + self.email
+        return "type:" + str(self.user_type) + " / email:" + self.email + " / username:" + self.user.username
+
+
+class Event(models.Model):
+    STATUS_CHOICES = [
+        (0, 'no feedback'),
+        (1, 'accepted'),
+        (-1, 'failed'),
+    ]
+
+    title = models.CharField(
+        max_length=128,
+        default="",
+        null=True
+    )
+    description = models.TextField(
+        null=True
+    )
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.DO_NOTHING
+    )
+    enabled = models.BooleanField(
+        default=False,
+    )
+    create_date = models.DateField(
+        auto_now=True
+    )
+    status = models.IntegerField(
+        default=0,
+        choices=STATUS_CHOICES
+    )
+    # TODO:image_url
+    feedback = models.TextField(
+        default="",
+        null=True
+    )
+

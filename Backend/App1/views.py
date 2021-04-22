@@ -33,14 +33,14 @@ def error(message):
                     status=status.HTTP_200_OK)
 
 
-def simplify_email(email):
+def simplify_email(email_input):
     try:
         # Handle email tags and dot trick:
-        email_tags_string = "+".join(email.split("@")[0].split("+")[1:])
+        email_tags_string = "+".join(email_input.split("@")[0].split("+")[1:])
         simplified_email = "".join(
-            email.split("@")[0]
-                .split("+")[0].split(".")
-        ) + "@" + email.split("@")[1]
+            email_input.split("@")[0]
+            .split("+")[0].split(".")
+        ) + "@" + email_input.split("@")[1]
 
         return {'success': 1,
                 'email': simplified_email,
@@ -61,11 +61,13 @@ def send_email(subject, message, to_list, html_content):
 
 def send_text_email(subject, message, to_list):
     """Sends text email to a list"""
-    msg = EmailMultiAlternatives(subject,
-                                 message,
-                                 settings.EMAIL_HOST_USER,
-                                 to_list)
-    msg.send()
+    for E in to_list:
+        E = [E]
+        msg = EmailMultiAlternatives(subject,
+                                     message,
+                                     settings.EMAIL_HOST_USER,
+                                     E)
+        msg.send()
 
 
 def unique_user_token():
