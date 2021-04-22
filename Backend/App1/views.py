@@ -49,12 +49,22 @@ def simplify_email(email):
         return {'success': 0}
 
 
-def send_email (subject, message, to_list, html_content):
+def send_email(subject, message, to_list, html_content):
+    """Sends html email"""
     msg = EmailMultiAlternatives(subject,
                                  message,
                                  settings.EMAIL_HOST_USER,
                                  to_list)
     msg.attach_alternative(html_content, "text/html")
+    msg.send()
+
+
+def send_text_email(subject, message, to_list):
+    """Sends text email to a list"""
+    msg = EmailMultiAlternatives(subject,
+                                 message,
+                                 settings.EMAIL_HOST_USER,
+                                 to_list)
     msg.send()
 
 
@@ -76,6 +86,26 @@ def get_data_or_none(request, key):
 
 
 # API functions:
+@api_view(['POST'])
+def email(request):
+    try:
+        subject = request.data["subject"]
+        message = request.data["message"]
+        to_list = request.data["to_list"]
+        separated_with = request.data["separated_with"]
+        if len(separated_with) == 0:
+            separated_with = " "
+    except:
+        return error("requiredParams")
+
+    to_list = to_list.split(separated_with)
+    send_text_email(subject, message, to_list)
+
+    return Response({"message": "email sent",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 @limiter([LoginLimiter])
 def login(request):
@@ -99,6 +129,19 @@ def login(request):
 
             # Check verified_email:
             if not user_profile.verified_email:
+                # Sending html based email to user to verify his/her email:
+                verify_email_token = token_hex(64)
+                html_content = get_template('EmailVerification.html').render(context={
+                    'HOST': HOST,
+                    'PORT': PORT,
+                    'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
+                    'email': user_profile.email,
+                    'private_token': verify_email_token
+                })
+                send_email(subject='NTM charity email verification',
+                           message='Email verification',
+                           to_list=[email],
+                           html_content=html_content)
                 return error("emailVerificationError")
 
             request.session['user_id'] = user.id
