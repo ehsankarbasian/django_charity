@@ -603,3 +603,63 @@ def editEventByAdmin(request):
                          },
                         status=status.HTTP_200_OK)
 
+
+@api_view(['POST'])
+@limiter([FeedbackEventLimiter])
+def leaveFeedback(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        event_id = request.data["event_id"]
+
+        feedback = request.data["feedback"]
+        accept = int(request.data["accept"])
+        if accept:
+            event_status = 1
+        else:
+            event_status = -1
+
+    except:
+        return error("requiredParams")
+    else:
+        # Check whether SuperAdmin or not:
+        prof = UserProfile.objects.get(token=token)
+        if prof.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Leave feedback for the event:
+        event = Event.objects.get(id=event_id)
+        event.feedback = feedback
+        event.status = event_status
+        event.enabled = accept
+        event.save()
+
+        return Response({"message": "feedback been leave and status changed",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@limiter([DisableEventLimiter])
+def disableEvent(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        event_id = request.data["event_id"]
+    except:
+        return error("requiredParams")
+    else:
+        # Check whether SuperAdmin or not:
+        prof = UserProfile.objects.get(token=token)
+        if prof.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Disable the event:
+        event = Event.objects.get(id=event_id)
+        event.enabled = False
+        event.save()
+
+        return Response({"message": "event disabled",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
+
