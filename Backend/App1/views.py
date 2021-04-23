@@ -283,7 +283,7 @@ def verifyEmailCodeBased(request):
             return error("privateCodeError")
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @limiter([ForgotPasswordLimiter])
 def forgotPassword(request):
     try:
@@ -299,7 +299,10 @@ def forgotPassword(request):
     to_email = email['email']
 
     # Check if email verified:
-    user = UserProfile.objects.get(email=to_email)
+    try:
+        user = UserProfile.objects.get(email=to_email)
+    except:
+        return error("noSuchUser")
     if user is None:
         return error("noSuchUser")
     elif not user.verified_email:
@@ -398,7 +401,7 @@ def resetPasswordCodeBased(request):
                     status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @limiter([LogOutLimiter])
 def logout(request):
     if request.session.get('user_id', None) is None:
@@ -556,22 +559,24 @@ def createEvent(request):
         description = request.data["description"]
     except:
         return error("requiredParams")
-    else:
-        # Find user:
+
+    # Find user:
+    try:
         userProfile = UserProfile.objects.get(token=token)
         user = userProfile.user
+    except:
+        return error("Wrong TOKEN_ID")
+    # Create event:
+    Event.objects.create(
+        creator=user,
+        title=title,
+        description=description
+    )
 
-        # Create event:
-        Event.objects.create(
-            creator=user,
-            title=title,
-            description=description
-        )
-
-        return Response({"message": "event created",
-                         "success": "1"
-                         },
-                        status=status.HTTP_200_OK)
+    return Response({"message": "event created",
+                    "success": "1"
+                     },
+                    status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -583,20 +588,33 @@ def editEventByAdmin(request):
 
         title = request.data["title"]
         description = request.data["description"]
+        feedback = request.data["feedback"]
     except:
         return error("requiredParams")
     else:
+        # Find user:
+        try:
+            prof = UserProfile.objects.get(token=token)
+        except:
+            return error("Wrong TOKEN_ID")
+
         # Check whether SuperAdmin or not:
-        prof = UserProfile.objects.get(token=token)
         if prof.user_type != 1:
             return error("NotSuperAdmin")
 
         # Edit event:
-        event = Event.objects.get(id=event_id)
-        event.title = title
-        event.description = description
-        event.edited = True
-        event.save()
+        try:
+            event = Event.objects.get(id=event_id)
+        except:
+            return error("WrongEventId")
+        else:
+            event.title = title
+            event.description = description
+            event.edited = True
+            event.feedback = feedback
+            event.status = 1
+            event.enabled = True
+            event.save()
 
         return Response({"message": "event edited",
                          "success": "1"
@@ -621,8 +639,12 @@ def leaveFeedback(request):
     except:
         return error("requiredParams")
     else:
+        # Find user:
+        try:
+            prof = UserProfile.objects.get(token=token)
+        except:
+            return error("Wrong TOKEN_ID")
         # Check whether SuperAdmin or not:
-        prof = UserProfile.objects.get(token=token)
         if prof.user_type != 1:
             return error("NotSuperAdmin")
 
@@ -648,8 +670,11 @@ def disableEvent(request):
     except:
         return error("requiredParams")
     else:
+        try:
+            prof = UserProfile.objects.get(token=token)
+        except:
+            return error("Wrong TOKEN_ID")
         # Check whether SuperAdmin or not:
-        prof = UserProfile.objects.get(token=token)
         if prof.user_type != 1:
             return error("NotSuperAdmin")
 
