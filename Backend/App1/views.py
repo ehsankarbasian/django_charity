@@ -10,6 +10,7 @@ from App1.models import Event
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
 
+import json
 from random import randint
 from re import search as validateRegex
 from secrets import token_hex
@@ -113,8 +114,8 @@ def email(request):
 @api_view(['POST'])
 @limiter([LoginLimiter])
 def login(request):
-    if request.session.get('user_id', None) is not None:
-        return error("loggedInBefore")
+    # if request.session.get('user_id', None) is not None:
+    #     return error("loggedInBefore")
     try:
         username = request.data["username"]
         password = request.data["password"]
@@ -557,7 +558,8 @@ def createEvent(request):
         token = request.data["TOKEN_ID"]
         title = request.data["title"]
         description = request.data["description"]
-        image_url = request.date["image_url"]
+        list_of_needs = request.data["list_of_needs"]
+        image_url = request.data["image_url"]
     except:
         return error("requiredParams")
 
@@ -567,11 +569,17 @@ def createEvent(request):
         user = userProfile.user
     except:
         return error("Wrong TOKEN_ID")
+
+    needs_list = []
+    for (key, value) in list_of_needs.items():
+        needs_list.append(value)
+
     # Create event:
     Event.objects.create(
         creator=user,
         title=title,
         description=description,
+        list_of_needs=",".join(needs_list),
         image_url=image_url
     )
 
@@ -603,14 +611,20 @@ def requestedEventList(request):
 
         event_json = {}
         for e in event_set:
+            list_of_needs = {}
+            if e.list_of_needs is None:
+                list_of_needs = ""
+            else:
+                counter = 0
+                for need in e.list_of_needs.split(","):
+                    counter += 1
+                    list_of_needs[counter] = need
             user = e.creator
-            prof = UserProfile.objects.get(user=user)
-            creator_name = prof.first_name
             event_json[e.id] = {
                 "title": e.title,
                 "description": e.description,
+                "list_of_needs": list_of_needs,
                 "creator_username": user.username,
-                "creator_name": creator_name,
                 "create_date": e.create_date,
                 "image_url": e.image_url,
             }
@@ -629,6 +643,7 @@ def editEventByAdmin(request):
 
         title = request.data["title"]
         description = request.data["description"]
+        list_of_needs = request.data["list_of_needs"]
         image_url = request.data["image_url"]
         feedback = request.data["feedback"]
     except:
@@ -650,10 +665,16 @@ def editEventByAdmin(request):
         except:
             return error("WrongEventId")
         else:
+            needs_list = []
+            for (key, value) in list_of_needs.items():
+                needs_list.append(value)
+
             event.title = title
             event.description = description
+            event.list_of_needs = ",".join(needs_list)
             event.image_url = image_url
             event.edited = True
+            event.edited_by = prof.id
             event.feedback = feedback
             event.status = 1
             event.enabled = True
@@ -692,11 +713,15 @@ def leaveFeedback(request):
             return error("NotSuperAdmin")
 
         # Leave feedback for the event:
-        event = Event.objects.get(id=event_id)
-        event.feedback = feedback
-        event.status = event_status
-        event.enabled = accept
-        event.save()
+        try:
+            event = Event.objects.get(id=event_id)
+        except:
+            return error("EventDoesNotExist")
+        else:
+            event.feedback = feedback
+            event.status = event_status
+            event.enabled = accept
+            event.save()
 
         return Response({"message": "feedback been leave and status changed",
                          "success": "1"

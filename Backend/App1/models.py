@@ -154,7 +154,12 @@ class Event(models.Model):
         null=True
     )
     description = models.TextField(
-        null=True
+        null=True,
+        blank=True
+    )
+    list_of_needs = models.TextField(
+        null=True,
+        blank=True
     )
     creator = models.ForeignKey(
         User,
@@ -184,6 +189,7 @@ class Event(models.Model):
         default=False
     )
     edited_by = models.IntegerField(
+        # The super admin PROFILE id
         default=-1
     )
 
