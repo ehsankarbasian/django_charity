@@ -14,6 +14,7 @@ urlpatterns = [
     path('SendEmail', views.email),
 
     path('CreateEvent', views.createEvent),
+    path('GetEventRequested', views.requestedEventList),
     path('EditEventByAdmin', views.editEventByAdmin),
     path('LeaveFeedback', views.leaveFeedback),
     path('DisableEvent', views.disableEvent)

@@ -22,6 +22,7 @@ CREATE_EVENT_RATE = '25/minute'
 EDIT_EVENT_RATE = '20/minute'
 FEEDBACK_EVENT_RATE = '30/minute'
 DISABLE_EVENT_RATE = '60/minute'
+REQUESTED_EVENT_LIST_RATE = '40/minute'
 
 """
 SIGN_UP_RATE is used for email verification too
@@ -80,6 +81,13 @@ class BioLimiter(UserRateLimiter):
 
 class CreateEventLimiter(UserRateLimiter):
     rate = CREATE_EVENT_RATE
+
+    def allow_request(self, request, view):
+        return super().allow_request(request, view)
+
+
+class RequestedEventListLimiter(UserRateLimiter):
+    rate = REQUESTED_EVENT_LIST_RATE
 
     def allow_request(self, request, view):
         return super().allow_request(request, view)

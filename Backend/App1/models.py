@@ -158,7 +158,8 @@ class Event(models.Model):
     )
     creator = models.ForeignKey(
         User,
-        on_delete=models.DO_NOTHING
+        on_delete=models.DO_NOTHING,
+        related_name='creator'
     )
     enabled = models.BooleanField(
         default=False,
@@ -170,13 +171,20 @@ class Event(models.Model):
         default=0,
         choices=STATUS_CHOICES
     )
-    # TODO:image_url
+    image_url = models.CharField(
+        max_length=512,
+        null=True,
+        blank=True
+    )
     feedback = models.TextField(
         default="",
         null=True
     )
     edited = models.BooleanField(
         default=False
+    )
+    edited_by = models.IntegerField(
+        default=-1
     )
 
     def __str__(self):

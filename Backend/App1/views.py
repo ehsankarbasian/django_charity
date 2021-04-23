@@ -557,6 +557,7 @@ def createEvent(request):
         token = request.data["TOKEN_ID"]
         title = request.data["title"]
         description = request.data["description"]
+        image_url = request.date["image_url"]
     except:
         return error("requiredParams")
 
@@ -570,13 +571,53 @@ def createEvent(request):
     Event.objects.create(
         creator=user,
         title=title,
-        description=description
+        description=description,
+        image_url=image_url
     )
 
     return Response({"message": "event created",
                     "success": "1"
                      },
                     status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@limiter([RequestedEventListLimiter])
+def requestedEventList(request):
+    try:
+        token = request.data["TOKEN_ID"]
+    except:
+        return error("requiredParams")
+    else:
+        # Find user:
+        try:
+            prof = UserProfile.objects.get(token=token)
+        except:
+            return error("Wrong TOKEN_ID")
+        # Check whether SuperAdmin or not:
+        if prof.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Find events with status 0:
+        event_set = list(Event.objects.filter(status=0))
+
+        event_json = {}
+        for e in event_set:
+            user = e.creator
+            prof = UserProfile.objects.get(user=user)
+            creator_name = prof.first_name
+            event_json[e.id] = {
+                "title": e.title,
+                "description": e.description,
+                "creator_username": user.username,
+                "creator_name": creator_name,
+                "create_date": e.create_date,
+                "image_url": e.image_url,
+            }
+        event_json["success"] = "1"
+
+        return Response(event_json,
+                        status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -588,6 +629,7 @@ def editEventByAdmin(request):
 
         title = request.data["title"]
         description = request.data["description"]
+        image_url = request.data["image_url"]
         feedback = request.data["feedback"]
     except:
         return error("requiredParams")
@@ -610,6 +652,7 @@ def editEventByAdmin(request):
         else:
             event.title = title
             event.description = description
+            event.image_url = image_url
             event.edited = True
             event.feedback = feedback
             event.status = 1
