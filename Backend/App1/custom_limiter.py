@@ -18,6 +18,8 @@ RESET_PASS_RATE = '20/minute'
 FORGOT_PASS_RATE = '5/minute'
 PROFILE_RATE = '100/minute'
 BIO_RATE = '30/minute'
+CREATE_EVENT_RATE = '25/minute'
+EDIT_EVENT_RATE = '20/minute'
 
 """
 SIGN_UP_RATE is used for email verification too
@@ -72,3 +74,20 @@ class BioLimiter(UserRateLimiter):
 
     def allow_request(self, request, view):
         return super().allow_request(request, view)
+
+
+class CreateEventLimiter(UserRateLimiter):
+    rate = CREATE_EVENT_RATE
+
+    def allow_request(self, request, view):
+        return super().allow_request(request, view)
+
+
+class EditEventLimiter(UserRateLimiter):
+    rate = EDIT_EVENT_RATE
+
+    def allow_request(self, request, view):
+        return super().allow_request(request, view)
+
+
+

@@ -5,6 +5,7 @@ from rest_framework import status
 
 from django.contrib.auth.models import User
 from App1.models import UserProfile
+from App1.models import Event
 
 from django.contrib.auth import authenticate
 from django.shortcuts import get_object_or_404
@@ -544,3 +545,61 @@ def userBio(request):
                          "success": "1"
                          },
                         status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@limiter([CreateEventLimiter])
+def createEvent(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        title = request.data["title"]
+        description = request.data["description"]
+    except:
+        return error("requiredParams")
+    else:
+        # Find user:
+        userProfile = UserProfile.objects.get(token=token)
+        user = userProfile.user
+
+        # Create event:
+        Event.objects.create(
+            creator=user,
+            title=title,
+            description=description
+        )
+
+        return Response({"message": "event created",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@limiter([EditEventLimiter])
+def editEventByAdmin(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        event_id = request.data["event_id"]
+
+        title = request.data["title"]
+        description = request.data["description"]
+    except:
+        return error("requiredParams")
+    else:
+        # Check whether SuperAdmin or not:
+        prof = UserProfile.objects.get(token=token)
+        if prof.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Edit event:
+        event = Event.objects.get(id=event_id)
+        event.title = title
+        event.description = description
+        event.edited = True
+        event.save()
+
+        return Response({"message": "event edited",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
+

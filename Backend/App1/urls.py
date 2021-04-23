@@ -11,5 +11,8 @@ urlpatterns = [
     path('SubmitUserProfile', views.submitUserProfile),
     path('UserBio', views.userBio),
 
-    path('SendEmail', views.email)
+    path('SendEmail', views.email),
+
+    path('CreateEvent', views.createEvent),
+    path('EditEventByAdmin', views.editEventByAdmin)
 ]

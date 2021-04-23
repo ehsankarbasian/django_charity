@@ -175,4 +175,10 @@ class Event(models.Model):
         default="",
         null=True
     )
+    edited = models.BooleanField(
+        default=False
+    )
+
+    def __str__(self):
+        return "Title:" + self.title
 
