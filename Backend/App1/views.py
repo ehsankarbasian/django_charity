@@ -305,7 +305,9 @@ def forgotPassword(request):
         return error("notVerifiedEmailError")
 
     token = token_hex(128)
+    code = randint(10000000, 99999999)
     user.reset_pass_token = token
+    user.reset_pass_code = code
     user.save()
 
     html_content = get_template('ResetPass.html').render(context={
@@ -313,6 +315,7 @@ def forgotPassword(request):
         'PORT': PORT,
         'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
         'email': to_email,
+        'private_code': code,
         'private_token': token
     })
 
@@ -329,12 +332,12 @@ def forgotPassword(request):
 
 @api_view(['POST'])
 @limiter([ResetPasswordLimiter])
-def resetPassword(request):
+def resetPasswordTokenBased(request):
     try:
-        pass1 = request.POST["pass1"]
-        pass2 = request.POST["pass2"]
-        token = request.POST["token"]
-        email = request.POST["email"]
+        pass1 = request.data["pass1"]
+        pass2 = request.data["pass2"]
+        token = request.data["token"]
+        email = request.data["email"]
     except:
         return error("requiredParams")
 
@@ -347,10 +350,44 @@ def resetPassword(request):
 
     # Check token:
     if not userProfile.reset_pass_token == token:
+        print (token)
         return error("privateTokenError")
     else:
         # Change private token and password
         userProfile.reset_pass_token = token_hex(64)
+        userProfile.save()
+        user.set_password(pass1)
+        user.save()
+
+    return Response({"message": "password changed",
+                    "success": "1"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@limiter([ResetPasswordLimiter])
+def resetPasswordCodeBased(request):
+    try:
+        pass1 = request.data["pass1"]
+        pass2 = request.data["pass2"]
+        code = int(request.data["code"])
+        email = request.data["email"]
+    except:
+        return error("requiredParams")
+
+    if pass1 != pass2:
+        return error("differentPasswords")
+
+    # Find user:
+    userProfile = UserProfile.objects.get(email=email)
+    user = User.objects.get(user=userProfile)
+
+    # Check token:
+    if not userProfile.reset_pass_code == code:
+        return error("privateCodeError")
+    else:
+        # Change private code and password
+        userProfile.reset_pass_code = randint(10000000, 99999999)
         userProfile.save()
         user.set_password(pass1)
         user.save()

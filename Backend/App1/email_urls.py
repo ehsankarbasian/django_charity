@@ -13,7 +13,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('ResetPassword', views.resetPassword),
+    path('ResetPassword', views.resetPasswordCodeBased),
+    path('ResetPasswordTokenBased', views.resetPasswordTokenBased),
+
     path('VerifyEmail', views.verifyEmailCodeBased),
     path('VerifyEmailTokenBased', views.verifyEmailTokenBased),
 ]

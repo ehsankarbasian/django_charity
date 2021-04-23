@@ -118,6 +118,10 @@ class UserProfile(models.Model):
         blank=True,
         default=""
     )
+    reset_pass_code = models.IntegerField(
+        null=True,
+        blank=True
+    )
     verify_email_token = models.CharField(
         max_length=128,
         null=True,

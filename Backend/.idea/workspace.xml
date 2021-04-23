@@ -6,7 +6,7 @@
       <change beforePath="$PROJECT_DIR$/App1/custom_limiter.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/custom_limiter.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App1/email_urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/email_urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App1/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App1/templates/EmailVerification.html" beforeDir="false" afterPath="$PROJECT_DIR$/App1/templates/EmailVerification.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App1/templates/ResetPass.html" beforeDir="false" afterPath="$PROJECT_DIR$/App1/templates/ResetPass.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App1/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -68,7 +68,7 @@
       <workItem from="1618880317577" duration="2236000" />
       <workItem from="1618955507358" duration="134000" />
       <workItem from="1619041892584" duration="8671000" />
-      <workItem from="1619104917338" duration="18513000" />
+      <workItem from="1619104917338" duration="21058000" />
     </task>
     <servers />
   </component>
