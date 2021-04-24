@@ -146,6 +146,7 @@ def login(request):
                     'PORT': PORT,
                     'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
                     'email': user_profile.email,
+                    'name': username,
                     'private_code': verify_email_code,
                     'private_token': verify_email_token
                 })
@@ -229,6 +230,7 @@ def signup(request):
                 'PORT': PORT,
                 'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
                 'email': email,
+                'name': username,
                 'private_code': verify_email_code,
                 'private_token': verify_email_token
             })
@@ -300,10 +302,9 @@ def forgotPassword(request):
     to_email = email['email']
 
     # Check if email verified:
-    try:
-        user = UserProfile.objects.get(email=to_email)
-    except:
-        return error("noSuchUser")
+
+    user = UserProfile.objects.get(email=to_email)
+
     if user is None:
         return error("noSuchUser")
     elif not user.verified_email:
@@ -320,6 +321,7 @@ def forgotPassword(request):
         'PORT': PORT,
         'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
         'email': to_email,
+        'name': user.user.username,
         'private_code': code,
         'private_token': token
     })
