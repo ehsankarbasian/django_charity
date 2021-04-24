@@ -573,7 +573,7 @@ def createEvent(request):
         return error("Wrong TOKEN_ID")
 
     needs_list = []
-    for (key, value) in list_of_needs.items():
+    for (value) in list_of_needs:
         needs_list.append(value)
 
     # Create event:
@@ -623,6 +623,7 @@ def requestedEventList(request):
                     list_of_needs[counter] = need
             user = e.creator
             event_json[e.id] = {
+                "id": e.id,
                 "title": e.title,
                 "description": e.description,
                 "list_of_needs": list_of_needs,
@@ -630,9 +631,10 @@ def requestedEventList(request):
                 "create_date": e.create_date,
                 "image_url": e.image_url,
             }
-        event_json["success"] = "1"
 
-        return Response(event_json,
+        final_json = {"event_set": event_json, "success": "1"}
+
+        return Response(final_json,
                         status=status.HTTP_200_OK)
 
 
@@ -668,7 +670,7 @@ def editEventByAdmin(request):
             return error("WrongEventId")
         else:
             needs_list = []
-            for (key, value) in list_of_needs.items():
+            for value in list_of_needs:
                 needs_list.append(value)
 
             event.title = title
