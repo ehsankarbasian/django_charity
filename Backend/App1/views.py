@@ -134,26 +134,6 @@ def login(request):
 
             # Check verified_email:
             if not user_profile.verified_email:
-                # Sending html based email to user to verify his/her email:
-                verify_email_code = randint(100000, 999999)
-
-                verify_email_token = user_profile.verify_email_token
-                user_profile.verify_email_code = verify_email_code
-                user_profile.save()
-
-                html_content = get_template('EmailVerification.html').render(context={
-                    'HOST': HOST,
-                    'PORT': PORT,
-                    'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
-                    'email': user_profile.email,
-                    'name': username,
-                    'private_code': verify_email_code,
-                    'private_token': verify_email_token
-                })
-                send_email(subject='NTM charity email verification',
-                           message='Email verification',
-                           to_list=[email],
-                           html_content=html_content)
                 return error("emailVerificationError")
 
             request.session['user_id'] = user.id
@@ -275,7 +255,14 @@ def verifyEmailCodeBased(request):
     except:
         return error("requiredParams")
     else:
-        userProfile = UserProfile.objects.get(email=email)
+        try:
+            userProfile = UserProfile.objects.get(email=email)
+        except:
+            return error("NoUserForEmail")
+
+        if userProfile.verified_email:
+            return error("VerifiedBefore")
+
         if userProfile.verify_email_code == private_code:
             userProfile.verified_email = True
             userProfile.save()
