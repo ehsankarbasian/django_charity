@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.db.models import Q
 from django.contrib.auth.models import User
 from App1.models import UserProfile
 from App1.models import Event
@@ -40,3 +41,24 @@ def email(request):
     return Response({"message": "email sent",
                      "success": "1"},
                     status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@limiter([SearchLimiter])
+def search(request):
+    """
+    searches for events according to title and description
+    it's not case-sensitive
+
+    potential error:
+        requiredParams
+    """
+    try:
+        search_key = request.data["search_key"]
+    except:
+        return error("requiredParams")
+
+    result_set = Event.objects.filter(
+        Q(title__contains=search_key) | Q(description__contains=search_key)
+    )
+    return create_event_set(result_set)

@@ -17,5 +17,6 @@ urlpatterns = [
     path('GetEventRequested', views.requestedEventList),
     path('EditEventByAdmin', views.editEventByAdmin),
     path('LeaveFeedback', views.leaveFeedback),
-    path('DisableEvent', views.disableEvent)
+    path('DisableEvent', views.disableEvent),
+    path('Search', views.search)
 ]

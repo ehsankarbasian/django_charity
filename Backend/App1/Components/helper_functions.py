@@ -94,3 +94,53 @@ def get_data_or_none(request, key):
         return request.data(key)
     except:
         return None
+
+
+def create_event_set(event_queryset):
+    """
+    creates an event_set according to queryset
+    it's used in APIs that return several events to front
+
+    the event_set structure is as below:
+        {
+            "success": "1",
+            "event_set": {
+                "<<id_of_event>>": {
+                    "id", "title", "description", "creator_username", "create_date", "image_url"
+                    "list_of_needs":{
+                        "1":
+                        "2":
+                        ...
+                        "n":
+                    }
+                }
+            }
+        }
+    """
+    # Create a json for an event:
+    event_json = {}
+    for event in event_queryset:
+        list_of_needs = {}
+        if event.list_of_needs is None:
+            list_of_needs = ""
+        else:
+            counter = 0
+            for need in event.list_of_needs.split(","):
+                counter += 1
+                list_of_needs[counter] = need
+        user = event.creator
+        event_json[event.id] = {
+            "id": event.id,
+            "title": event.title,
+            "description": event.description,
+            "list_of_needs": list_of_needs,
+            "creator_username": user.username,
+            "create_date": event.create_date,
+            "image_url": event.image_url,
+        }
+
+    empty = [0 if len(event_json) else 1]
+    final_json = {"event_set": event_json, "empty": empty[0], "success": "1"}
+
+    return Response(final_json,
+                    status=status.HTTP_200_OK)
