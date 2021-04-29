@@ -15,13 +15,22 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 
 
-def error(message):
+def error(message, additional_data=None):
     """
     returns error and status-200 and a message
     it's used many times in APIs
+
+    it can pass additional data too
+    additional_data is a dictionary which can be None
     """
-    return Response({"status": message,
-                     "success": "0"},
+    result = {"status": message,
+              "success": "0"}
+
+    if additional_data:
+        for key, value in additional_data.items():
+            result[key] = value
+
+    return Response(result,
                     status=status.HTTP_200_OK)
 
 
@@ -96,10 +105,11 @@ def get_data_or_none(request, key):
         return None
 
 
-def create_event_set(event_queryset):
+def create_event_set(event_queryset, pagination_params=None):
     """
     creates an event_set according to queryset
     it's used in APIs that return several events to front
+    it passes pagination params to front if exists too
 
     the event_set structure is as below:
         {
@@ -140,7 +150,63 @@ def create_event_set(event_queryset):
         }
 
     empty = [0 if len(event_json) else 1]
-    final_json = {"event_set": event_json, "empty": empty[0], "success": "1"}
+    final_json = {"success": "1",
+                  "empty": empty[0],
+                  "pagination_params": pagination_params,
+                  "event_set": event_json}
 
     return Response(final_json,
                     status=status.HTTP_200_OK)
+
+
+def create_pagination_bar(page):
+    """
+    returns a ',' separated string according to current_page & number of pages
+    the string will be the pagination bar
+    """
+    paginator = page.paginator
+    page_number = page.number
+    total_pages = paginator.num_pages
+
+    small_case = bool(total_pages < 10)
+    begin_case = bool(page_number <= 5)
+    middle_case = bool((page_number > 5) and (page_number < total_pages - 4))
+    end_case = bool(page_number >= total_pages - 4)
+
+    pagination_bar = ""
+    if small_case:
+        for num in range(1, total_pages):
+            pagination_bar += str(num)
+            pagination_bar += ","
+        pagination_bar += str(total_pages)
+    elif begin_case:
+        for num in range(1, page_number + 3):
+            pagination_bar += str(num)
+            pagination_bar += ","
+        pagination_bar += "...," + str(total_pages - 2) + "," + str(total_pages - 1) + "," + str(total_pages)
+    elif middle_case:
+        pagination_bar = "1,2,3,...,"
+        for num in range(page_number - 2, page_number + 3):
+            pagination_bar += str(num)
+            pagination_bar += ","
+        pagination_bar += "...," + str(total_pages - 2) + "," + str(total_pages - 1) + "," + str(total_pages)
+    elif end_case:
+        pagination_bar = "1,2,3,...,"
+        for num in range(page_number - 2, total_pages + 1):
+            pagination_bar += str(num)
+            pagination_bar += ","
+
+    return pagination_bar
+
+
+def pagination_bar_params(page):
+    """
+    returns parameters of pagination ber to be used in UI
+    """
+
+    params = {
+        "current_page": page.number,
+        "the_last_page": page.paginator.num_pages,
+        "pagination_bar": create_pagination_bar(page)
+    }
+    return params

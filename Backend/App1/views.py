@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth.models import User
 from App1.models import UserProfile
@@ -46,19 +47,36 @@ def email(request):
 @api_view(['POST'])
 @limiter([SearchLimiter])
 def search(request):
+    PAGINATED_BY = 10
     """
     searches for events according to title and description
+    just for 'enabled' & 'accepted' events
     it's not case-sensitive
+    it paginates event by PAGINATED_BY
 
-    potential error:
+    potential errors:
         requiredParams
+        pageOverFlowError
+        noResultForSearch
     """
     try:
         search_key = request.data["search_key"]
+        page_number = int(request.data["page_number"])
     except:
         return error("requiredParams")
 
-    result_set = Event.objects.filter(
-        Q(title__contains=search_key) | Q(description__contains=search_key)
-    )
-    return create_event_set(result_set)
+    # Search:
+    search_query = Q(title__contains=search_key) | Q(description__contains=search_key)
+    allowed_event_query = Q(enabled=1) & Q(status=1)
+    result_set = Event.objects.filter(search_query).filter(allowed_event_query)
+
+    if not len(result_set):
+        return error("noResultForSearch")
+
+    # Paginate:
+    paginator = Paginator(result_set, PAGINATED_BY)
+    if page_number > paginator.num_pages:
+        return error("pageOverFlowError", {"the_last_page": paginator.num_pages})
+    page = paginator.page(page_number)
+
+    return create_event_set(page, pagination_bar_params(page))
