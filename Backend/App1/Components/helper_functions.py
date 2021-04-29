@@ -114,6 +114,8 @@ def create_event_set(event_queryset, pagination_params=None):
     the event_set structure is as below:
         {
             "success": "1",
+            "empty": "0",
+            "pagination_params":{"current_page", "the_last_page", "pagination_bar"}
             "event_set": {
                 "<<id_of_event>>": {
                     "id", "title", "description", "creator_username", "create_date", "image_url"

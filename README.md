@@ -1,4 +1,8 @@
-# charity_back
+NTM charity Backend
 
-API documentation link:
-https://docs.google.com/spreadsheets/d/1LUUp9Ho67VU3wwDcxZprRSSDAuGIDrohQJfg5NV7HTM
+python
+django
+djangorest
+sqlite
+
+deploy url: TODO
