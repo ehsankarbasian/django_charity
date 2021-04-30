@@ -80,3 +80,27 @@ def search(request):
     page = paginator.page(page_number)
 
     return create_event_set(page, pagination_bar_params(page))
+
+
+@api_view(['POST'])
+@limiter([UserEventLimiter])
+def userEvent(request):
+    """
+    passes events created by an specific user
+
+    potential errors:
+        requiredParams
+        noSuchUser
+    """
+    try:
+        token = request.data["token"]
+    except:
+        return error("requiredParams")
+
+    try:
+        userProfile = UserProfile.objects.get(token=token)
+        user = userProfile.user
+        eventSet = Event.objects.filter(creator=user)
+        return create_event_set(eventSet)
+    except:
+        return error("noSuchUser")

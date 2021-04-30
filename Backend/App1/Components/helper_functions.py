@@ -142,6 +142,7 @@ def create_event_set(event_queryset, pagination_params=None):
                 list_of_needs[counter] = need
         user = event.creator
         event_json[event.id] = {
+            "status": event.status,
             "id": event.id,
             "title": event.title,
             "description": event.description,

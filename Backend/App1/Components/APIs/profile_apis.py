@@ -29,24 +29,16 @@ def loadUserProfile(request):
     loads user profile if logged in
 
     potential errors:
-        notLoggedIn
         requiredParams
-        differentUsername
         DoesNotExist
     """
     try:
-        if not request.session.get('user_id', False):
-            return error("notLoggedIn")
         username = request.data["username"]
     except:
         return error("requiredParams")
 
     try:
-        user_id = request.session.get('user_id', 0)
-        user = User.objects.get(id=user_id)
-        if username != user.username:
-            # current_user in backend is different with current_user.username sent form frontend !
-            return error("differentUsername")
+        user = User.objects.get(username=username)
         current_user = UserProfile.objects.get(user=user)
     except:
         return error("DoesNotExist")
@@ -81,14 +73,9 @@ def submitUserProfile(request):
     """
     edits user profile according to new inputs by user if logged in
 
-    potential errors:
-        notLoggedIn
+    potential error:
         requiredParams
-        DisputeError
     """
-    if not request.session.get('user_id', False):
-        return error("notLoggedIn")
-
     try:
         # Required fields:
         username = request.data["username"]
@@ -103,11 +90,6 @@ def submitUserProfile(request):
         # Check user:
         user = get_object_or_404(User, username=username)
         userProfile = get_object_or_404(UserProfile, user=user)
-
-        valid_user = bool(request.session.get('user_id', None) == user.id)
-        valid_type = bool(userProfile.user_type == user_type)
-        if not (valid_user and valid_type):
-            return error("DisputeError")
 
         # NOT required fields:
         job = get_data_or_none(request, "job")
