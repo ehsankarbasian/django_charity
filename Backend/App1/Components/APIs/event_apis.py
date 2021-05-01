@@ -180,8 +180,10 @@ def leaveFeedback(request):
         event_id = request.data["event_id"]
 
         feedback = request.data["feedback"]
-        accept = int(request.data["accept"])
-        if accept:
+        accept = int(request.get_data_or_none("accept"))
+        if accept is None:
+            event_status = 0
+        if accept == 1:
             event_status = 1
         else:
             event_status = -1

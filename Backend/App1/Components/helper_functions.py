@@ -118,7 +118,7 @@ def create_event_set(event_queryset, pagination_params=None):
             "pagination_params":{"current_page", "the_last_page", "pagination_bar"}
             "event_set": {
                 "<<id_of_event>>": {
-                    "id", "title", "description", "creator_username", "create_date", "image_url"
+                    "status", "id", "title", "description", "feedback", "creator_username", "create_date", "image_url"
                     "list_of_needs":{
                         "1":
                         "2":
@@ -147,6 +147,7 @@ def create_event_set(event_queryset, pagination_params=None):
             "title": event.title,
             "description": event.description,
             "list_of_needs": list_of_needs,
+            "feedback": [event.feedback if len(event.feedback) else None][0],
             "creator_username": user.username,
             "create_date": event.create_date,
             "image_url": event.image_url,
