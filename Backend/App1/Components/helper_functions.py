@@ -118,7 +118,8 @@ def create_event_set(event_queryset, pagination_params=None):
             "pagination_params":{"current_page", "the_last_page", "pagination_bar"}
             "event_set": {
                 "<<id_of_event>>": {
-                    "status", "id", "title", "description", "feedback", "creator_username", "create_date", "image_url"
+                    "status", "id", "title", "description", "feedback", "creator_username",
+                    "create_date", "image_url", "money_target", "donated_money, "to_money_target"
                     "list_of_needs":{
                         "1":
                         "2":
@@ -151,6 +152,9 @@ def create_event_set(event_queryset, pagination_params=None):
             "creator_username": user.username,
             "create_date": event.create_date,
             "image_url": event.image_url,
+            "money_target": event.money_target,
+            "donated_money": event.donated_money,
+            "to_money_target": event.to_money_target(),
         }
 
     empty = [0 if len(event_json) else 1]

@@ -161,6 +161,12 @@ class Event(models.Model):
         null=True,
         blank=True
     )
+    money_target = models.IntegerField(
+        default=0
+    )
+    donated_money = models.IntegerField(
+        default=0
+    )
     creator = models.ForeignKey(
         User,
         on_delete=models.DO_NOTHING,
@@ -192,6 +198,12 @@ class Event(models.Model):
         # The super admin PROFILE id
         default=-1
     )
+
+    def to_money_target(self):
+        if self.donated_money - self.money_target >= 0:
+            return 0
+        else:
+            return self.money_target - self.donated_money
 
     def __str__(self):
         return "Title:" + self.title

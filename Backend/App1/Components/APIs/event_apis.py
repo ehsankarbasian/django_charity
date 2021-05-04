@@ -39,6 +39,7 @@ def createEvent(request):
         title = request.data["title"]
         description = request.data["description"]
         list_of_needs = request.data["list_of_needs"]
+        money_target = int(request.data["money_target"])
         image_url = request.data["image_url"]
     except:
         return error("requiredParams")
@@ -60,6 +61,7 @@ def createEvent(request):
         title=title,
         description=description,
         list_of_needs=",".join(needs_list),
+        money_target=money_target,
         image_url=image_url
     )
 
@@ -120,6 +122,7 @@ def editEventByAdmin(request):
         title = request.data["title"]
         description = request.data["description"]
         list_of_needs = request.data["list_of_needs"]
+        money_target = int(request.data["money_target"])
         image_url = request.data["image_url"]
         feedback = request.data["feedback"]
     except:
@@ -148,6 +151,7 @@ def editEventByAdmin(request):
             event.title = title
             event.description = description
             event.list_of_needs = ",".join(needs_list)
+            event.money_target = money_target
             event.image_url = image_url
             event.edited = True
             event.edited_by = userProfile.id
