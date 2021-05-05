@@ -40,8 +40,9 @@ class UserProfile(models.Model):
         choices=USER_TYPE_CHOICES,
         default=-1
     )
-    verified_needy = models.BooleanField(
-        null=True
+    verified = models.BooleanField(
+        null=True,
+        default=False
     )
 
     first_name = models.CharField(
