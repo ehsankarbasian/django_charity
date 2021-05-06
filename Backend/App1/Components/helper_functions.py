@@ -4,6 +4,7 @@ they are not APIs but they help APIs to work
 they're imported and used in views.py and *_apis.py
 """
 
+import sys
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -24,6 +25,8 @@ def error(message, additional_data=None):
     additional_data is a dictionary which can be None
     """
     result = {"status": message,
+              "error_type": str([[sys.exc_info()[0]] if sys.exc_info()[0] is not None else "CUSTOM"][0]),
+              "error_on": str([[sys.exc_info()[1]] if sys.exc_info()[1] is not None else "CUSTOM"][0]),
               "success": "0"}
 
     if additional_data:
@@ -44,7 +47,7 @@ def simplify_email(email):
     try:
         simplified_email = "".join(
             email.split("@")[0]
-                .split("+")[0].split(".")
+            .split("+")[0].split(".")
         ) + "@" + email.split("@")[1]
 
         email_tags_string = "+".join(email.split("@")[0].split("+")[1:])
@@ -52,7 +55,7 @@ def simplify_email(email):
         return {'success': 1,
                 'email': simplified_email,
                 'tags': email_tags_string}
-    except:
+    except e:
         return {'success': 0}
 
 
@@ -101,7 +104,7 @@ def get_data_or_none(request, key):
     """
     try:
         return request.data(key)
-    except:
+    except e:
         return None
 
 

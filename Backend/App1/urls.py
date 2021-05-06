@@ -22,5 +22,4 @@ urlpatterns = [
     path('Search', views.search),
     path('UserEvent', views.userEvent),
     path('DeleteEvent', views.deleteEvent),
-    path('NotVerifiedUserSet', views.notVerifiedUserSet),
 ]

@@ -34,13 +34,13 @@ def loadUserProfile(request):
     """
     try:
         username = request.data["username"]
-    except:
+    except e:
         return error("requiredParams")
 
     try:
         user = User.objects.get(username=username)
         current_user = UserProfile.objects.get(user=user)
-    except:
+    except e:
         return error("DoesNotExist")
     else:
         # Send current_user.details to front:
@@ -58,7 +58,7 @@ def loadUserProfile(request):
                          "gender": current_user.gender,
                          "married": current_user.married,
                          "birth_date": current_user.birth_date,
-                         "verified_needy": current_user.verified_needy,
+                         "verified_needy": current_user.verified,
                          "verified_mobile": current_user.verified_mobile,
                          "verified_email": current_user.verified_email,
                          "is_profile_completed": current_user.completed,
@@ -75,6 +75,7 @@ def submitUserProfile(request):
 
     potential error:
         requiredParams
+        noSuchUser
     """
     try:
         # Required fields:
@@ -84,12 +85,14 @@ def submitUserProfile(request):
         last_name = request.data["last_name"]
         melli_code = request.data["melli_code"]
         mobile_number = request.data["mobile_number"]
-    except:
+    except e:
         return error("requiredParams")
     else:
         # Check user:
         user = get_object_or_404(User, username=username)
         userProfile = get_object_or_404(UserProfile, user=user)
+        if not (user and userProfile):
+            return error("noSuchUser")
 
         # NOT required fields:
         job = get_data_or_none(request, "job")
@@ -101,13 +104,11 @@ def submitUserProfile(request):
         birth_date = get_data_or_none(request, "birth_date")
 
         # Update User:
-        user = User.objects.get(username=username)
         user.first_name = first_name
         user.last_name = last_name
         user.save()
 
         # Update UserProfile:
-        userProfile = UserProfile.objects.get(user=user)
         userProfile.first_name = first_name
         userProfile.last_name = last_name
         userProfile.melli_code = melli_code
@@ -143,13 +144,13 @@ def userBio(request):
     """
     try:
         username = request.data["username"]
-    except:
+    except e:
         return error("requiredParams")
 
     try:
         user = User.objects.get(username=username)
         userProfile = UserProfile.objects.get(user=user)
-    except:
+    except e:
         return error("DoesNotExist")
     else:
         # Send current_user.bio to front:
@@ -158,7 +159,7 @@ def userBio(request):
                          "first_name": userProfile.first_name,
                          "last_name": userProfile.last_name,
                          "email": userProfile.email,
-                         "verified_needy": userProfile.verified_needy,
+                         "verified_needy": userProfile.verified,
                          "success": "1"
                          },
                         status=status.HTTP_200_OK)

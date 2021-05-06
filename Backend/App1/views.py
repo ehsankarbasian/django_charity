@@ -22,6 +22,7 @@ from App1.Components.APIs.event_apis import *
 def email(request):
     """
     It's an API to send email from ntm.patronage@gmail.com to a list
+    it can be used by front end too
 
     potential error:
         requiredParams
@@ -33,7 +34,7 @@ def email(request):
         separated_with = request.data["separated_with"]
         if len(separated_with) == 0:
             separated_with = " "
-    except:
+    except e:
         return error("requiredParams")
 
     to_list = to_list.split(separated_with)
@@ -62,7 +63,7 @@ def search(request):
     try:
         search_key = request.data["search_key"]
         page_number = int(request.data["page_number"])
-    except:
+    except e:
         return error("requiredParams")
 
     # Search:

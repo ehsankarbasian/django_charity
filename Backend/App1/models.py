@@ -22,121 +22,32 @@ class UserProfile(models.Model):
     ]
 
     # Attributes:
-    user = models.OneToOneField(
-        User,
-        related_name='user',
-        null=True,
-        on_delete=models.CASCADE
-    )
-    creator = models.OneToOneField(
-        User,
-        null=True,
-        on_delete=models.DO_NOTHING,
-        related_name='The one who signed the user up'
-                     + ' for the first time.+'
-    )
     # TODO:image_url
-    user_type = models.IntegerField(
-        choices=USER_TYPE_CHOICES,
-        default=-1
-    )
-    verified = models.BooleanField(
-        null=True,
-        default=False
-    )
-
-    first_name = models.CharField(
-        max_length=127,
-        blank=True
-    )
-    last_name = models.CharField(
-        max_length=127,
-        blank=True
-    )
-    melli_code = models.CharField(
-        blank=True,
-        max_length=15
-    )
+    user = models.OneToOneField(User, related_name='user', null=True, on_delete=models.CASCADE)
+    user_type = models.IntegerField(choices=USER_TYPE_CHOICES, default=-1)
+    verified = models.BooleanField(null=True, default=False)
+    first_name = models.CharField(max_length=127, blank=True)
+    last_name = models.CharField(max_length=127, blank=True)
+    melli_code = models.CharField(blank=True, max_length=15)
     email = models.EmailField()
-    email_tags = models.CharField(
-        max_length=255,
-        blank=True
-    )
-    verified_email = models.BooleanField(
-        default=False
-    )
-    job = models.CharField(
-        max_length=127,
-        null=True,
-        blank=True
-    )
-    address = models.TextField(
-        null=True,
-        blank=True
-    )
-    mobile_number = models.CharField(
-        null=True,
-        blank=True,
-        max_length=31
-    )
-    verified_mobile = models.BooleanField(
-        default=False
-    )
-    house_phone = models.CharField(
-        max_length=31,
-        null=True,
-        blank=True
-    )
-    workplace_phone = models.CharField(
-        max_length=31,
-        null=True,
-        blank=True
-    )
-    gender = models.BooleanField(
-        choices=GENDER_CHOICES,
-        null=True,
-        default=1
-    )
-    married = models.BooleanField(
-        blank=True,
-        null=True,
-        choices=MARRIED_CHOICES,
-        default=0
-    )
-    birth_date = models.DateField(
-        null=True,
-        blank=True
-    )
-    signup_date = models.DateTimeField(
-        auto_now=True
-    )
-    completed = models.BooleanField(
-        default=False
-    )
-    reset_pass_token = models.CharField(
-        max_length=128,
-        null=True,
-        blank=True,
-        default=""
-    )
-    reset_pass_code = models.IntegerField(
-        null=True,
-        blank=True
-    )
-    verify_email_token = models.CharField(
-        max_length=128,
-        null=True,
-        blank=True
-    )
-    verify_email_code = models.IntegerField(
-        null=True,
-        blank=True
-    )
-    token = models.CharField(
-        max_length=128,
-        null=True,
-        default=""
-    )
+    email_tags = models.CharField(max_length=255, blank=True)
+    verified_email = models.BooleanField(default=False)
+    job = models.CharField(max_length=127, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    mobile_number = models.CharField(null=True, blank=True, max_length=31)
+    verified_mobile = models.BooleanField(default=False)
+    house_phone = models.CharField(max_length=31, null=True, blank=True)
+    workplace_phone = models.CharField(max_length=31, null=True, blank=True)
+    gender = models.BooleanField(choices=GENDER_CHOICES, null=True, default=1)
+    married = models.BooleanField(blank=True, null=True, choices=MARRIED_CHOICES, default=0)
+    birth_date = models.DateField(null=True, blank=True)
+    signup_date = models.DateTimeField(auto_now=True)
+    completed = models.BooleanField(default=False)
+    reset_pass_token = models.CharField(max_length=128, null=True, blank=True, default="")
+    reset_pass_code = models.IntegerField(null=True, blank=True)
+    verify_email_token = models.CharField(max_length=128, null=True, blank=True)
+    verify_email_code = models.IntegerField(null=True, blank=True)
+    token = models.CharField(max_length=128, null=True, default="")
 
     def __str__(self):
         return "type:" + str(self.user_type) + " / email:" + self.email + " / username:" + self.user.username
@@ -149,56 +60,19 @@ class Event(models.Model):
         (-1, 'failed'),
     ]
 
-    title = models.CharField(
-        max_length=128,
-        default="",
-        null=True
-    )
-    description = models.TextField(
-        null=True,
-        blank=True
-    )
-    list_of_needs = models.TextField(
-        null=True,
-        blank=True
-    )
-    money_target = models.IntegerField(
-        default=0
-    )
-    donated_money = models.IntegerField(
-        default=0
-    )
-    creator = models.ForeignKey(
-        User,
-        on_delete=models.DO_NOTHING,
-        related_name='creator'
-    )
-    enabled = models.BooleanField(
-        default=False,
-    )
-    create_date = models.DateField(
-        auto_now=True
-    )
-    status = models.IntegerField(
-        default=0,
-        choices=STATUS_CHOICES
-    )
-    image_url = models.CharField(
-        max_length=512,
-        null=True,
-        blank=True
-    )
-    feedback = models.TextField(
-        default="",
-        null=True
-    )
-    edited = models.BooleanField(
-        default=False
-    )
-    edited_by = models.IntegerField(
-        # The super admin PROFILE id
-        default=-1
-    )
+    title = models.CharField(max_length=128, default="", null=True)
+    description = models.TextField(null=True, blank=True)
+    list_of_needs = models.TextField(null=True, blank=True)
+    money_target = models.IntegerField(default=0)
+    donated_money = models.IntegerField(default=0)
+    creator = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='creator')
+    enabled = models.BooleanField(default=False, )
+    create_date = models.DateField(auto_now=True)
+    status = models.IntegerField(default=0, choices=STATUS_CHOICES)
+    image_url = models.CharField(max_length=512, null=True, blank=True)
+    feedback = models.TextField(default="", null=True)
+    edited = models.BooleanField(default=False)
+    edited_by = models.IntegerField(default=-1)  # The super admin PROFILE id
 
     def to_money_target(self):
         if self.donated_money - self.money_target >= 0:
@@ -208,4 +82,3 @@ class Event(models.Model):
 
     def __str__(self):
         return "Title:" + self.title
-
