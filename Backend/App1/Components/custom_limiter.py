@@ -28,6 +28,7 @@ SEARCH_RATE = '50/minute'
 USER_EVENT_RATE = '30/minute'
 DELETE_EVENT_BY_USER_RATE = '30/minute'
 EDIT_EVENT_BY_USER_RATE = '20/minute'
+NOT_VERIFIED_USER_SET_RATE = '50/minute'
 
 """
 SIGN_UP_RATE is used for email verification too
@@ -142,6 +143,13 @@ class DeleteEventByUserLimiter(UserRateLimiter):
 
 class EditEventByUserLimiter(UserRateLimiter):
     rate = EDIT_EVENT_BY_USER_RATE
+
+    def allow_request(self, request, view):
+        return super().allow_request(request, view)
+
+
+class NotVerifiedUserSetLimiter(UserRateLimiter):
+    rate = NOT_VERIFIED_USER_SET_RATE
 
     def allow_request(self, request, view):
         return super().allow_request(request, view)

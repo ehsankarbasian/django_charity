@@ -32,6 +32,8 @@ from django.contrib.auth.models import User
 from App1.models import UserProfile
 
 from Backend.urls import TOKEN_API, EMAIL_TOKEN_API, HOST, PORT
+
+
 EMAIL_REGEX = r'^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
 
 
@@ -49,7 +51,7 @@ def login(request):
     try:
         username = request.data["username"]
         password = request.data["password"]
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         # Authenticate:
@@ -97,7 +99,7 @@ def signup(request):
         original_email = request.data["email"]
         password = request.data["password"]
         user_type = int(request.data["user_type"])
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         simple_email_set = simplify_email(original_email)
@@ -194,7 +196,7 @@ def verifyEmailTokenBased(request):
     try:
         private_token = request.data["token"]
         email = request.data["email"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     userProfile = UserProfile.objects.get(email=email)
@@ -223,12 +225,12 @@ def verifyEmailCodeBased(request):
     try:
         private_code = int(request.data["code"])
         email = request.data["email"]
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         try:
             userProfile = UserProfile.objects.get(email=email)
-        except e:
+        except Exception:
             return error("NoUserForEmail")
 
         if userProfile.verified_email:
@@ -258,7 +260,7 @@ def forgotPassword(request):
     """
     try:
         email = request.data["email"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     simple_email_set = simplify_email(email)
@@ -319,7 +321,7 @@ def resetPasswordTokenBased(request):
         pass2 = request.data["pass2"]
         token = request.data["token"]
         email = request.data["email"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     if pass1 != pass2:
@@ -360,7 +362,7 @@ def resetPasswordCodeBased(request):
         pass2 = request.data["pass2"]
         code = int(request.data["code"])
         email = request.data["email"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     if pass1 != pass2:

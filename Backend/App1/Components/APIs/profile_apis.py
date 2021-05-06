@@ -34,13 +34,13 @@ def loadUserProfile(request):
     """
     try:
         username = request.data["username"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     try:
         user = User.objects.get(username=username)
         current_user = UserProfile.objects.get(user=user)
-    except e:
+    except Exception:
         return error("DoesNotExist")
     else:
         # Send current_user.details to front:
@@ -85,7 +85,7 @@ def submitUserProfile(request):
         last_name = request.data["last_name"]
         melli_code = request.data["melli_code"]
         mobile_number = request.data["mobile_number"]
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         # Check user:
@@ -144,13 +144,13 @@ def userBio(request):
     """
     try:
         username = request.data["username"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     try:
         user = User.objects.get(username=username)
         userProfile = UserProfile.objects.get(user=user)
-    except e:
+    except Exception:
         return error("DoesNotExist")
     else:
         # Send current_user.bio to front:

@@ -34,7 +34,7 @@ def email(request):
         separated_with = request.data["separated_with"]
         if len(separated_with) == 0:
             separated_with = " "
-    except e:
+    except Exception:
         return error("requiredParams")
 
     to_list = to_list.split(separated_with)
@@ -81,3 +81,33 @@ def search(request):
     page = paginator.page(page_number)
 
     return create_event_set(page, pagination_bar_params(page))
+
+
+@api_view(['POST'])
+@limiter([NotVerifiedUserSetLimiter])
+def notVerifiedUserSet(request):
+    """
+    returns the list of not verified users to verify by super admin
+
+    potential errors:
+        requiredParams
+        adminNotFound
+        notSuperAdmin
+    """
+    try:
+        TOKEN_API = request.data["TOKEN_API"]
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        adminProfile = UserProfile.objects.get(token=TOKEN_API)
+    except Exception:
+        return error("adminNotFound")
+
+    if adminProfile.user_type != 1:
+        return error("notSuperAdmin")
+
+    donator_list = UserProfile.objects.filter(verified=False).filter(user_type=3)
+    needy_list = UserProfile.objects.filter(verified=False).filter(user_type=4)
+
+    return create_user_set(needy_list, donator_list)

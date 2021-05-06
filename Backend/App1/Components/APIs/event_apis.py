@@ -7,6 +7,9 @@ contains:
     editEventByAdmin
     leaveFeedback
     disableEvent
+    userEvent
+    deleteEvent
+    editEventByUser
 """
 
 
@@ -41,14 +44,14 @@ def createEvent(request):
         list_of_needs = request.data["list_of_needs"]
         money_target = int(request.data["money_target"])
         image_url = request.data["image_url"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     # Find user:
     try:
         userProfile = UserProfile.objects.get(token=token)
         user = userProfile.user
-    except e:
+    except Exception:
         return error("Wrong TOKEN_ID")
 
     needs_list = []
@@ -84,13 +87,13 @@ def requestedEventList(request):
     """
     try:
         token = request.data["TOKEN_ID"]
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         # Find user:
         try:
             userProfile = UserProfile.objects.get(token=token)
-        except e:
+        except Exception:
             return error("Wrong TOKEN_ID")
 
         # Check whether SuperAdmin or not:
@@ -125,13 +128,13 @@ def editEventByAdmin(request):
         money_target = int(request.data["money_target"])
         image_url = request.data["image_url"]
         feedback = request.data["feedback"]
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         # Find user:
         try:
             userProfile = UserProfile.objects.get(token=token)
-        except e:
+        except Exception:
             return error("Wrong TOKEN_ID")
 
         # Check whether SuperAdmin or not:
@@ -141,7 +144,7 @@ def editEventByAdmin(request):
         # Edit event:
         try:
             event = Event.objects.get(id=event_id)
-        except e:
+        except Exception:
             return error("WrongEventId")
         else:
             needs_list = []
@@ -192,13 +195,13 @@ def leaveFeedback(request):
         else:
             event_status = -1
 
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         # Find user:
         try:
             userProfile = UserProfile.objects.get(token=token)
-        except e:
+        except Exception:
             return error("noSuchUser")
         # Check whether SuperAdmin or not:
         if userProfile.user_type != 1:
@@ -207,7 +210,7 @@ def leaveFeedback(request):
         # Leave feedback for the event:
         try:
             event = Event.objects.get(id=event_id)
-        except e:
+        except Exception:
             return error("EventDoesNotExist")
         else:
             event.feedback = feedback
@@ -235,12 +238,12 @@ def disableEvent(request):
     try:
         token = request.data["TOKEN_ID"]
         event_id = request.data["event_id"]
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         try:
             userProfile = UserProfile.objects.get(token=token)
-        except e:
+        except Exception:
             return error("Wrong TOKEN_ID")
 
         # Check whether SuperAdmin or not:
@@ -270,7 +273,7 @@ def userEvent(request):
     """
     try:
         token = request.data["token"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     try:
@@ -278,7 +281,7 @@ def userEvent(request):
         user = userProfile.user
         eventSet = Event.objects.filter(creator=user)
         return create_event_set(eventSet)
-    except e:
+    except Exception:
         return error("noSuchUser")
 
 
@@ -298,18 +301,18 @@ def deleteEvent(request):
     try:
         event_id = request.data["event_id"]
         token = request.data["token"]
-    except e:
+    except Exception:
         return error("requiredParams")
 
     try:
         event = Event.objects.get(id=event_id)
-    except e:
+    except Exception:
         return error("noSuchEvent")
 
     try:
         userProfile = UserProfile.objects.get(token=token)
         user = userProfile.user
-    except e:
+    except Exception:
         return error("noSuchUser")
 
     if event.creator.username != user.username:
@@ -347,18 +350,18 @@ def editEventByUser(request):
         list_of_needs = request.data["list_of_needs"]
         money_target = int(request.data["money_target"])
         image_url = request.data["image_url"]
-    except e:
+    except Exception:
         return error("requiredParams")
     else:
         # Find user:
         try:
             userProfile = UserProfile.objects.get(token=token)
-        except e:
+        except Exception:
             return error("noSuchUser")
 
         try:
             event = Event.objects.get(id=event_id)
-        except e:
+        except Exception:
             return error("noSuchEvent")
         else:
             if event.creator != userProfile.user:

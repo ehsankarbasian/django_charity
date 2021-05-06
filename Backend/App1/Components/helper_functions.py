@@ -108,6 +108,61 @@ def get_data_or_none(request, key):
         return None
 
 
+def create_user_items(queryset):
+    """
+    helps the function create_user_set() to not double write the code
+
+    it structs user items in a JSON
+    """
+    result = {}
+    for user in queryset:
+        result[user.id] = {
+            "id": user.id,
+            "username": user.user.username,
+            "user_type": user.user_type,
+            "first_name": user.first_name,
+            "lsat_name": user.last_name,
+            "melli_code": user.melli_code,
+            "email": user.email,
+            "job": user.job,
+            "address": user.address,
+            "mobile_number": user.mobile_number,
+            "house_phone": user.house_phone,
+            "workplace_phone": user.workplace_phone,
+            "gender": ["male" if user.gender == 1 else "female"][0],
+            "married": user.married,
+            "birth_date": user.birth_date,
+            "signup_date": user.signup_date,
+        }
+    return result
+
+
+def create_user_set(needy_queryset, donator_queryset, pagination_params=None):
+    """
+    creates json-based user set to show
+
+    it gets help from create_user_item() function
+    """
+    if pagination_params:
+        return error("TODO", {"message": "Have no pagination yet; coming soon"})
+
+    needy_json = create_user_items(needy_queryset)
+    donator_json = create_user_items(donator_queryset)
+
+    empty_needy = [0 if len(needy_json) else 1]
+    empty_donator = [0 if len(donator_json) else 1]
+
+    final_json = {"success": "1",
+                  "empty_needy": empty_needy[0],
+                  "empty_donator": empty_donator[0],
+                  "pagination_params": pagination_params,
+                  "needy_set": needy_json,
+                  "donator_set": donator_json}
+
+    return Response(final_json,
+                    status=status.HTTP_200_OK)
+
+
 def create_event_set(event_queryset, pagination_params=None):
     """
     creates an event_set according to queryset
