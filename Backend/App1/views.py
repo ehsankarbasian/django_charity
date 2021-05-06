@@ -111,3 +111,53 @@ def notVerifiedUserSet(request):
     needy_list = UserProfile.objects.filter(verified=False).filter(user_type=4)
 
     return create_user_set(needy_list, donator_list)
+
+
+@api_view(['POST'])
+@limiter([VerifyOrRejectUserLimiter])
+def verifyOrRejectUser(request):
+    """
+    verifies or rejects user by superAdmin
+
+    potential errors:
+        requiredParams
+        notSuperAdmin
+        adminNotFound
+        verifiedBefore
+        userTypeError
+        userNotFound
+    """
+    try:
+        TOKEN_API = request.data["TOKEN_API"]
+        user_id = int(request.data["user_id"])
+        action = int(request.data["action"])
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        superAdmin = UserProfile.objects.get(token=TOKEN_API)
+        if superAdmin.user_type != 1:
+            return error("notSuperAdmin")
+    except Exception:
+        return error("adminNotFound")
+
+    try:
+        userProfile = UserProfile.objects.get(id=user_id)
+        if userProfile.verified:
+            return error("verifiedBefore")
+        elif (userProfile.user_type == 1) or (userProfile.user_type == 2):
+            return error("userTypeError", {"explanation": "user_type is "
+                                                          + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
+    except Exception:
+        return error("userNotFound")
+
+    if action:
+        userProfile.verified = True
+        userProfile.save()
+    else:
+        userProfile.user.delete()
+        userProfile.delete()
+
+    return Response({"message": "user " + str(["verified" if action else "rejected (deleted)"][0]) + " successfully",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)

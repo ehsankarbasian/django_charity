@@ -23,4 +23,5 @@ urlpatterns = [
     path('UserEvent', views.userEvent),
     path('DeleteEvent', views.deleteEvent),
     path('NotVerifiedUserSet', views.notVerifiedUserSet),
+    path('VerifyOrRejectUser', views.verifyOrRejectUser),
 ]
