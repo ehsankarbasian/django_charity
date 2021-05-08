@@ -103,8 +103,8 @@ def get_data_or_none(request, key):
     returns None for not required fields
     """
     try:
-        return request.data(key)
-    except e:
+        return request.data[key]
+    except Exception:
         return None
 
 

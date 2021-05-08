@@ -80,7 +80,6 @@ def submitUserProfile(request):
     try:
         # Required fields:
         username = request.data["username"]
-        user_type = request.data["user_type"]
         first_name = request.data["first_name"]
         last_name = request.data["last_name"]
         melli_code = request.data["melli_code"]
@@ -126,7 +125,7 @@ def submitUserProfile(request):
 
         return Response({"username": username,
                          "email": userProfile.email,
-                         "user_type": user_type,
+                         "user_type": userProfile.user_type,
                          "success": "1"},
                         status=status.HTTP_200_OK)
 
