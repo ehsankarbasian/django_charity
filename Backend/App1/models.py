@@ -196,3 +196,84 @@ class Event(models.Model):
     def __str__(self):
         return "Title:" + self.title
 
+class StoreCategory(models.Model):
+    title = models.CharField(
+    null = True,
+    blank = True,
+    max_length = 127,
+    default = ""
+    )
+     def __str__(self):
+        return "Title:" + self.title
+
+class StoreSubCategory(models.Model):
+    title = models.CharField(
+        null = True,
+        blank = True,
+        max_length = 127,
+        default = ""
+    )
+
+    category = models.ForeignKey(
+        StoreCategory,
+        null = False,
+
+    )
+
+
+    def __str__(self):
+         return "Title:" + self.title
+
+class StoreProduct(models.Model):
+    title = models.CharField(
+        null = False,
+        blank = False,
+        max_length = 127
+    )
+
+    quantity = models.IntegerField(
+        null = True,
+        default = 0
+    )
+
+    subCategory = models.ForeignKey(
+        StoreSubCategory,
+        null = False
+    )
+
+    def __str__(self):
+        return  "Title:" + self.title + " / Quantity:" + self.quantity
+
+class DonatesIn(models.Model):
+    quantity = models.IntegerField(
+        null=True,
+        default = -1
+    )
+
+    product = models.ForeignKey(
+        StoreProduct,
+        null = False
+    )
+
+    #transaction
+
+    event = models.ForeignKey(
+        Event,
+        null = True
+    )
+
+    donator = models.ForeignKey(
+        User,
+        null = False
+    )
+
+    create_date = models.DateField(
+        auto_now=True
+    )
+
+    #DeliveredTo
+
+    #ExpDate?
+
+#class DonatesOut(models.Model):
+

@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af27e988-ae8e-4f7b-97d5-75b5231538fe" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/App1/Components/APIs/auth_apis.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/App1/Components/APIs/event_apis.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/App1/Components/APIs/profile_apis.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/App1/Components/helper_functions.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App1/custom_limiter.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/Components/custom_limiter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App1/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App1/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,6 +71,9 @@
       <workItem from="1619305815020" duration="3584000" />
       <workItem from="1619319820564" duration="3322000" />
       <workItem from="1619576374531" duration="16550000" />
+      <workItem from="1620136503039" duration="2198000" />
+      <workItem from="1620299631254" duration="1300000" />
+      <workItem from="1620485584924" duration="9726000" />
     </task>
     <servers />
   </component>
