@@ -29,26 +29,18 @@ def loadUserProfile(request):
     loads user profile if logged in
 
     potential errors:
-        notLoggedIn
         requiredParams
-        differentUsername
         DoesNotExist
     """
     try:
-        if not request.session.get('user_id', False):
-            return error("notLoggedIn")
         username = request.data["username"]
-    except:
+    except Exception:
         return error("requiredParams")
 
     try:
-        user_id = request.session.get('user_id', 0)
-        user = User.objects.get(id=user_id)
-        if username != user.username:
-            # current_user in backend is different with current_user.username sent form frontend !
-            return error("differentUsername")
+        user = User.objects.get(username=username)
         current_user = UserProfile.objects.get(user=user)
-    except:
+    except Exception:
         return error("DoesNotExist")
     else:
         # Send current_user.details to front:
@@ -66,7 +58,7 @@ def loadUserProfile(request):
                          "gender": current_user.gender,
                          "married": current_user.married,
                          "birth_date": current_user.birth_date,
-                         "verified_needy": current_user.verified_needy,
+                         "verified_needy": current_user.verified,
                          "verified_mobile": current_user.verified_mobile,
                          "verified_email": current_user.verified_email,
                          "is_profile_completed": current_user.completed,
@@ -81,33 +73,25 @@ def submitUserProfile(request):
     """
     edits user profile according to new inputs by user if logged in
 
-    potential errors:
-        notLoggedIn
+    potential error:
         requiredParams
-        DisputeError
+        noSuchUser
     """
-    if not request.session.get('user_id', False):
-        return error("notLoggedIn")
-
     try:
         # Required fields:
         username = request.data["username"]
-        user_type = request.data["user_type"]
         first_name = request.data["first_name"]
         last_name = request.data["last_name"]
         melli_code = request.data["melli_code"]
         mobile_number = request.data["mobile_number"]
-    except:
+    except Exception:
         return error("requiredParams")
     else:
         # Check user:
         user = get_object_or_404(User, username=username)
         userProfile = get_object_or_404(UserProfile, user=user)
-
-        valid_user = bool(request.session.get('user_id', None) == user.id)
-        valid_type = bool(userProfile.user_type == user_type)
-        if not (valid_user and valid_type):
-            return error("DisputeError")
+        if not (user and userProfile):
+            return error("noSuchUser")
 
         # NOT required fields:
         job = get_data_or_none(request, "job")
@@ -119,13 +103,11 @@ def submitUserProfile(request):
         birth_date = get_data_or_none(request, "birth_date")
 
         # Update User:
-        user = User.objects.get(username=username)
         user.first_name = first_name
         user.last_name = last_name
         user.save()
 
         # Update UserProfile:
-        userProfile = UserProfile.objects.get(user=user)
         userProfile.first_name = first_name
         userProfile.last_name = last_name
         userProfile.melli_code = melli_code
@@ -143,7 +125,7 @@ def submitUserProfile(request):
 
         return Response({"username": username,
                          "email": userProfile.email,
-                         "user_type": user_type,
+                         "user_type": userProfile.user_type,
                          "success": "1"},
                         status=status.HTTP_200_OK)
 
@@ -161,13 +143,13 @@ def userBio(request):
     """
     try:
         username = request.data["username"]
-    except:
+    except Exception:
         return error("requiredParams")
 
     try:
         user = User.objects.get(username=username)
         userProfile = UserProfile.objects.get(user=user)
-    except:
+    except Exception:
         return error("DoesNotExist")
     else:
         # Send current_user.bio to front:
@@ -176,7 +158,7 @@ def userBio(request):
                          "first_name": userProfile.first_name,
                          "last_name": userProfile.last_name,
                          "email": userProfile.email,
-                         "verified_needy": userProfile.verified_needy,
+                         "verified_needy": userProfile.verified,
                          "success": "1"
                          },
                         status=status.HTTP_200_OK)
