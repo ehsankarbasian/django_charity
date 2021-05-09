@@ -84,83 +84,77 @@ class Event(models.Model):
         return "Title:" + self.title
 
 
-class StoreCategory(models.Model):
+class Category(models.Model):
     title = models.CharField(
-    null = True,
-    blank = True,
-    max_length = 127,
-    default = ""
-    )
-     def __str__(self):
-        return "Title:" + self.title
-
-class StoreSubCategory(models.Model):
-    title = models.CharField(
-        null = True,
-        blank = True,
-        max_length = 127,
-        default = ""
+        null=True,
+        blank=True,
+        max_length=127,
+        default=""
     )
 
+    def __str__(self):
+        return "Title: " + self.title
+
+
+class SubCategory(models.Model):
+    title = models.CharField(
+        null=True,
+        blank=True,
+        max_length=127,
+        default=""
+    )
     category = models.ForeignKey(
-        StoreCategory,
-        null = False,
-
+        Category,
+        null=False,
     )
 
-
     def __str__(self):
-         return "Title:" + self.title
+        return "(" + category.title + ") Title: " + self.title
 
-class StoreProduct(models.Model):
+
+class Product(models.Model):
     title = models.CharField(
-        null = False,
-        blank = False,
-        max_length = 127
+        null=False,
+        blank=False,
+        max_length=127
     )
-
     quantity = models.IntegerField(
-        null = True,
-        default = 0
+        null=True,
+        default=0
     )
-
     subCategory = models.ForeignKey(
-        StoreSubCategory,
-        null = False
+        SubCategory,
+        null=False
     )
 
     def __str__(self):
-        return  "Title:" + self.title + " / Quantity:" + self.quantity
+        return "Title: " + self.title + " / Quantity: " + self.quantity
+
 
 class DonatesIn(models.Model):
     quantity = models.IntegerField(
         null=True,
-        default = -1
+        default=-1
     )
-
     product = models.ForeignKey(
-        StoreProduct,
-        null = False
+        Product,
+        null=True
     )
-
-    #transaction
-
+    # transaction = foreignKey (Transaction)
     event = models.ForeignKey(
         Event,
-        null = True
+        null=True
     )
-
     donator = models.ForeignKey(
         User,
-        null = False
+        null=False
     )
-
-    create_date = models.DateField(
+    create_date = models.DateTimeField(
         auto_now=True
     )
 
-    #DeliveredTo
+    # DeliveredTo (optional)
+    # ExpDate (optional)
 
-    #ExpDate?
-
-#class DonatesOut(models.Model):
+# class Transactions
+# class DonatesOut(models.Model):
