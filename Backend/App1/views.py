@@ -164,34 +164,56 @@ def verifyOrRejectUser(request):
                      "success": "1"},
                     status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
-def donate(request):
+def donate_money(request):
+    """
+    donates money for an event
+
+    potential errors:
+        requiredParams
+        eventNotFound
+        userNotFound
+        userIsNotDonator
+        userIsNotVerified
+        eventIsNotEnabled
+        lessenTheAmount
+    """
+
     try:
         event_id = int(request.data["event_id"])
-        user_id = request.data["user_id"]
-        moneyamount = int(request.data["amount"])
-
+        TOKEN_ID = request.data["TOKEN_ID"]
+        amount = int(request.data["amount"])
     except Exception:
         return error("requiredParams")
 
+    try:
+        event = Event.objects.get(id=event_id)
+        if not event.enabled:
+            return error("eventIsNotEnabled")
+        if amount > event.to_money_target():
+            return error("lessenTheAmount")
+    except Exception:
+        return error("eventNotFound")
 
     try:
-        event_in = Event.objects.get(id=event_id)
- #make event if not found
+        donator = UserProfile.objects.get(token=TOKEN_ID)
+        if donator.type != 3:
+            return error("userIsNotDonator")
+        elif not donator.verified:
+            return error("userIsNotVerified")
     except Exception:
-        return error("Event not found")
+        return error("userNotFound")
 
-    try:
-        donator_in = UserProfile.objects.get(token=user_id)
+    transaction = Transactions.objects.create(amount=amount,
+                                              donatorOrNeedy=donator,
+                                              is_in=True)
 
-    except Exception:
-        return  error("UserNotFound")
+    DonatesIn.objects.create(transaction=transaction,
+                             event=event, donator=donator)
+    event.donated_money += amount
+    event.save()
 
-    try:
-        transaction_in = Transactions.objects.create(amount=moneyamount, DonatorOrNeedy=donator_in)
-    except Exception:
-        return error("requiredParams")
-
-    donate_in = DonatesIn.objects.create(transaction=transaction_in, event=event_in, donatot=donator_in)
-    event_in.donated_money += moneyamount
-    event_in.save()
+    return Response({"message": "money donated successfully",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)

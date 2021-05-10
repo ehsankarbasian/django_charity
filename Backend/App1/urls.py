@@ -25,6 +25,6 @@ urlpatterns = [
     path('NotVerifiedUserSet', views.notVerifiedUserSet),
     path('VerifyOrRejectUser', views.verifyOrRejectUser),
 
-    path('donate_in',views.donate),
+    path('DonateMoney', views.donate_money),
 
 ]
