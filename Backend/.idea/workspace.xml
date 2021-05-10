@@ -5,6 +5,7 @@
       <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/App1/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +84,7 @@
       <workItem from="1620256701744" duration="18725000" />
       <workItem from="1620372158209" duration="3104000" />
       <workItem from="1620438672808" duration="1017000" />
-      <workItem from="1620568733989" duration="1740000" />
+      <workItem from="1620568733989" duration="8523000" />
     </task>
     <servers />
   </component>

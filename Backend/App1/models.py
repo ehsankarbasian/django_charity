@@ -106,6 +106,7 @@ class SubCategory(models.Model):
     category = models.ForeignKey(
         Category,
         null=False,
+        on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -124,7 +125,8 @@ class Product(models.Model):
     )
     subCategory = models.ForeignKey(
         SubCategory,
-        null=False
+        null=False,
+        on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -138,16 +140,19 @@ class DonatesIn(models.Model):
     )
     product = models.ForeignKey(
         Product,
-        null=True
+        null=True,
+        on_delete=models.DO_NOTHING
     )
     # transaction = foreignKey (Transaction)
     event = models.ForeignKey(
         Event,
-        null=True
+        null=True,
+        on_delete=models.DO_NOTHING
     )
     donator = models.ForeignKey(
         User,
-        null=False
+        null=False,
+        on_delete=models.CASCADE
     )
     create_date = models.DateTimeField(
         auto_now=True
