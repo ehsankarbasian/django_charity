@@ -8,6 +8,8 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from App1.models import UserProfile
 from App1.models import Event
+from App1.models import Transactions
+from App1.models import DonatesIn
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
@@ -161,3 +163,33 @@ def verifyOrRejectUser(request):
     return Response({"message": "user " + str(["verified" if action else "rejected (deleted)"][0]) + " successfully",
                      "success": "1"},
                     status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def donate(request):
+    try:
+        event_id = int(request.data["event_id"])
+        user_id = request.data["user_id"]
+        moneyamount = int(request.data["amount"])
+
+    except Exception:
+        return error("requiredParams")
+
+
+    try:
+        event_in = Event.objects.get(id=event_id)
+ #make event if not found
+    except Exception:
+        return error("Event not found")
+
+    try:
+        donator_in = UserProfile.objects.get(token=user_id)
+
+    except Exception:
+        return  error("UserNotFound")
+
+    try:
+        transaction_in = Transactions.objects.get(amount=moneyamount, DonatorOrNeedy=donator_in)
+    except Exception:
+        return error("requiredParams")
+
+    donate_in = DonatesIn.objects.get(transaction=transaction_in, event=event_in, donatot=donator_in)

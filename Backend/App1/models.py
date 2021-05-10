@@ -143,7 +143,11 @@ class DonatesIn(models.Model):
         null=True,
         on_delete=models.DO_NOTHING
     )
-    # transaction = foreignKey (Transaction)
+    transaction = models.ForeignKey(
+        Transactions,
+        null=True,
+        on_delete=models.DO_NOTHING
+    )
     event = models.ForeignKey(
         Event,
         null=True,
@@ -161,5 +165,56 @@ class DonatesIn(models.Model):
     # DeliveredTo (optional)
     # ExpDate (optional)
 
-# class Transactions
-# class DonatesOut(models.Model):
+    def __str__(self):
+        return "Quantity: " + self.quantity
+
+
+class Transactions(models.Model):
+    # If is In, boolean will be true and if it is out,boolean will be false
+
+    isin = models.BooleanField(
+        default=True
+    )
+
+    amount = models.IntegerField(
+        null=False,
+        blank=False
+    )
+
+    create_date = models.DateTimeField(
+        auto_now=True
+    )
+
+    DonatorOrNeedy = models.ForeignKey(
+        User,
+        null=False,
+        on_delete=models.DO_NOTHING
+    )
+
+    def __str__(self):
+        return "Amount: " + self.amount + " / Is in? :" + self.isin
+
+
+class DonatesOut(models.Model):
+    quantity = models.IntegerField(
+        null=True,
+        default=-1
+    )
+
+    create_date = models.DateTimeField(
+        auto_now=True
+    )
+
+    deliveredto = models.ForeignKey(
+        User,
+        null=False,
+        blank=False,
+        on_delete=models.DO_NOTHING
+    )
+
+    deliveredby = models.ForeignKey(
+        User,
+        null=False,
+        blank=False,
+        on_delete=models.DO_NOTHING
+    )
