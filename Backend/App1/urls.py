@@ -24,4 +24,7 @@ urlpatterns = [
     path('DeleteEvent', views.deleteEvent),
     path('NotVerifiedUserSet', views.notVerifiedUserSet),
     path('VerifyOrRejectUser', views.verifyOrRejectUser),
+
+    path('donate_in',views.donate),
+
 ]

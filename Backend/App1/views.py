@@ -188,8 +188,10 @@ def donate(request):
         return  error("UserNotFound")
 
     try:
-        transaction_in = Transactions.objects.get(amount=moneyamount, DonatorOrNeedy=donator_in)
+        transaction_in = Transactions.objects.create(amount=moneyamount, DonatorOrNeedy=donator_in)
     except Exception:
         return error("requiredParams")
 
-    donate_in = DonatesIn.objects.get(transaction=transaction_in, event=event_in, donatot=donator_in)
+    donate_in = DonatesIn.objects.create(transaction=transaction_in, event=event_in, donatot=donator_in)
+    event_in.donated_money += moneyamount
+    event_in.save()
