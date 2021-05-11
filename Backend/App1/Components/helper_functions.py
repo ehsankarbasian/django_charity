@@ -163,6 +163,10 @@ def create_user_set(needy_queryset, donator_queryset, pagination_params=None):
                     status=status.HTTP_200_OK)
 
 
+def create_product_set(product_queryset):
+    pass
+
+
 def create_event_set(event_queryset, pagination_params=None):
     """
     creates an event_set according to queryset
@@ -176,7 +180,7 @@ def create_event_set(event_queryset, pagination_params=None):
             "pagination_params":{"current_page", "the_last_page", "pagination_bar"}
             "event_set": {
                 "<<id_of_event>>": {
-                    "status", "id", "title", "description", "feedback", "creator_username",
+                    "status", "id", "title", "description", "list_of_needs", "feedback", "creator_username",
                     "create_date", "image_url", "money_target", "donated_money, "to_money_target"
                     "list_of_needs":{
                         "1":

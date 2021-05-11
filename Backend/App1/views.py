@@ -198,7 +198,7 @@ def donate_money(request):
 
     try:
         donator = UserProfile.objects.get(token=TOKEN_ID)
-        if donator.type != 3:
+        if donator.user_type not in [1, 3]:
             return error("userIsNotDonator")
         elif not donator.verified:
             return error("userIsNotVerified")
