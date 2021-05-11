@@ -17,6 +17,10 @@ contains:
     delete_category
     delete_subcategory
     delete_product
+
+    the_category
+    the_subcategory
+    the_product
 """
 
 
@@ -57,8 +61,7 @@ def create_category(request):
 
     return Response({"message": "category created successfully",
                      "id": category.id,
-                     "success": "1"
-                     },
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -88,8 +91,7 @@ def create_subcategory(request):
 
     return Response({"message": "subcategory created successfully",
                      "id": subcategory.id,
-                     "success": "1"
-                     },
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -121,8 +123,7 @@ def create_product(request):
 
     return Response({"message": "product created successfully",
                      "id": product.id,
-                     "success": "1"
-                     },
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -231,8 +232,7 @@ def edit_category(request):
     category.save()
 
     return Response({"message": "category edited successfully",
-                     "success": "1"
-                     },
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -273,8 +273,7 @@ def edit_subcategory(request):
     subcategory.save()
 
     return Response({"message": "subcategory edited successfully",
-                     "success": "1"
-                     },
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -317,65 +316,79 @@ def edit_product(request):
     product.save()
 
     return Response({"message": "product edited successfully",
-                     "success": "1"
-                     },
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def delete_category(request):
     """
-
+    Find category by id and DELETE it
 
     potential errors:
         requiredParams
+        categoryNotFound
     """
     try:
-        pass
+        id = int(request.data["id"])
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "delete_category",
-                     "success": "1"
-                     },
+    if not len(Category.objects.filter(id=id)):
+        return error("categoryNotFound")
+    category = Category.objects.get(id=id)
+    category.delete()
+
+    return Response({"message": "category deleted successfully",
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def delete_subcategory(request):
     """
-
+    Find subcategory by id and DELETE it
 
     potential errors:
         requiredParams
+        subcategoryNotFound
     """
     try:
-        pass
+        id = int(request.data["id"])
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "delete_subcategory",
-                     "success": "1"
-                     },
+    if not len(SubCategory.objects.filter(id=id)):
+        return error("subcategoryNotFound")
+    subcategory = SubCategory.objects.get(id=id)
+    subcategory.delete()
+
+    return Response({"message": "subcategory deleted successfully",
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def delete_product(request):
     """
-
+    Find product by id and DELETE it
 
     potential errors:
         requiredParams
+        productNotFound
     """
     try:
-        pass
+        id = int(request.data["id"])
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "delete_product",
-                     "success": "1"
-                     },
+    if not len(Product.objects.filter(id=id)):
+        return error("productNotFound")
+    product = Product.objects.get(id=id)
+    product.delete()
+
+    return Response({"message": "product deleted successfully",
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
