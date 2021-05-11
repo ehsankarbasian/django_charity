@@ -7,3 +7,7 @@ admin.site.register(UserProfile)
 admin.site.register(Event)
 admin.site.register(Transactions)
 admin.site.register(DonatesIn)
+
+admin.site.register(Category)
+admin.site.register(SubCategory)
+admin.site.register(Product)

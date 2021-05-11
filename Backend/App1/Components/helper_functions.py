@@ -4,6 +4,7 @@ they are not APIs but they help APIs to work
 they're imported and used in views.py and *_apis.py
 """
 
+
 import sys
 
 from rest_framework.response import Response
@@ -161,10 +162,6 @@ def create_user_set(needy_queryset, donator_queryset, pagination_params=None):
 
     return Response(final_json,
                     status=status.HTTP_200_OK)
-
-
-def create_product_set(product_queryset):
-    pass
 
 
 def create_event_set(event_queryset, pagination_params=None):

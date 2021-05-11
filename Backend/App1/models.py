@@ -111,25 +111,14 @@ class Product(models.Model):
 class Transactions(models.Model):
     # If is In, boolean will be true and if it is out,boolean will be false
 
-    is_in = models.BooleanField(
-        default=True
-    )
-    amount = models.IntegerField(
-        null=False,
-        default=0
-    )
-    create_date = models.DateTimeField(
-        auto_now=True
-    )
-    donatorOrNeedy = models.ForeignKey(
-        UserProfile,
-        null=False,
-        on_delete=models.DO_NOTHING
-    )
+    is_in = models.BooleanField(default=True)
+    amount = models.IntegerField(null=False, default=0)
+    create_date = models.DateTimeField(auto_now=True)
+    donatorOrNeedy = models.ForeignKey(UserProfile, null=False, on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return "Amount: " + str(self.amount) +\
-               " / Is in? :" + str(self.is_in) +\
+        return "Amount: " + str(self.amount) + \
+               " / Is in? :" + str(self.is_in) + \
                " / From: " + str(self.donatorOrNeedy.user.username)
 
 

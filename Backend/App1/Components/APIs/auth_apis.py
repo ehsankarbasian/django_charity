@@ -11,7 +11,7 @@ contains:
 
     forgotPassword
     resetPasswordTokenBased
-    resetPasswordTokenBased
+    resetPasswordCodeBased
 """
 
 

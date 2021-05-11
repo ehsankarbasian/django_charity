@@ -17,6 +17,7 @@ from App1.Components.custom_limiter import *
 from App1.Components.APIs.auth_apis import *
 from App1.Components.APIs.profile_apis import *
 from App1.Components.APIs.event_apis import *
+from App1.Components.APIs.store_apis import *
 
 
 # API functions:
