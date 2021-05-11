@@ -39,17 +39,24 @@ from App1.models import Category, SubCategory, Product
 @api_view(['POST'])
 def create_category(request):
     """
-
+    creates a new category with a title
 
     potential errors:
         requiredParams
+        notUniqueTitle
     """
     try:
-        pass
+        title = request.data["title"]
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "create_category",
+    if len(Category.objects.filter(title=title)):
+        return error("notUniqueTitle")
+
+    category = Category.objects.create(title=title)
+
+    return Response({"message": "category created successfully",
+                     "id": category.id,
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -58,17 +65,29 @@ def create_category(request):
 @api_view(['POST'])
 def create_subcategory(request):
     """
-
+    creates a new subcategory with a title in a category
 
     potential errors:
         requiredParams
+        notUniqueTitle
+        categoryNotFound
     """
     try:
-        pass
+        title = request.data["title"]
+        category_id = request.data["category_id"]
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "create_subcategory",
+    if len(SubCategory.objects.filter(title=title)):
+        return error("notUniqueTitle")
+
+    if not len(Category.objects.filter(id=category_id)):
+        return error("categoryNotFound")
+    category = Category.objects.get(id=category_id)
+    subcategory = SubCategory.objects.create(title=title, category=category)
+
+    return Response({"message": "subcategory created successfully",
+                     "id": subcategory.id,
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -77,17 +96,31 @@ def create_subcategory(request):
 @api_view(['POST'])
 def create_product(request):
     """
-
+    creates a new product with a title in a subcategory
 
     potential errors:
         requiredParams
+        notUniqueTitle
+        subcategoryNotFound
     """
     try:
-        pass
+        title = request.data["title"]
+        quantity = int(request.data["quantity"])
+        subcategory_id = request.data["subcategory_id"]
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "create_product",
+    if len(Product.objects.filter(title=title)):
+        return error("notUniqueTitle")
+
+    if not len(SubCategory.objects.filter(id=subcategory_id)):
+        return error("subcategoryNotFound")
+    subcategory = SubCategory.objects.get(id=subcategory_id)
+    product = Product.objects.create(title=title, quantity=quantity,
+                                     subCategory=subcategory)
+
+    return Response({"message": "product created successfully",
+                     "id": product.id,
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)

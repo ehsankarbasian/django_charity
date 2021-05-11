@@ -105,7 +105,8 @@ class Product(models.Model):
     subCategory = models.ForeignKey(SubCategory, null=False, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "Title: " + self.title + " / Quantity: " + str(self.quantity)
+        return self.subCategory.category.title + " > " + self.subCategory.title + \
+               " > Title: " + self.title + " / Quantity: " + str(self.quantity)
 
 
 class Transactions(models.Model):
