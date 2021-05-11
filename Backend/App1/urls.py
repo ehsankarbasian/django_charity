@@ -41,4 +41,8 @@ urlpatterns = [
     path('DeleteCategory', views.delete_category),
     path('DeleteSubCategory', views.delete_subcategory),
     path('DeleteProduct', views.delete_product),
+
+    path('TheCategory', views.the_category),
+    path('TheSubCategory', views.the_subcategory),
+    path('TheProduct', views.the_product),
 ]

@@ -377,3 +377,69 @@ def delete_product(request):
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def the_category(request):
+    """
+    passes an specific category according to it's id
+
+    potential errors:
+        requiredParams
+        categoryNotFound
+    """
+    try:
+        id = int(request.data["id"])
+    except Exception:
+        return error("requiredParams")
+
+    if not len(Category.objects.filter(id=id)):
+        return error("categoryNotFound")
+    category = Category.objects.get(id=id)
+
+    return Response(category_item(category),
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def the_subcategory(request):
+    """
+    passes an specific subcategory according to it's id
+
+    potential errors:
+        requiredParams
+        subcategoryNotFound
+    """
+    try:
+        id = int(request.data["id"])
+    except Exception:
+        return error("requiredParams")
+
+    if not len(SubCategory.objects.filter(id=id)):
+        return error("subcategoryNotFound")
+    subcategory = SubCategory.objects.get(id=id)
+
+    return Response(subcategory_item(subcategory),
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def the_product(request):
+    """
+    passes an specific product according to it's id
+
+    potential errors:
+        requiredParams
+        productNotFound
+    """
+    try:
+        id = int(request.data["id"])
+    except Exception:
+        return error("requiredParams")
+
+    if not len(Product.objects.filter(id=id)):
+        return error("productNotFound")
+    product = Product.objects.get(id=id)
+
+    return Response(product_item(product),
+                    status=status.HTTP_200_OK)
