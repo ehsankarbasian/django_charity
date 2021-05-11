@@ -96,7 +96,7 @@ class SubCategory(models.Model):
     category = models.ForeignKey(Category, null=False, on_delete=models.CASCADE)
 
     def __str__(self):
-        return "(" + category.title + ") Title: " + self.title
+        return "(" + self.category.title + ") Title: " + self.title
 
 
 class Product(models.Model):
