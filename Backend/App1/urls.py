@@ -26,19 +26,19 @@ urlpatterns = [
 
 
     # StoreManagement urls:
-    path('CreateCategoty', views.create_category),
-    path('CreateSubCategoty', views.create_subcategory),
+    path('CreateCategory', views.create_category),
+    path('CreateSubCategory', views.create_subcategory),
     path('CreateProduct', views.create_product),
 
-    path('CategotyList', views.category_list),
-    path('SubCategotyList', views.subcategory_list),
+    path('CategoryList', views.category_list),
+    path('SubCategoryList', views.subcategory_list),
     path('ProductList', views.product_list),
 
-    path('EditCategoty', views.edit_category),
-    path('EditSubCategoty', views.edit_subcategory),
+    path('EditCategory', views.edit_category),
+    path('EditSubCategory', views.edit_subcategory),
     path('EditProduct', views.edit_product),
 
-    path('DeleteCategoty', views.delete_category),
-    path('DeleteSubCategoty', views.delete_subcategory),
+    path('DeleteCategory', views.delete_category),
+    path('DeleteSubCategory', views.delete_subcategory),
     path('DeleteProduct', views.delete_product),
 ]

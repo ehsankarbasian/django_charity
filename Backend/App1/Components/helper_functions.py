@@ -2,6 +2,21 @@
 helper functions are here,
 they are not APIs but they help APIs to work
 they're imported and used in views.py and *_apis.py
+
+contains:
+    error
+    simplify_email
+    send_email
+    send_text_email
+    unique_user_token
+    get_data_or_none
+
+    create_user_items
+    create_user_set
+    create_event_set
+
+    create_pagination_bar
+    pagination_bar_params
 """
 
 
@@ -109,6 +124,7 @@ def get_data_or_none(request, key):
         return None
 
 
+# TODO: move to lister_functions.py
 def create_user_items(queryset):
     """
     helps the function create_user_set() to not double write the code
@@ -122,7 +138,7 @@ def create_user_items(queryset):
             "username": user.user.username,
             "user_type": user.user_type,
             "first_name": user.first_name,
-            "lsat_name": user.last_name,
+            "last_name": user.last_name,
             "melli_code": user.melli_code,
             "email": user.email,
             "job": user.job,
@@ -138,9 +154,14 @@ def create_user_items(queryset):
     return result
 
 
+# TODO: move to lister_functions.py
 def create_user_set(needy_queryset, donator_queryset, pagination_params=None):
     """
     creates json-based user set to show
+
+    the JSON contains: "id", "username", "user_type", "first_name", "last_name",
+    "melli_code", "email", "job", "address", "mobile_number", "house_phone",
+    "workplace_phone", "gender", "married", "birth_date", "signup_date"
 
     it gets help from create_user_item() function
     """
@@ -164,6 +185,7 @@ def create_user_set(needy_queryset, donator_queryset, pagination_params=None):
                     status=status.HTTP_200_OK)
 
 
+# TODO: move to lister_functions.py
 def create_event_set(event_queryset, pagination_params=None):
     """
     creates an event_set according to queryset

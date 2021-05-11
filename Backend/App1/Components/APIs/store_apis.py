@@ -32,7 +32,7 @@ from App1.Components.custom_limiter import *
 
 from django.contrib.auth.models import User
 from App1.models import UserProfile
-from App1.models import Category, Subcategory, Product
+from App1.models import Category, SubCategory, Product
 
 
 @api_view(['POST'])
@@ -48,7 +48,7 @@ def create_category(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "create_category",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -67,7 +67,7 @@ def create_subcategory(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "create_subcategory",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -86,7 +86,7 @@ def create_product(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "create_product",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -105,7 +105,7 @@ def category_list(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "category_list",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -124,7 +124,7 @@ def subcategory_list(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "subcategory_list",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -143,7 +143,7 @@ def product_list(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "product_list",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -162,7 +162,7 @@ def edit_category(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "edit_category",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -181,7 +181,7 @@ def edit_subcategory(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "edit_subcategory",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -200,7 +200,7 @@ def edit_product(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "edit_product",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -219,7 +219,7 @@ def delete_category(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "delete_category",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -238,7 +238,7 @@ def delete_subcategory(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "delete_subcategory",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -257,7 +257,7 @@ def delete_product(request):
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "TODO",
+    return Response({"message": "delete_product",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
