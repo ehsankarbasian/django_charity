@@ -208,17 +208,29 @@ def product_list(request):
 @api_view(['POST'])
 def edit_category(request):
     """
-
+    edits the title of a category
 
     potential errors:
         requiredParams
+        notUniqueTitle
+        categoryNotFound
     """
     try:
-        pass
+        category_id = request.data["category_id"]
+        title = request.data["title"]
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "edit_category",
+    if len(Category.objects.filter(title=title)):
+        return error("notUniqueTitle")
+
+    if not len(Category.objects.filter(id=category_id)):
+        return error("categoryNotFound")
+    category = Category.objects.get(id=category_id)
+    category.title = title
+    category.save()
+
+    return Response({"message": "category edited successfully",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -227,17 +239,40 @@ def edit_category(request):
 @api_view(['POST'])
 def edit_subcategory(request):
     """
-
+    edits the title and category of a subcategory
 
     potential errors:
         requiredParams
+        notUniqueTitle
+        subcategoryNotFound
+        categoryNotFound
     """
     try:
-        pass
+        subcategory_id = request.data["subcategory_id"]
+        title = get_data_or_none(request, "title")
+        category_id = get_data_or_none(request, "category_id")
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "edit_subcategory",
+    if not (title or category_id):
+        return error("requiredParams", {
+            "message": "at least one of 'title' or 'category_id' must be passed"})
+
+    if len(SubCategory.objects.filter(title=title)):
+        return error("notUniqueTitle")
+
+    if not len(SubCategory.objects.filter(id=subcategory_id)):
+        return error("subcategoryNotFound")
+    if category_id:
+        if not len(Category.objects.filter(id=category_id)):
+            return error("categoryNotFound")
+    subcategory = SubCategory.objects.get(id=subcategory_id)
+    subcategory.title = [title if title else subcategory.title][0]
+    subcategory.category = [Category.objects.get(id=category_id) if category_id
+                            else subcategory.category][0]
+    subcategory.save()
+
+    return Response({"message": "subcategory edited successfully",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
@@ -246,17 +281,42 @@ def edit_subcategory(request):
 @api_view(['POST'])
 def edit_product(request):
     """
-
+    edits the title, subcategory and quantity of a product
 
     potential errors:
         requiredParams
+        notUniqueTitle
+        productNotFound
+        subcategoryNotFound
     """
     try:
-        pass
+        product_id = int(request.data["product_id"])
+        title = get_data_or_none(request, "title")
+        quantity = get_data_or_none(request, "quantity")
+        subcategory_id = get_data_or_none(request, "subcategory_id")
     except Exception:
         return error("requiredParams")
 
-    return Response({"message": "edit_product",
+    if not (title or subcategory_id or quantity):
+        return error("requiredParams", {
+            "message": "at least one of 'title', 'subcategory_id' or 'quantity 'must be passed"})
+
+    if len(Product.objects.filter(title=title)):
+        return error("notUniqueTitle")
+
+    if not len(Product.objects.filter(id=product_id)):
+        return error("productNotFound")
+    if subcategory_id:
+        if not len(SubCategory.objects.filter(id=subcategory_id)):
+            return error("subcategoryNotFound")
+    product = Product.objects.get(id=product_id)
+    product.title = [title if title else product.title][0]
+    product.quantity = [quantity if quantity else product.quantity][0]
+    product.subCategory = [SubCategory.objects.get(id=subcategory_id) if subcategory_id
+                           else product.subCategory][0]
+    product.save()
+
+    return Response({"message": "product edited successfully",
                      "success": "1"
                      },
                     status=status.HTTP_200_OK)
