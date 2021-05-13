@@ -82,3 +82,81 @@ class Event(models.Model):
 
     def __str__(self):
         return "Title:" + self.title
+
+
+class Category(models.Model):
+    title = models.CharField(null=True, blank=True, max_length=127, default="")
+
+    def __str__(self):
+        return "Title: " + self.title
+
+
+class SubCategory(models.Model):
+    title = models.CharField(null=True, blank=True, max_length=127, default="")
+    category = models.ForeignKey(Category, null=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return "(" + self.category.title + ") Title: " + self.title
+
+
+class Product(models.Model):
+    title = models.CharField(null=False, blank=False, max_length=127)
+    quantity = models.IntegerField(null=True, default=0)
+    subCategory = models.ForeignKey(SubCategory, null=False, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.subCategory.category.title + " > " + self.subCategory.title + \
+               " > Title: " + self.title + " / Quantity: " + str(self.quantity)
+
+
+class Transactions(models.Model):
+    # If is In, boolean will be true and if it is out,boolean will be false
+
+    is_in = models.BooleanField(default=True)
+    amount = models.IntegerField(null=False, default=0)
+    create_date = models.DateTimeField(auto_now=True)
+    donatorOrNeedy = models.ForeignKey(UserProfile, null=False, on_delete=models.DO_NOTHING)
+
+    def __str__(self):
+        return "Amount: " + str(self.amount) + \
+               " / Is in? :" + str(self.is_in) + \
+               " / From: " + str(self.donatorOrNeedy.user.username)
+
+
+class DonatesIn(models.Model):
+    quantity = models.IntegerField(null=True, default=-1)
+    product = models.ForeignKey(Product, null=True, on_delete=models.DO_NOTHING)
+    transaction = models.ForeignKey(Transactions, null=True, on_delete=models.DO_NOTHING)
+    event = models.ForeignKey(Event, null=True, on_delete=models.DO_NOTHING)
+    donator = models.ForeignKey(UserProfile, null=False, on_delete=models.CASCADE)
+    create_date = models.DateTimeField(auto_now=True)
+
+    # DeliveredTo (optional)
+    # ExpDate (optional)
+
+    def __str__(self):
+        return "Quantity: " + str(self.quantity) + " / Amount: " + str(self.transaction.amount)
+
+
+class DonatesOut(models.Model):
+    quantity = models.IntegerField(
+        null=True,
+        default=-1
+    )
+    create_date = models.DateTimeField(
+        auto_now=True
+    )
+    delivered_to = models.ForeignKey(
+        UserProfile,
+        null=False,
+        blank=False,
+        related_name='needy',
+        on_delete=models.DO_NOTHING
+    )
+    delivered_by = models.ForeignKey(
+        UserProfile,
+        null=False,
+        blank=False,
+        related_name='admin',
+        on_delete=models.DO_NOTHING
+    )

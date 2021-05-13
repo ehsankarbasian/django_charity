@@ -8,6 +8,8 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from App1.models import UserProfile
 from App1.models import Event
+from App1.models import Transactions
+from App1.models import DonatesIn
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
@@ -15,6 +17,7 @@ from App1.Components.custom_limiter import *
 from App1.Components.APIs.auth_apis import *
 from App1.Components.APIs.profile_apis import *
 from App1.Components.APIs.event_apis import *
+from App1.Components.APIs.store_apis import *
 
 
 # API functions:
@@ -159,5 +162,59 @@ def verifyOrRejectUser(request):
         userProfile.delete()
 
     return Response({"message": "user " + str(["verified" if action else "rejected (deleted)"][0]) + " successfully",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def donate_money(request):
+    """
+    donates money for an event
+
+    potential errors:
+        requiredParams
+        eventNotFound
+        userNotFound
+        userIsNotDonator
+        userIsNotVerified
+        eventIsNotEnabled
+        lessenTheAmount
+    """
+
+    try:
+        event_id = int(request.data["event_id"])
+        TOKEN_ID = request.data["TOKEN_ID"]
+        amount = int(request.data["amount"])
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        event = Event.objects.get(id=event_id)
+        if not event.enabled:
+            return error("eventIsNotEnabled")
+        if amount > event.to_money_target():
+            return error("lessenTheAmount")
+    except Exception:
+        return error("eventNotFound")
+
+    try:
+        donator = UserProfile.objects.get(token=TOKEN_ID)
+        if donator.user_type not in [1, 3]:
+            return error("userIsNotDonator")
+        elif not donator.verified:
+            return error("userIsNotVerified")
+    except Exception:
+        return error("userNotFound")
+
+    transaction = Transactions.objects.create(amount=amount,
+                                              donatorOrNeedy=donator,
+                                              is_in=True)
+
+    DonatesIn.objects.create(transaction=transaction,
+                             event=event, donator=donator)
+    event.donated_money += amount
+    event.save()
+
+    return Response({"message": "money donated successfully",
                      "success": "1"},
                     status=status.HTTP_200_OK)
