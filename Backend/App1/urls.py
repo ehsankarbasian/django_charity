@@ -26,6 +26,8 @@ urlpatterns = [
 
 
     path('GeneralDonate', views.generalDonate),
+    path('Delivery', views.delivery),
+    path('test', views.test),
 
 
     # StoreManagement urls:

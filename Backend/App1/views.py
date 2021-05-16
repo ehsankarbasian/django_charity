@@ -117,3 +117,48 @@ def generalDonate(request):
     return Response({"message": "donate recorded successfully",
                      "success": "1"},
                     status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def delivery(request):
+    """
+    records delivery product by admin fo a donate
+
+    potential errors:
+        requiredParams
+        userNotFound
+        userNotAdmin
+        donateNotFound
+    """
+    try:
+        donate_id = int(request.data["donate_id"])
+        TOKEN_ID = request.data["TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+
+    transferee = UserProfile.objects.filter(token=TOKEN_ID)
+    if not transferee:
+        return error("userNotFound")
+    transferee = UserProfile.objects.get(token=TOKEN_ID)
+    if transferee.user_type not in [1, 2]:
+        return error("userNotAdmin")
+
+    donate = DonatesIn.objects.filter(id=donate_id)
+    if not donate:
+        return error("donateNotFound")
+    donate = DonatesIn.objects.get(id=donate_id)
+
+    donate.transferee = transferee
+    donate.save()
+
+    return Response({"message": "delivered successfully",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def test(request):
+    string = request.GET.get("input")
+    return Response({"message": string,
+                     "success": "1"},
+                    status=status.HTTP_200_OK)

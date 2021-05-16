@@ -128,10 +128,10 @@ class DonatesIn(models.Model):
     product = models.ForeignKey(Product, null=True, on_delete=models.DO_NOTHING)
     transaction = models.ForeignKey(Transactions, null=True, on_delete=models.DO_NOTHING)
     event = models.ForeignKey(Event, null=True, on_delete=models.DO_NOTHING)
-    donator = models.ForeignKey(UserProfile, null=False, on_delete=models.CASCADE)
+    donator = models.ForeignKey(UserProfile, null=False, related_name='donator', on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now=True)
+    transferee = models.ForeignKey(UserProfile, null=True, default=None, related_name='transferee', on_delete=models.DO_NOTHING)
 
-    # DeliveredTo (optional)
     # ExpDate (optional)
 
     def __str__(self):
