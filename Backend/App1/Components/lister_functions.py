@@ -2,10 +2,9 @@
 The functions that adapts a queryset in JSONs to use by frontend
 
 contains:
-    category_item
-    subcategory_item
-    product_item
-
+    user_lister
+    requested_user_lister
+    event_lister
     category_lister
     subcategory_lister
     product_lister
@@ -14,35 +13,66 @@ contains:
 
 from rest_framework.response import Response
 from rest_framework import status
+from App1.Components.item_functions import *
 
 
-def category_item(category):
-    item = {"id": category.id,
-            "title": category.title}
+def user_lister(user_queryset):
+    user_json = {}
+    for user in user_queryset:
+        user_json[user.id] = user_item(user)
 
-    return item
-
-
-def subcategory_item(subcategory):
-    item = {"id": subcategory.id,
-            "title": subcategory.title,
-            "category_title": subcategory.category.title,
-            "category_id": subcategory.category.id}
-
-    return item
+    return user_json
 
 
-def product_item(product):
-    item = {"id": product.id,
-            "title": product.title,
-            "quantity": product.quantity,
+def requested_user_lister(needy_queryset, donator_queryset, pagination_params=None):
+    """
+    creates json-based user set to show
 
-            "subcategory_title": product.subCategory.title,
-            "subcategory_id": product.subCategory.id,
-            "category_title": product.subCategory.category.title,
-            "category_id": product.subCategory.category.id}
+    the JSON contains: "id", "username", "user_type", "first_name", "last_name",
+    "melli_code", "email", "job", "address", "mobile_number", "house_phone",
+    "workplace_phone", "gender", "married", "birth_date", "signup_date"
 
-    return item
+    it gets help from user_item() function
+    """
+    if pagination_params:
+        return error("TODO", {"message": "Have no pagination yet; coming soon"})
+
+    needy_json = user_lister(needy_queryset)
+    donator_json = user_lister(donator_queryset)
+
+    empty_needy = [0 if len(needy_json) else 1]
+    empty_donator = [0 if len(donator_json) else 1]
+
+    final_json = {"success": "1",
+                  "empty_needy": empty_needy[0],
+                  "empty_donator": empty_donator[0],
+                  "pagination_params": pagination_params,
+                  "needy_set": needy_json,
+                  "donator_set": donator_json}
+
+    return Response(final_json,
+                    status=status.HTTP_200_OK)
+
+
+def event_lister(event_queryset, pagination_params=None):
+    """
+    creates an event_set according to queryset
+    it's used in APIs that return several events to front
+    it passes pagination params to front if exists too
+    """
+    # Create a json for an event:
+    event_json = {}
+    for event in event_queryset:
+        event_json[event.id] = event_item(event)
+
+    empty = [0 if len(event_json) else 1]
+    final_json = {"success": "1",
+                  "empty": empty[0],
+                  "pagination_params": pagination_params,
+                  "event_set": event_json}
+
+    return Response(final_json,
+                    status=status.HTTP_200_OK)
 
 
 def category_lister(category_queryset):
