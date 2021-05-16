@@ -99,7 +99,7 @@ def subcategory_lister(subcategory_queryset):
                   "empty": [0 if len(subcategory_json) else 1][0],
                   "count": len(subcategory_queryset),
                   # "pagination_params": pagination_params,
-                  "category_set": subcategory_json}
+                  "subcategory_set": subcategory_json}
 
     return Response(final_json,
                     status=status.HTTP_200_OK)
@@ -114,7 +114,7 @@ def product_lister(product_queryset):
                   "empty": [0 if len(product_json) else 1][0],
                   "count": len(product_queryset),
                   # "pagination_params": pagination_params,
-                  "category_set": product_json}
+                  "product_set": product_json}
 
     return Response(final_json,
                     status=status.HTTP_200_OK)

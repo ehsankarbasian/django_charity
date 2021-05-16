@@ -135,7 +135,10 @@ class DonatesIn(models.Model):
     # ExpDate (optional)
 
     def __str__(self):
-        return "Quantity: " + str(self.quantity) + " / Amount: " + str(self.transaction.amount)
+        if self.transaction:
+            return "Amount: " + str(self.transaction.amount)
+        else:
+            return "Quantity: " + str(self.quantity) + "/ Product_id: " + str(self.product.id)
 
 
 class DonatesOut(models.Model):

@@ -435,7 +435,7 @@ def editEventByUser(request):
 
 
 @api_view(['POST'])
-def donate_money(request):
+def donate_money_event(request):
     """
     donates money for an event
 

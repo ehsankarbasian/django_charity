@@ -22,10 +22,10 @@ urlpatterns = [
     path('DeleteEvent', views.deleteEvent),
     path('NotVerifiedUserSet', views.notVerifiedUserSet),
     path('VerifyOrRejectUser', views.verifyOrRejectUser),
-    path('DonateMoney', views.donate_money),
+    path('DonateMoney', views.donate_money_event),
 
 
-    # path
+    path('GeneralDonate', views.generalDonate),
 
 
     # StoreManagement urls:
