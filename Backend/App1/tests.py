@@ -7,7 +7,38 @@ from App1.models import *
 
 
 class AuthAPIsTestCase(TestCase):
-    pass
+    def setUp(self):
+        init_db_user()
+
+    def test_api_signup(self):
+        pass
+
+    def test_api_login(self):
+        pass
+
+    def test_api_logout(self):
+        pass
+
+    def test_api_verifyEmailTokenBased(self):
+        pass
+
+    def test_api_verifyEmailCodeBased(self):
+        pass
+
+    def test_api_forgotPassword(self):
+        pass
+
+    def test_api_resetPasswordTokenBased(self):
+        pass
+
+    def test_api_resetPasswordCodeBased(self):
+        pass
+
+    def test_api_notVerifiedUserSet(self):
+        pass
+
+    def test_api_verifyOrRejectUser(self):
+        pass
 
 
 class EventAPIsTestCase(TestCase):
@@ -667,4 +698,3 @@ class StoreAPIsTestCase(TestCase):
         self.assertEqual(response_2, response_2_result)
         self.assertEqual(response_3, response_3_result)
         self.assertEqual(response_4, response_4_result)
-
