@@ -28,8 +28,19 @@ from secrets import token_hex
 
 from App1.models import UserProfile
 
+from django.test import Client
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+
+
+def client_post(url, json):
+    response = Client().post('/App1/' + url, json, format='json')
+    return response.data
+
+
+def client_get():
+    # response = Client().get(...)
+    pass
 
 
 def error(message, additional_data=None):
