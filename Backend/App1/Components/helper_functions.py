@@ -26,6 +26,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from secrets import token_hex
 
+from django.contrib.auth.models import User
 from App1.models import UserProfile
 
 from django.test import Client
@@ -133,6 +134,16 @@ def get_data_or_none(request, key):
         return request.data[key]
     except Exception:
         return None
+
+
+def set_email_verified(username):
+    """
+    set userProfile.verified_email True
+    """
+    user = User.objects.get(username=username)
+    profile = UserProfile.objects.get(user=user)
+    profile.verified_email = True
+    profile.save()
 
 
 def create_pagination_bar(page):

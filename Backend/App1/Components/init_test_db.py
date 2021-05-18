@@ -6,44 +6,44 @@ def init_db_user():
     initials the default database for User and UserProfile
     """
 
-    superAdminUser = User.objects.create_user(username="superAdmin", email="superAdmin@gmail.com", passwoer="12345")
-    adminUser = User.objects.create_user(username="admin", email="admin@gmail.com", passwoer="12345")
-    donatorUser_1 = User.objects.create_user(username="donator_1", email="donator_1@gmail.com", passwoer="12345")
-    donatorUser_2 = User.objects.create_user(username="donator_2", email="donator_2@gmail.com", passwoer="12345")
-    needyUser = User.objects.create_user(username="needy", email="needy@gmail.com", passwoer="12345")
+    superAdminUser = User.objects.create_user(username="superAdmin", email="superAdmin@gmail.com", password="12345")
+    adminUser = User.objects.create_user(username="admin", email="admin@gmail.com", password="12345")
+    donatorUser_1 = User.objects.create_user(username="donator_1", email="donator_1@gmail.com", password="12345")
+    donatorUser_2 = User.objects.create_user(username="donator_2", email="donator_2@gmail.com", password="12345")
+    needyUser_1 = User.objects.create_user(username="needy_1", email="needy@gmail.com", password="12345")
 
     UserProfile.objects.create(user=superAdminUser,
                                email=superAdminUser.email,
                                token="defaultSuperAdmin",
-                               email_tags_string="",
+                               email_tags="",
                                user_type=1,
                                verify_email_code=2500,
                                verify_email_token="verifyEmailToken")
     UserProfile.objects.create(user=adminUser,
                                email=adminUser.email,
                                token="defaultAdmin",
-                               email_tags_string="",
+                               email_tags="",
                                user_type=2,
                                verify_email_code=2500,
                                verify_email_token="verifyEmailToken")
     UserProfile.objects.create(user=donatorUser_1,
                                email=donatorUser_1.email,
                                token="defaultDonator_1",
-                               email_tags_string="",
+                               email_tags="",
                                user_type=3,
                                verify_email_code=2500,
                                verify_email_token="verifyEmailToken")
     UserProfile.objects.create(user=donatorUser_2,
                                email=donatorUser_2.email,
                                token="defaultDonator_2",
-                               email_tags_string="",
+                               email_tags="",
                                user_type=3,
                                verify_email_code=2500,
                                verify_email_token="verifyEmailToken")
-    UserProfile.objects.create(user=needyUser,
-                               email=needyUser.email,
-                               token="defaultNeedy",
-                               email_tags_string="",
+    UserProfile.objects.create(user=needyUser_1,
+                               email=needyUser_1.email,
+                               token="defaultNeedy_1",
+                               email_tags="",
                                user_type=4,
                                verify_email_code=2500,
                                verify_email_token="verifyEmailToken")

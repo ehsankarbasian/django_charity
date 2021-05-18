@@ -1,5 +1,6 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
+from App1.Components.helper_functions import set_email_verified
 from App1.Components.helper_functions import client_post
 from App1.Components.helper_functions import client_get
 from App1.Components.init_test_db import *
@@ -11,13 +12,191 @@ class AuthAPIsTestCase(TestCase):
         init_db_user()
 
     def test_api_signup(self):
-        pass
+        response_1 = client_post('signup', {})
+        response_2 = client_post('signup', {"username": "ehsan_karbasian",
+                                            "email": "ehsan.karbasian@gmail.com"})
+        response_3 = client_post('signup', {"username": "ehsan_karbasian",
+                                            "email": "ehsan.karbasian@gmail.com",
+                                            "password": "54321",
+                                            "user_type": "donator"})
+        response_4 = client_post('signup', {"username": "donator_1",
+                                            "email": "ehsan.karb@asian@gmail.com",
+                                            "password": "54321",
+                                            "user_type": 3})
+        response_5 = client_post('signup', {"username": "ehsan_karbasian",
+                                            "email": "donator_2@gmail.com",
+                                            "password": "54321",
+                                            "user_type": 3})
+        response_6 = client_post('signup', {"username": "donator_1",
+                                            "email": "donator_1@gmail.com",
+                                            "password": "54321",
+                                            "user_type": 3})
+        response_7 = client_post('signup', {"username": "ehsan_karbasian",
+                                            "email": "ehsan.karbasian@gmail.com",
+                                            "password": "54321",
+                                            "user_type": 1})
+        response_8 = client_post('signup', {"username": "ehsan_karbasian",
+                                            "email": "ehsan.karbasian@gmail.com",
+                                            "password": "54321",
+                                            "user_type": 2})
+        response_9 = client_post('signup', {"username": "needy_1",
+                                            "email": "ehsan.karbasian@gmail.com",
+                                            "password": "54321",
+                                            "user_type": 3})
+        response_10 = client_post('signup', {"username": "donator_3",
+                                             "email": "don.ator._3+ntm+charity@gmail.com",
+                                             "password": "54321",
+                                             "user_type": 3})
+        response_11 = client_post('signup', {"username": "needy_2",
+                                             "email": "nee..dy._2+ntm_charity@gmail.com",
+                                             "password": "54321",
+                                             "user_type": 4})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('password',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'donator\'",)]',
+                             'success': '0'}
+        response_4_result = {'status': 'invalidEmailError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'status': 'emailError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_6_result = {'status': 'emailUsernameError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_7_result = {'status': 'notAllowedUserTypeError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_8_result = {'status': 'notAllowedUserTypeError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_9_result = {'status': 'usernameError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_10_result = {'username': 'donator_3',
+                              'email': 'donator_3@gmail.com',
+                              'user_type': 3,
+                              'success': '1'}
+        response_11_result = {'username': 'needy_2',
+                              'email': 'needy_2@gmail.com',
+                              'user_type': 4,
+                              'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        self.assertEqual(response_10, response_10_result)
+        self.assertEqual(response_11, response_11_result)
+        donatorUser_3 = User.objects.get(username="donator_3")
+        donatorUserProfile_3 = UserProfile.objects.get(user=donatorUser_3)
+        needyUser_2 = User.objects.get(username="needy_2")
+        needyUserProfile_2 = UserProfile.objects.get(user=needyUser_2)
+        self.assertEqual(User.objects.get(id=6), donatorUser_3)
+        self.assertEqual(UserProfile.objects.get(id=6), donatorUserProfile_3)
+        self.assertEqual(User.objects.get(id=7), needyUser_2)
+        self.assertEqual(UserProfile.objects.get(id=7), needyUserProfile_2)
 
     def test_api_login(self):
-        pass
+        response_1 = client_post('login', {})
+        response_2 = client_post('login', {"username": "donator_1"})
+        response_3 = client_post('login', {"password": "12345"})
+        response_4 = client_post('login', {"username": "donator_1", "password": "thePass"})
+        response_5 = client_post('login', {"username": "dontor_1", "password": "12345"})
+        response_6 = client_post('login', {"username": "superAdmin", "password": "12345"})
+        response_7 = client_post('login', {"username": "admin", "password": "12345"})
+        response_8 = client_post('login', {"username": "donator_1", "password": "12345"})
+        response_9 = client_post('login', {"username": "needy_1", "password": "12345"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('password',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_4_result = {'status': 'wrongUsernameOrPass',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = response_4_result
+        response_6_result = {'status': 'emailVerificationError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_7_result = response_6_result
+        response_8_result = response_6_result
+        response_9_result = response_6_result
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        set_email_verified("superAdmin")
+        set_email_verified("admin")
+        set_email_verified("donator_1")
+        set_email_verified("needy_1")
+        response_10 = client_post('login', {"username": "superAdmin", "password": "12345"})
+        response_11 = client_post('login', {"username": "admin", "password": "12345"})
+        response_12 = client_post('login', {"username": "donator_1", "password": "12345"})
+        response_13 = client_post('login', {"username": "needy_1", "password": "12345"})
+        response_10_result = {'username': 'superAdmin',
+                              'email': 'superAdmin@gmail.com',
+                              'token': 'defaultSuperAdmin',
+                              'user_type': 1,
+                              'success': '1'}
+        response_11_result = {'username': 'admin',
+                              'email': 'admin@gmail.com',
+                              'token': 'defaultAdmin',
+                              'user_type': 2,
+                              'success': '1'}
+        response_12_result = {'username': 'donator_1',
+                              'email': 'donator_1@gmail.com',
+                              'token': 'defaultDonator_1',
+                              'user_type': 3,
+                              'success': '1'}
+        response_13_result = {'username': 'needy_1',
+                              'email': 'needy@gmail.com',
+                              'token': 'defaultNeedy_1',
+                              'user_type': 4,
+                              'success': '1'}
+        self.assertEqual(response_10, response_10_result)
+        self.assertEqual(response_11, response_11_result)
+        self.assertEqual(response_12, response_12_result)
+        self.assertEqual(response_13, response_13_result)
 
     def test_api_logout(self):
-        pass
+        set_email_verified("donator_1")
+        client_post('login', {"username": "donator_1", "password": "12345"})
+        response_1 = client_post('logout', {})
+        response_1_result = {'message': 'successfully logged out', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
 
     def test_api_verifyEmailTokenBased(self):
         pass
