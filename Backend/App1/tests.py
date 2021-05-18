@@ -593,3 +593,78 @@ class StoreAPIsTestCase(TestCase):
         self.assertEqual(response_4, response_4_result)
         self.assertEqual(len(Product.objects.filter(id=2)), 0)
 
+    def test_api_the_category(self):
+        response_1 = client_post('TheCategory', {})
+        response_2 = client_post('TheCategory', {"id": "four"})
+        response_3 = client_post('TheCategory', {"id": 8})
+        response_4 = client_post('TheCategory', {"id": 2})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'four\'",)]',
+                             'success': '0'}
+        response_3_result = {'status': 'categoryNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'id': 2, 'title': 'clothes'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+
+    def test_api_the_subcategory(self):
+        response_1 = client_post('TheSubCategory', {})
+        response_2 = client_post('TheSubCategory', {"id": "four"})
+        response_3 = client_post('TheSubCategory', {"id": 26})
+        response_4 = client_post('TheSubCategory', {"id": 2})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'four\'",)]',
+                             'success': '0'}
+        response_3_result = {'status': 'subcategoryNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'id': 2, 'title': 'rice', 'category_title': 'food', 'category_id': 1}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+
+    def test_api_the_product(self):
+        response_1 = client_post('TheProduct', {})
+        response_2 = client_post('TheProduct', {"id": "four"})
+        response_3 = client_post('TheProduct', {"id": 74})
+        response_4 = client_post('TheProduct', {"id": 2})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'four\'",)]',
+                             'success': '0'}
+        response_3_result = {'status': 'productNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'id': 2,
+                             'title': 'ladan 0.9',
+                             'quantity': 12,
+                             'subcategory_title': 'oil',
+                             'subcategory_id': 1,
+                             'category_title': 'food',
+                             'category_id': 1}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+
