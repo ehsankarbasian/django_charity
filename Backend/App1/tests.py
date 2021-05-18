@@ -521,3 +521,75 @@ class StoreAPIsTestCase(TestCase):
         self.assertEqual(product.title, "tmnt 2020")
         self.assertEqual(product.subCategory, subCategory)
 
+    def test_api_delete_category(self):
+        response_1 = client_post('DeleteCategory', {})
+        response_2 = client_post('DeleteCategory', {"id": "four"})
+        response_3 = client_post('DeleteCategory', {"id": 8})
+        response_4 = client_post('DeleteCategory', {"id": 2})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'four\'",)]',
+                             'success': '0'}
+        response_3_result = {'status': 'categoryNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'message': 'category deleted successfully', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(len(Category.objects.filter(id=2)), 0)
+
+    def test_api_delete_subcategory(self):
+        response_1 = client_post('DeleteSubCategory', {})
+        response_2 = client_post('DeleteSubCategory', {"id": "four"})
+        response_3 = client_post('DeleteSubCategory', {"id": 26})
+        response_4 = client_post('DeleteSubCategory', {"id": 2})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'four\'",)]',
+                             'success': '0'}
+        response_3_result = {'status': 'subcategoryNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'message': 'subcategory deleted successfully', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(len(SubCategory.objects.filter(id=2)), 0)
+
+    def test_api_delete_product(self):
+        response_1 = client_post('DeleteProduct', {})
+        response_2 = client_post('DeleteProduct', {"id": "four"})
+        response_3 = client_post('DeleteProduct', {"id": 74})
+        response_4 = client_post('DeleteProduct', {"id": 2})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'four\'",)]',
+                             'success': '0'}
+        response_3_result = {'status': 'productNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'message': 'product deleted successfully', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(len(Product.objects.filter(id=2)), 0)
+
