@@ -88,3 +88,21 @@ def product_lister(product_queryset):
 
     return Response(final_json,
                     status=status.HTTP_200_OK)
+
+def transaction_item(transactions):
+    item = {"id" : transactions.id
+            "isIn" : transactions.isIn
+            "amount" : transactions.amount
+            "createDate" : transactions.createdate
+            "user_id" : transactions.donatorOrNeedy.id}
+    return item
+
+def transaction_lister(transaction_queryset):
+    transaction_json = {}
+    for transaction in transaction_queryset:
+        transaction_json[transaction.id] = transaction_item(transaction)
+
+    final_json = {"success": "1",
+                  "empty": [0 if len(transaction_json) else 1][0],
+                  "count": len(transaction_queryset),
+                  }

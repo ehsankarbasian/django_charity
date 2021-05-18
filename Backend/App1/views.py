@@ -218,3 +218,22 @@ def donate_money(request):
     return Response({"message": "money donated successfully",
                      "success": "1"},
                     status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def transaction_list(request):
+
+
+    search_key = get_data_or_none(request, "search_key")
+    search_key = ["" if not search_key else search_key][0]
+
+#be jaye title?
+    search_query = Q(title__contains=search_key)
+    user_query = Q(User__id=category_id)
+
+    result_set = Transactions.objects.filter(search_query)
+
+    if UserProfile_id:
+        result_set = result_set.filter(user_query)
+
+    return transaction_lister(result_set)
+
