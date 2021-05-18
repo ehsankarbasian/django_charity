@@ -342,3 +342,182 @@ class StoreAPIsTestCase(TestCase):
         self.assertEqual(response_8, response_8_result)
         self.assertEqual(response_9, response_9_result)
         self.assertEqual(response_10, response_10_result)
+
+    def test_api_edit_category(self):
+        response_1 = client_post('EditCategory', {})
+        response_2 = client_post('EditCategory', {"category_id": 2})
+        response_3 = client_post('EditCategory', {"title": "digital"})
+        response_4 = client_post('EditCategory', {"category_id": 2, "title": "digital"})
+        response_5 = client_post('EditCategory', {"category_id": 8, "title": "digital"})
+        response_6 = client_post('EditCategory', {"category_id": 8, "title": "pooshaak"})
+        response_7 = client_post('EditCategory', {"category_id": 2, "title": "pooshaak"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('category_id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('title',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('category_id',)]",
+                             'success': '0'}
+        response_4_result = {'status': 'notUniqueTitle',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'status': 'notUniqueTitle',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_6_result = {'status': 'categoryNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_7_result = {'message': 'category edited successfully', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        category = Category.objects.get(id=2)
+        self.assertEqual(category.title, "pooshaak")
+
+    def test_api_edit_subcategory(self):
+        response_1 = client_post('EditSubCategory', {})
+        response_2 = client_post('EditSubCategory', {"subcategory_id": 27})
+        response_3 = client_post('EditSubCategory', {"subcategory_id": 8})
+        response_4 = client_post('EditSubCategory', {"subcategory_id": 27, "category_id": 1})
+        response_5 = client_post('EditSubCategory', {"subcategory_id": 8, "category_id": 1})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('subcategory_id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0',
+                             'message': "at least one of 'title' or 'category_id' must be passed"}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0',
+                             'message': "at least one of 'title' or 'category_id' must be passed"}
+        response_4_result = {'status': 'subcategoryNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'message': 'subcategory edited successfully',
+                             'success': '1'}
+        response_6_result = {'status': 'subcategoryNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_7_result = {'status': 'notUniqueTitle',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_8_result = {'message': 'subcategory edited successfully', 'success': '1'}
+        response_9_result = {'message': 'subcategory edited successfully', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        subcategory = SubCategory.objects.get(id=8)
+        category = Category.objects.get(id=1)
+        self.assertEqual(subcategory.category, category)
+        response_6 = client_post('EditSubCategory', {"subcategory_id": 27, "title": "phone"})
+        response_7 = client_post('EditSubCategory', {"subcategory_id": 8, "title": "laptop"})
+        response_8 = client_post('EditSubCategory', {"subcategory_id": 8, "title": "phone"})
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        subcategory = SubCategory.objects.get(id=8)
+        self.assertEqual(subcategory.title, "phone")
+        response_9 = client_post('EditSubCategory', {"subcategory_id": 8, "title": "telephone", "category_id": 3})
+        self.assertEqual(response_9, response_9_result)
+        subcategory = SubCategory.objects.get(id=8)
+        self.assertEqual(subcategory.title, "telephone")
+        category = Category.objects.get(id=3)
+        self.assertEqual(subcategory.category, category)
+
+    def test_api_edit_product(self):
+        response_1 = client_post('EditProduct', {})
+        response_2 = client_post('EditProduct', {"product_id": 8})
+        response_3 = client_post('EditProduct', {"title": "ladan 1.8"})
+        response_4 = client_post('EditProduct', {"product_id": 82, "title": "ladan 1.8"})
+        response_5 = client_post('EditProduct', {"product_id": 2, "title": "bahar 1.5"})
+        response_6 = client_post('EditProduct', {"product_id": 8, "subcategory_id": 17})
+        response_7 = client_post('EditProduct', {"product_id": 8, "title": "mashhood"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('product_id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0',
+                             'message': "at least one of 'title', 'subcategory_id' or 'quantity 'must be passed"}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('product_id',)]",
+                             'success': '0'}
+        response_4_result = {'status': 'productNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'status': 'notUniqueTitle',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_6_result = {'status': 'subcategoryNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_7_result = {'message': 'product edited successfully', 'success': '1'}
+        response_8_result = response_7_result
+        response_9_result = response_7_result
+        response_10_result = response_7_result
+        response_11_result = response_7_result
+        response_12_result = response_7_result
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        product = Product.objects.get(id=8)
+        self.assertEqual(product.title, "mashhood")
+        response_8 = client_post('EditProduct', {"product_id": 8, "quantity": 400})
+        self.assertEqual(response_8, response_8_result)
+        product = Product.objects.get(id=8)
+        self.assertEqual(product.quantity, 400)
+        response_9 = client_post('EditProduct', {"product_id": 8, "subcategory_id": 8})
+        self.assertEqual(response_9, response_9_result)
+        product = Product.objects.get(id=8)
+        subCategory = SubCategory.objects.get(id=8)
+        self.assertEqual(product.subCategory, subCategory)
+        response_10 = client_post('EditProduct', {"product_id": 8, "title": "NOKIA N95", "quantity": 5000})
+        self.assertEqual(response_10, response_10_result)
+        product = Product.objects.get(id=8)
+        self.assertEqual(product.quantity, 5000)
+        self.assertEqual(product.title, "NOKIA N95")
+        response_11 = client_post('EditProduct', {"product_id": 8, "title": "GTA VI", "quantity": 999999, "subcategory_id": 12})
+        self.assertEqual(response_11, response_11_result)
+        product = Product.objects.get(id=8)
+        subCategory = SubCategory.objects.get(id=12)
+        self.assertEqual(product.quantity, 999999)
+        self.assertEqual(product.title, "GTA VI")
+        self.assertEqual(product.subCategory, subCategory)
+        response_12 = client_post('EditProduct', {"product_id": 8, "title": "tmnt 2020", "subcategory_id": 11})
+        self.assertEqual(response_12, response_12_result)
+        product = Product.objects.get(id=8)
+        subCategory = SubCategory.objects.get(id=11)
+        self.assertEqual(product.title, "tmnt 2020")
+        self.assertEqual(product.subCategory, subCategory)
+
