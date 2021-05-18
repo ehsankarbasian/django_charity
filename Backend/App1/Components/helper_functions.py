@@ -35,6 +35,9 @@ from django.core.mail import EmailMultiAlternatives
 
 
 def client_post(url, json):
+    if url in ['ResetPassword', 'ResetPasswordTokenBased',
+               'VerifyEmail', 'VerifyEmailTokenBased']:
+        url = "0xAjE2MT6eiOi538574I1NiJ467f4378A9iOiJ821A5IiLC695e6b88FFxkZ1a997F/" + url
     response = Client().post('/App1/' + url, json, format='json')
     return response.data
 

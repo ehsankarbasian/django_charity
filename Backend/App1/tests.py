@@ -199,10 +199,101 @@ class AuthAPIsTestCase(TestCase):
         self.assertEqual(response_1, response_1_result)
 
     def test_api_verifyEmailTokenBased(self):
-        pass
+        response_1 = client_post('VerifyEmailTokenBased', {})
+        response_2 = client_post('VerifyEmailTokenBased', {"email": "superAdmin@gmail.com"})
+        response_3 = client_post('VerifyEmailTokenBased', {"email": "superAdmin@gmail.com",
+                                                           "token": "theToken"})
+        response_4 = client_post('VerifyEmailTokenBased', {"email": "superAdmin@gmail.com",
+                                                           "token": "verifyEmailToken"})
+        response_5 = client_post('VerifyEmailTokenBased', {"email": "admin@gmail.com",
+                                                           "token": "verifyEmailToken"})
+        response_6 = client_post('VerifyEmailTokenBased', {"email": "donator_2@gmail.com",
+                                                           "token": "verifyEmailToken"})
+        response_7 = client_post('VerifyEmailTokenBased', {"email": "needy@gmail.com",
+                                                           "token": "verifyEmailToken"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('token',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('token',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'privateTokenError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'message': 'email verification was successful, you can login now!', 'success': '1'}
+        response_5_result = response_4_result
+        response_6_result = response_4_result
+        response_7_result = response_4_result
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        user_1 = UserProfile.objects.get(email="superAdmin@gmail.com")
+        user_2 = UserProfile.objects.get(email="admin@gmail.com")
+        user_3 = UserProfile.objects.get(email="donator_2@gmail.com")
+        user_4 = UserProfile.objects.get(email="needy@gmail.com")
+        self.assertEqual(user_1.verified_email, True)
+        self.assertEqual(user_2.verified_email, True)
+        self.assertEqual(user_3.verified_email, True)
+        self.assertEqual(user_4.verified_email, True)
 
     def test_api_verifyEmailCodeBased(self):
-        pass
+        response_1 = client_post('VerifyEmail', {})
+        response_2 = client_post('VerifyEmail', {"email": "superAdmin@gmail.com"})
+        response_3 = client_post('VerifyEmail', {"email": "superAdmin@gmail.com", "code": 1355})
+        response_4 = client_post('VerifyEmail', {"email": "superAdmin_2@gmail.com", "code": 1355})
+        response_5 = client_post('VerifyEmail', {"email": "superAdmin@gmail.com", "code": 2500})
+        response_6 = client_post('VerifyEmail', {"email": "admin@gmail.com", "code": 2500})
+        response_7 = client_post('VerifyEmail', {"email": "donator_2@gmail.com", "code": 2500})
+        response_8 = client_post('VerifyEmail', {"email": "needy@gmail.com", "code": 2500})
+        response_9 = client_post('VerifyEmail', {"email": "needy@gmail.com", "code": 2500})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('code',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('code',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'privateCodeError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'status': 'NoUserForEmail',
+                             'error_type': "[<class 'App1.models.UserProfile.DoesNotExist'>]",
+                             'error_on': "[DoesNotExist('UserProfile matching query does not exist.',)]",
+                             'success': '0'}
+        response_5_result = {'message': 'email verification was successful, you can login now!', 'success': '1'}
+        response_6_result = response_5_result
+        response_7_result = response_5_result
+        response_8_result = response_5_result
+        response_9_result = {'status': 'VerifiedBefore',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        user_1 = UserProfile.objects.get(email="superAdmin@gmail.com")
+        user_2 = UserProfile.objects.get(email="admin@gmail.com")
+        user_3 = UserProfile.objects.get(email="donator_2@gmail.com")
+        user_4 = UserProfile.objects.get(email="needy@gmail.com")
+        self.assertEqual(user_1.verified_email, True)
+        self.assertEqual(user_2.verified_email, True)
+        self.assertEqual(user_3.verified_email, True)
+        self.assertEqual(user_4.verified_email, True)
 
     def test_api_forgotPassword(self):
         pass
