@@ -25,7 +25,6 @@ def init_db_storeManagement():
     """
     initials the default database for Product, Category and SubCategory
     """
-    print("ABBAS BUAZAR")
     food = Category.objects.create(title="food")
     clothes = Category.objects.create(title="clothes")
     digital = Category.objects.create(title="digital")
