@@ -6,11 +6,21 @@ def init_db_user():
     initials the default database for User and UserProfile
     """
 
-    superAdminUser = User.objects.create_user(username="superAdmin", email="superAdmin@gmail.com", password="12345")
-    adminUser = User.objects.create_user(username="admin", email="admin@gmail.com", password="12345")
-    donatorUser_1 = User.objects.create_user(username="donator_1", email="donator_1@gmail.com", password="12345")
-    donatorUser_2 = User.objects.create_user(username="donator_2", email="donator_2@gmail.com", password="12345")
-    needyUser_1 = User.objects.create_user(username="needy_1", email="needy@gmail.com", password="12345")
+    superAdminUser = User.objects.create_user(username="superAdmin",
+                                              email="superAdmin@gmail.com",
+                                              password="12345")
+    adminUser = User.objects.create_user(username="admin",
+                                         email="admin@gmail.com",
+                                         password="12345")
+    donatorUser_1 = User.objects.create_user(username="donator_1",
+                                             email="donator_1@gmail.com",
+                                             password="12345")
+    donatorUser_2 = User.objects.create_user(username="donator_2",
+                                             email="donator_2@gmail.com",
+                                             password="12345")
+    needyUser_1 = User.objects.create_user(username="needy_1",
+                                           email="needy@gmail.com",
+                                           password="12345")
 
     UserProfile.objects.create(user=superAdminUser,
                                email=superAdminUser.email,

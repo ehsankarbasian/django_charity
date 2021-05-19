@@ -26,8 +26,7 @@ def user_item(user):
         "workplace_phone": user.workplace_phone,
         "gender": ["male" if user.gender == 1 else "female"][0],
         "married": user.married,
-        "birth_date": user.birth_date,
-        "signup_date": user.signup_date,
+        "birth_date": user.birth_date
     }
 
     return item

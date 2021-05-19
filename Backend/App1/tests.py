@@ -496,10 +496,176 @@ class AuthAPIsTestCase(TestCase):
         self.assertEqual(user_3, profile_3.user)
 
     def test_api_notVerifiedUserSet(self):
-        pass
+        response_1 = client_post('NotVerifiedUserSet', {})
+        response_2 = client_post('NotVerifiedUserSet', {"TOKEN_API": "jnfavlbinjaedsnc"})
+        response_3 = client_post('NotVerifiedUserSet', {"TOKEN_API": "defaultAdmin"})
+        response_4 = client_post('NotVerifiedUserSet', {"TOKEN_API": "defaultDonator_1"})
+        response_5 = client_post('NotVerifiedUserSet', {"TOKEN_API": "defaultSuperAdmin"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('TOKEN_API',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'adminNotFound',
+                             'error_type': "[<class 'App1.models.UserProfile.DoesNotExist'>]",
+                             'error_on': "[DoesNotExist('UserProfile matching query does not exist.',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'notSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'status': 'notSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'success': '1',
+                             'empty_needy': 0,
+                             'empty_donator': 0,
+                             'pagination_params': None,
+                             'needy_set': {5: {'id': 5,
+                                               'username': 'needy_1',
+                                               'user_type': 4,
+                                               'first_name': '',
+                                               'last_name': '',
+                                               'melli_code': '',
+                                               'email': 'needy@gmail.com',
+                                               'job': None,
+                                               'address': None,
+                                               'mobile_number': None,
+                                               'house_phone': None,
+                                               'workplace_phone': None,
+                                               'gender': 'male',
+                                               'married': False,
+                                               'birth_date': None, }},
+                             'donator_set': {3: {'id': 3,
+                                                 'username': 'donator_1',
+                                                 'user_type': 3,
+                                                 'first_name': '',
+                                                 'last_name': '',
+                                                 'melli_code': '',
+                                                 'email': 'donator_1@gmail.com',
+                                                 'job': None,
+                                                 'address': None,
+                                                 'mobile_number': None,
+                                                 'house_phone': None,
+                                                 'workplace_phone': None,
+                                                 'gender': 'male',
+                                                 'married': False,
+                                                 'birth_date': None, },
+                                             4: {'id': 4,
+                                                 'username': 'donator_2',
+                                                 'user_type': 3,
+                                                 'first_name': '',
+                                                 'last_name': '',
+                                                 'melli_code': '',
+                                                 'email': 'donator_2@gmail.com',
+                                                 'job': None,
+                                                 'address': None,
+                                                 'mobile_number': None,
+                                                 'house_phone': None,
+                                                 'workplace_phone': None,
+                                                 'gender': 'male',
+                                                 'married': False,
+                                                 'birth_date': None}}}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
 
     def test_api_verifyOrRejectUser(self):
-        pass
+        response_1 = client_post('VerifyOrRejectUser', {})
+        response_2 = client_post('VerifyOrRejectUser', {"TOKEN_API": "jnfavlbinjaedsnc", "user_id": 3, "action": "verify"})
+        response_3 = client_post('VerifyOrRejectUser', {"TOKEN_API": "jnfavlbinjaedsnc", "user_id": "one", "action": "verify"})
+        response_4 = client_post('VerifyOrRejectUser', {"TOKEN_API": "jnfavlbinjaedsnc", "user_id": 4, "action": 1})
+        response_5 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultDonator_2", "user_id": 4, "action": 1})
+        response_6 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultNeedy_1", "user_id": 4, "action": 1})
+        response_7 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultAdmin", "user_id": 4, "action": 1})
+        response_8 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultSuperAdmin", "user_id": 12, "action": 1})
+        response_9 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultSuperAdmin", "user_id": 1, "action": 1})
+        response_10 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultSuperAdmin", "user_id": 2, "action": 1})
+        response_11 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultSuperAdmin", "user_id": 3, "action": 0})
+        response_12 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultSuperAdmin", "user_id": 3, "action": 1})
+        response_13 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultSuperAdmin", "user_id": 4, "action": 1})
+        response_14 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultSuperAdmin", "user_id": 4, "action": 1})
+        response_15 = client_post('VerifyOrRejectUser', {"TOKEN_API": "defaultSuperAdmin", "user_id": 5, "action": 1})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('TOKEN_API',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'verify\'",)]',
+                             'success': '0'}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'one\'",)]',
+                             'success': '0'}
+        response_4_result = {'status': 'adminNotFound',
+                             'error_type': "[<class 'App1.models.UserProfile.DoesNotExist'>]",
+                             'error_on': "[DoesNotExist('UserProfile matching query does not exist.',)]",
+                             'success': '0'}
+        response_5_result = {'status': 'notSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_6_result = {'status': 'notSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_7_result = {'status': 'notSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_8_result = {'status': 'userNotFound',
+                             'error_type': "[<class 'App1.models.UserProfile.DoesNotExist'>]",
+                             'error_on': "[DoesNotExist('UserProfile matching query does not exist.',)]",
+                             'success': '0'}
+        response_9_result = {'status': 'userTypeError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0',
+                             'explanation': 'user_type is superAdmin'}
+        response_10_result = {'status': 'userTypeError',
+                              'error_type': 'CUSTOM',
+                              'error_on': 'CUSTOM',
+                              'success': '0',
+                              'explanation': 'user_type is admin'}
+        response_11_result = {'message': 'user rejected (deleted) successfully', 'success': '1'}
+        response_12_result = {'status': 'userNotFound',
+                              'error_type': "[<class 'App1.models.UserProfile.DoesNotExist'>]",
+                              'error_on': "[DoesNotExist('UserProfile matching query does not exist.',)]",
+                              'success': '0'}
+        response_13_result = {'message': 'user verified successfully', 'success': '1'}
+        response_14_result = {'status': 'verifiedBefore',
+                              'error_type': 'CUSTOM',
+                              'error_on': 'CUSTOM',
+                              'success': '0'}
+        response_15_result = {'message': 'user verified successfully', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        self.assertEqual(response_10, response_10_result)
+        self.assertEqual(response_11, response_11_result)
+        self.assertEqual(response_12, response_12_result)
+        self.assertEqual(response_13, response_13_result)
+        self.assertEqual(response_14, response_14_result)
+        self.assertEqual(response_15, response_15_result)
+        user_1 = UserProfile.objects.get(id=1)
+        user_2 = UserProfile.objects.get(id=2)
+        user_3 = UserProfile.objects.filter(id=3)
+        user_4 = UserProfile.objects.get(id=4)
+        user_5 = UserProfile.objects.get(id=5)
+        self.assertEqual(user_1.verified, False)
+        self.assertEqual(user_2.verified, False)
+        self.assertEqual(len(user_3), 0)
+        self.assertEqual(user_4.verified, True)
+        self.assertEqual(user_5.verified, True)
 
 
 class EventAPIsTestCase(TestCase):
