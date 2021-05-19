@@ -219,21 +219,69 @@ def donate_money(request):
                      "success": "1"},
                     status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 def transaction_list(request):
+    """
+    lists all or filtered money transactions
 
+    potential errors:
+        requiredParams
+        userNotFound
+        filterUserNotFound
+    """
+    SORT_BY = ["", "amount", "create_date"]
 
-    search_key = get_data_or_none(request, "search_key")
-    search_key = ["" if not search_key else search_key][0]
+    try:
+        TOKEN_ID = request.data["TOKEN_ID"]
+        is_in = get_data_or_none(request, "is_in")
+        sort_by = get_data_or_none(request, "sort_by")
+        sort_type = get_data_or_none(request, "sort_type")
+        amount_max = get_data_or_none(request, "amount_max")
+        amount_min = get_data_or_none(request, "amount_min")
+        filter_by_user = get_data_or_none(request, "filter_by_user")
+    except Exception:
+        return error("requiredParams")
 
-#be jaye title?
-    search_query = Q(title__contains=search_key)
-    user_query = Q(User__id=category_id)
+    user = UserProfile.objects.filter(token=TOKEN_ID)
+    if not len(user):
+        return error("userNotFound")
+    user = UserProfile.objects.get(token=TOKEN_ID)
 
-    result_set = Transactions.objects.filter(search_query)
+    if user.user_type in [3, 4]:
+        user_filter = user
+    else:
+        if filter_by_user:
+            user_filter = UserProfile.objects.filter(token=filter_by_user)
+            if not len(user_filter):
+                return error("filterUserNotFound")
+        else:
+            user_filter = UserProfile.objects.all()
 
-    if UserProfile_id:
-        result_set = result_set.filter(user_query)
+    user_query = Q(donatorOrNeedy__in=user_filter)
+    result_set = Transactions.objects.filter(user_query)
+
+    if is_in:
+        is_in = bool(is_in)
+        result_set = result_set.filter(is_in=is_in)
+
+    if amount_max:
+        amount_max = int(amount_max)
+        max_query = Q(amount__lte=amount_max)
+        result_set = result_set.filter(max_query)
+
+    if amount_min:
+        amount_min = int(amount_min)
+        min_query = Q(amount__gte=amount_min)
+        result_set = result_set.filter(min_query)
+
+    if sort_type:
+        sort_type = ['-' if sort_type == "Ascending" else '+']
+    else:
+        sort_type = '-'
+
+    if sort_by:
+        sort_by = int(sort_by)
+        result_set = result_set.order_by(sort_type + SORT_BY[sort_by])
 
     return transaction_lister(result_set)
-
