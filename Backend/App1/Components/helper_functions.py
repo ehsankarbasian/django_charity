@@ -23,6 +23,7 @@ contains:
 import sys
 
 from rest_framework.response import Response
+from re import search as validateRegex
 from rest_framework import status
 from secrets import token_hex
 
@@ -75,6 +76,9 @@ def simplify_email(email):
     (it's done in views.py before pass it to this function)
     returns email and tags as strings (tags are '+' joined)
     """
+    EMAIL_REGEX = r'^(\w|\.|\_|\-|\+)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
+    if not validateRegex(EMAIL_REGEX, email):
+        return {'success': 0}
     try:
         simplified_email = "".join(
             email.split("@")[0]
@@ -86,7 +90,7 @@ def simplify_email(email):
         return {'success': 1,
                 'email': simplified_email,
                 'tags': email_tags_string}
-    except e:
+    except Exception:
         return {'success': 0}
 
 

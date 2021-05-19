@@ -275,25 +275,28 @@ def forgotPassword(request):
     to_email = simple_email_set['email']
 
     # Check if email verified:
-    user = UserProfile.objects.get(email=to_email)
+    userProfile = UserProfile.objects.filter(email=to_email)
 
-    if user is None:
+    if not len(userProfile):
         return error("noSuchUser")
-    elif not user.verified_email:
+    else:
+        userProfile = UserProfile.objects.get(email=to_email)
+
+    if not userProfile.verified_email:
         return error("notVerifiedEmailError")
 
     token = token_hex(128)
     code = randint(10000000, 99999999)
-    user.reset_pass_token = token
-    user.reset_pass_code = code
-    user.save()
+    userProfile.reset_pass_token = token
+    userProfile.reset_pass_code = code
+    userProfile.save()
 
     html_content = get_template('ResetPass.html').render(context={
         'HOST': HOST,
         'PORT': PORT,
         'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
         'email': to_email,
-        'name': user.user.username,
+        'name': userProfile.user.username,
         'private_code': code,
         'private_token': token
     })

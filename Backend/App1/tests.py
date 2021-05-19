@@ -3,6 +3,7 @@ from rest_framework.test import APIRequestFactory
 from App1.Components.helper_functions import set_email_verified
 from App1.Components.helper_functions import client_post
 from App1.Components.helper_functions import client_get
+from django.contrib.auth import authenticate
 from App1.Components.init_test_db import *
 from App1.models import *
 
@@ -296,13 +297,203 @@ class AuthAPIsTestCase(TestCase):
         self.assertEqual(user_4.verified_email, True)
 
     def test_api_forgotPassword(self):
-        pass
+        response_1 = client_post('ForgotPassword', {})
+        response_2 = client_post('ForgotPassword', {"email": "ehsan@k@gmail.com"})
+        response_3 = client_post('ForgotPassword', {"email": "ehsan.k@gmail.com"})
+        response_4 = client_post('ForgotPassword', {"email": "donator_1@gmail.com"})
+        response_5 = client_post('ForgotPassword', {"email": "needy@gmail.com"})
+        set_email_verified("donator_1")
+        set_email_verified("needy_1")
+        response_6 = client_post('ForgotPassword', {"email": "d.on.at...o.r_.1@gmail.com"})
+        response_7 = client_post('ForgotPassword', {"email": "nee.dy@gmail.com"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('email',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'invalidEmailError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_3_result = {'status': 'noSuchUser',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'status': 'notVerifiedEmailError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'status': 'notVerifiedEmailError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_6_result = {'message': 'email sent', 'success': '1'}
+        response_7_result = {'message': 'email sent', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        user_1 = User.objects.get(username="donator_1")
+        profile_1 = UserProfile.objects.get(user=user_1)
+        user_2 = User.objects.get(username="needy_1")
+        profile_2 = UserProfile.objects.get(user=user_2)
+        self.assertEqual(len(profile_1.reset_pass_token), 256)
+        self.assertEqual(len(profile_2.reset_pass_token), 256)
+        self.assertGreaterEqual(profile_1.reset_pass_code, 10000000)
+        self.assertLessEqual(profile_1.reset_pass_code, 99999999)
+        self.assertGreaterEqual(profile_2.reset_pass_code, 10000000)
+        self.assertLessEqual(profile_2.reset_pass_code, 99999999)
 
     def test_api_resetPasswordTokenBased(self):
-        pass
+        set_email_verified("superAdmin")
+        set_email_verified("donator_1")
+        set_email_verified("needy_1")
+        response_1 = client_post('ResetPasswordTokenBased', {})
+        response_2 = client_post('ResetPasswordTokenBased', {"email": "superAdmin@gmail.com"})
+        response_3 = client_post('ResetPasswordTokenBased', {"email": "superAdmin@gmail.com",
+                                                             "pass1": "4444",
+                                                             "token": "TheToken"})
+        response_4 = client_post('ResetPasswordTokenBased', {"email": "superAdmin@gmail.com",
+                                                             "pass1": "4444",
+                                                             "pass2": "1234",
+                                                             "token": "TheToken"})
+        response_5 = client_post('ResetPasswordTokenBased', {"email": "superAdmin@gmail.com",
+                                                             "pass1": "4444",
+                                                             "pass2": "4444",
+                                                             "token": "TheToken"})
+        client_post('ForgotPassword', {"email": "superAdmin@gmail.com"})
+        profile_1 = UserProfile.objects.get(email="superAdmin@gmail.com")
+        response_6 = client_post('ResetPasswordTokenBased', {"email": "superAdmin@gmail.com",
+                                                             "pass1": "SuperAdminPass",
+                                                             "pass2": "SuperAdminPass",
+                                                             "token": profile_1.reset_pass_token})
+        client_post('ForgotPassword', {"email": "donator_1@gmail.com"})
+        profile_2 = UserProfile.objects.get(email="donator_1@gmail.com")
+        response_7 = client_post('ResetPasswordTokenBased', {"email": "donator_1@gmail.com",
+                                                             "pass1": "DonatorPass",
+                                                             "pass2": "DonatorPass",
+                                                             "token": profile_2.reset_pass_token})
+        client_post('ForgotPassword', {"email": "needy@gmail.com"})
+        profile_3 = UserProfile.objects.get(email="needy@gmail.com")
+        response_8 = client_post('ResetPasswordTokenBased', {"email": "needy@gmail.com",
+                                                             "pass1": "NeedyPass",
+                                                             "pass2": "NeedyPass",
+                                                             "token": profile_3.reset_pass_token})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('pass1',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('pass1',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('pass2',)]",
+                             'success': '0'}
+        response_4_result = {'status': 'differentPasswords',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'status': 'privateTokenError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_6_result = {'message': 'password changed', 'success': '1'}
+        response_7_result = {'message': 'password changed', 'success': '1'}
+        response_8_result = {'message': 'password changed', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        user_1 = authenticate(username="superAdmin", password="SuperAdminPass")
+        user_2 = authenticate(username="donator_1", password="DonatorPass")
+        user_3 = authenticate(username="needy_1", password="NeedyPass")
+        self.assertEqual(user_1, profile_1.user)
+        self.assertEqual(user_2, profile_2.user)
+        self.assertEqual(user_3, profile_3.user)
 
     def test_api_resetPasswordCodeBased(self):
-        pass
+        set_email_verified("superAdmin")
+        set_email_verified("donator_1")
+        set_email_verified("needy_1")
+        response_1 = client_post('ResetPassword', {})
+        response_2 = client_post('ResetPassword', {"email": "superAdmin@gmail.com",
+                                                   "pass1": "4444",
+                                                   "code": "1234"})
+        response_3 = client_post('ResetPassword', {"email": "superAdmin@gmail.com",
+                                                   "pass1": "4444",
+                                                   "pass2": "4444",
+                                                   "code": "theCode"})
+        response_4 = client_post('ResetPassword', {"email": "superAdmin@gmail.com",
+                                                   "pass1": "4444",
+                                                   "pass2": "1234",
+                                                   "code": "1234"})
+        response_5 = client_post('ResetPassword', {"email": "superAdmin@gmail.com",
+                                                   "pass1": "4444",
+                                                   "pass2": "4444",
+                                                   "code": "2021"})
+        client_post('ForgotPassword', {"email": "superAdmin@gmail.com"})
+        profile_1 = UserProfile.objects.get(email="superAdmin@gmail.com")
+        response_6 = client_post('ResetPassword', {"email": "superAdmin@gmail.com",
+                                                   "pass1": "SuperAdminPass",
+                                                   "pass2": "SuperAdminPass",
+                                                   "code": profile_1.reset_pass_code})
+        client_post('ForgotPassword', {"email": "donator_1@gmail.com"})
+        profile_2 = UserProfile.objects.get(email="donator_1@gmail.com")
+        response_7 = client_post('ResetPassword', {"email": "donator_1@gmail.com",
+                                                   "pass1": "DonatorPass",
+                                                   "pass2": "DonatorPass",
+                                                   "code": profile_2.reset_pass_code})
+        client_post('ForgotPassword', {"email": "needy@gmail.com"})
+        profile_3 = UserProfile.objects.get(email="needy@gmail.com")
+        response_8 = client_post('ResetPassword', {"email": "needy@gmail.com",
+                                                   "pass1": "NeedyPass",
+                                                   "pass2": "NeedyPass",
+                                                   "code": profile_3.reset_pass_code})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('pass1',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('pass2',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'theCode\'",)]',
+                             'success': '0'}
+        response_4_result = {'status': 'differentPasswords',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'status': 'privateCodeError',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_6_result = {'message': 'password changed', 'success': '1'}
+        response_7_result = {'message': 'password changed', 'success': '1'}
+        response_8_result = {'message': 'password changed', 'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        user_1 = authenticate(username="superAdmin", password="SuperAdminPass")
+        user_2 = authenticate(username="donator_1", password="DonatorPass")
+        user_3 = authenticate(username="needy_1", password="NeedyPass")
+        self.assertEqual(user_1, profile_1.user)
+        self.assertEqual(user_2, profile_2.user)
+        self.assertEqual(user_3, profile_3.user)
 
     def test_api_notVerifiedUserSet(self):
         pass
