@@ -7,6 +7,7 @@ contains:
     category_item
     subcategory_item
     product_item
+    transaction_item
 """
 
 
@@ -87,4 +88,13 @@ def product_item(product):
             "category_title": product.subCategory.category.title,
             "category_id": product.subCategory.category.id}
 
+    return item
+
+
+def transaction_item(transactions):
+    item = {"id": transactions.id,
+            "is_in": transactions.is_in,
+            "amount": transactions.amount,
+            "create_date": transactions.create_date,
+            "user_id": transactions.donatorOrNeedy.id}
     return item

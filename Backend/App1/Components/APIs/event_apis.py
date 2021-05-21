@@ -11,6 +11,7 @@ contains:
     userEvent
     deleteEvent
     editEventByUser
+    donateMoneyEvent
 """
 
 
@@ -435,7 +436,7 @@ def editEventByUser(request):
 
 
 @api_view(['POST'])
-def donate_money_event(request):
+def donateMoneyEvent(request):
     """
     donates money for an event
 

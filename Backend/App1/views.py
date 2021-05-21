@@ -127,7 +127,7 @@ def generalDonate(request):
 @api_view(['POST'])
 def delivery(request):
     """
-    records delivery product by admin fo a donate
+    records delivery product by admin for a donate
 
     potential errors:
         requiredParams
@@ -142,14 +142,14 @@ def delivery(request):
         return error("requiredParams")
 
     transferee = UserProfile.objects.filter(token=TOKEN_ID)
-    if not transferee:
+    if not len(transferee):
         return error("userNotFound")
     transferee = UserProfile.objects.get(token=TOKEN_ID)
     if transferee.user_type not in [1, 2]:
         return error("userNotAdmin")
 
     donate = DonatesIn.objects.filter(id=donate_id)
-    if not donate:
+    if not len(donate):
         return error("donateNotFound")
     donate = DonatesIn.objects.get(id=donate_id)
 
@@ -170,7 +170,7 @@ def test(request):
 
 
 @api_view(['POST'])
-def transaction_list(request):
+def transactionList(request):
     """
     lists all or filtered money transactions
 
@@ -201,7 +201,6 @@ def transaction_list(request):
         user_filter = UserProfile.objects.filter(token=TOKEN_ID)
     else:
         if filter_by_user:
-            print (filter_by_user)
             user_filter = UserProfile.objects.filter(melli_code=filter_by_user)
             if not len(user_filter):
                 return error("filterUserNotFound")
@@ -235,7 +234,7 @@ def transaction_list(request):
 
 
 @api_view(['POST'])
-def resent_transaction_list(request):
+def resentTransactionList(request):
     """
     lists the most recent transactions
 

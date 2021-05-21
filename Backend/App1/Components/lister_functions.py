@@ -8,6 +8,7 @@ contains:
     category_lister
     subcategory_lister
     product_lister
+    transaction_lister
 """
 
 
@@ -118,15 +119,6 @@ def product_lister(product_queryset):
 
     return Response(final_json,
                     status=status.HTTP_200_OK)
-
-
-def transaction_item(transactions):
-    item = {"id": transactions.id,
-            "is_in": transactions.is_in,
-            "amount": transactions.amount,
-            "create_date": transactions.create_date,
-            "user_id": transactions.donatorOrNeedy.id}
-    return item
 
 
 def transaction_lister(transaction_queryset):

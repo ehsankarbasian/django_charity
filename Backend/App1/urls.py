@@ -23,15 +23,15 @@ urlpatterns = [
     path('NotVerifiedUserSet', views.notVerifiedUserSet),
     path('VerifyOrRejectUser', views.verifyOrRejectUser),
 
-    # path('DonateMoney', views.donate_money_event),
+    path('DonateMoney', views.donateMoneyEvent),
     # path('DonateMoney', views.donate_money),
     
     path('GeneralDonate', views.generalDonate),
     path('Delivery', views.delivery),
     path('test', views.test),
 
-    path('TransactionList', views.transaction_list),
-    path('RecentTransactionList', views.resent_transaction_list),
+    path('TransactionList', views.transactionList),
+    path('RecentTransactionList', views.resentTransactionList),
 
     # StoreManagement urls:
     path('CreateCategory', views.create_category),
