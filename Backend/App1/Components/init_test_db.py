@@ -84,7 +84,7 @@ def init_db_profile():
     superAdminProfile.house_phone = "02152254444"
     superAdminProfile.workplace_phone = "02152253333"
     superAdminProfile.gender = 1
-    superAdminProfile.married = 1
+    superAdminProfile.married = 0
     superAdminProfile.birth_date = "2021-01-23"
     superAdminProfile.verified = True
     superAdminProfile.verified_mobile = False
@@ -92,8 +92,8 @@ def init_db_profile():
     superAdminProfile.completed = True
     superAdminProfile.save()
 
-    adminProfile.first_name = "super first name"
-    adminProfile.last_name = "super last name"
+    adminProfile.first_name = "admin first name"
+    adminProfile.last_name = "admin last name"
     adminProfile.melli_code = "1234444"
     adminProfile.job = "the admin of NTM charity"
     adminProfile.address = "ntm charity"

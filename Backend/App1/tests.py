@@ -1,3 +1,4 @@
+import datetime
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from App1.Components.helper_functions import set_email_verified
@@ -678,7 +679,243 @@ class ProfileAPIsTestCase(TestCase):
         init_db_profile()
 
     def test_api_loadUserProfile(self):
-        pass
+        response_1 = client_post('LoadUserProfile', {})
+        response_2 = client_post('LoadUserProfile', {"username": "Nobody"})
+        response_3 = client_post('LoadUserProfile', {"username": "superAdmin"})
+        response_4 = client_post('LoadUserProfile', {"username": "admin"})
+        response_5 = client_post('LoadUserProfile', {"username": "donator_2"})
+        response_6 = client_post('LoadUserProfile', {"username": "needy_1"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'DoesNotExist',
+                             'error_type': "[<class 'django.contrib.auth.models.User.DoesNotExist'>]",
+                             'error_on': "[DoesNotExist('User matching query does not exist.',)]",
+                             'success': '0'}
+        response_3_result = {'username': 'superAdmin',
+                             'user_type': 1,
+                             'first_name': 'super admin first name',
+                             'last_name': 'super admin last name',
+                             'melli_code': '1232500',
+                             'email': 'superAdmin@gmail.com',
+                             'job': 'the super admin of NTM charity',
+                             'address': 'ntm charity',
+                             'mobile_number': '09132224444',
+                             'house_phone': '02152254444',
+                             'workplace_phone': '02152253333',
+                             'gender': True,
+                             'married': False,
+                             'birth_date': datetime.date(2021, 1, 23),
+                             'verified_needy': True,
+                             'verified': True,
+                             'verified_mobile': False,
+                             'verified_email': True,
+                             'is_profile_completed': True,
+                             'success': '1'}
+        response_4_result = {'username': 'admin',
+                             'user_type': 2,
+                             'first_name': 'admin first name',
+                             'last_name': 'admin last name',
+                             'melli_code': '1234444',
+                             'email': 'admin@gmail.com',
+                             'job': 'the admin of NTM charity',
+                             'address': 'ntm charity',
+                             'mobile_number': '09132225555',
+                             'house_phone': '02152256666',
+                             'workplace_phone': '02152254444',
+                             'gender': False,
+                             'married': True,
+                             'birth_date': datetime.date(2020, 8, 11),
+                             'verified_needy': True,
+                             'verified': True,
+                             'verified_mobile': True,
+                             'verified_email': True,
+                             'is_profile_completed': True,
+                             'success': '1'}
+        response_5_result = {'username': 'donator_2',
+                             'user_type': 3,
+                             'first_name': '',
+                             'last_name': '',
+                             'melli_code': '',
+                             'email': 'donator_2@gmail.com',
+                             'job': None,
+                             'address': None,
+                             'mobile_number': None,
+                             'house_phone': None,
+                             'workplace_phone': None,
+                             'gender': True,
+                             'married': False,
+                             'birth_date': None,
+                             'verified_needy': False,
+                             'verified': False,
+                             'verified_mobile': False,
+                             'verified_email': False,
+                             'is_profile_completed': False,
+                             'success': '1'}
+        response_6_result = {'username': 'needy_1',
+                             'user_type': 4,
+                             'first_name': '',
+                             'last_name': '',
+                             'melli_code': '',
+                             'email': 'needy@gmail.com',
+                             'job': None,
+                             'address': None,
+                             'mobile_number': None,
+                             'house_phone': None,
+                             'workplace_phone': None,
+                             'gender': True,
+                             'married': False,
+                             'birth_date': None,
+                             'verified_needy': False,
+                             'verified': False,
+                             'verified_mobile': False,
+                             'verified_email': False,
+                             'is_profile_completed': False,
+                             'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        superAdminUser = User.objects.get(username="superAdmin")
+        adminUser = User.objects.get(username="admin")
+        donatorUser_2 = User.objects.get(username="donator_2")
+        needyUser_1 = User.objects.get(username="needy_1")
+        superAdminProfile = UserProfile.objects.get(user=superAdminUser)
+        adminProfile = UserProfile.objects.get(user=adminUser)
+        donatorProfile_2 = UserProfile.objects.get(user=donatorUser_2)
+        needyProfile_1 = UserProfile.objects.get(user=needyUser_1)
+        donatorProfile_2.first_name = "donator 2 first name"
+        donatorProfile_2.last_name = "donator 2 last name"
+        donatorProfile_2.melli_code = "12344425"
+        donatorProfile_2.job = "a donator of NTM charity"
+        donatorProfile_2.address = "ntm charity donator 2 home"
+        donatorProfile_2.mobile_number = "09132225665"
+        donatorProfile_2.house_phone = "02152256556"
+        donatorProfile_2.workplace_phone = "02152254334"
+        donatorProfile_2.gender = 0
+        donatorProfile_2.married = 0
+        donatorProfile_2.birth_date = "2018-08-11"
+        donatorProfile_2.verified = True
+        donatorProfile_2.verified_mobile = True
+        donatorProfile_2.verified_email = False
+        donatorProfile_2.completed = True
+        donatorProfile_2.save()
+        needyProfile_1.first_name = "needy 1 first name"
+        needyProfile_1.last_name = "needy 1 last name"
+        needyProfile_1.melli_code = "1234455"
+        needyProfile_1.job = "a needy of NTM charity"
+        needyProfile_1.address = "ntm charity needy 1 home"
+        needyProfile_1.mobile_number = "09132225775"
+        needyProfile_1.house_phone = "02152256766"
+        needyProfile_1.workplace_phone = "02152254474"
+        needyProfile_1.gender = 1
+        needyProfile_1.married = 0
+        needyProfile_1.birth_date = "2007-08-11"
+        needyProfile_1.verified = True
+        needyProfile_1.verified_mobile = True
+        needyProfile_1.verified_email = True
+        needyProfile_1.completed = True
+        needyProfile_1.save()
+        superAdminProfile.first_name = "THE super admin first name"
+        superAdminProfile.last_name = "THE super admin last name"
+        superAdminProfile.address = "ntm charity address 2"
+        superAdminProfile.mobile_number = "09132229999"
+        superAdminProfile.married = 1
+        superAdminProfile.save()
+        adminProfile.first_name = "THE admin first name"
+        adminProfile.last_name = "THE admin last name"
+        adminProfile.house_phone = "02152256896"
+        adminProfile.save()
+        response_7 = client_post('LoadUserProfile', {"username": "superAdmin"})
+        response_8 = client_post('LoadUserProfile', {"username": "admin"})
+        response_9 = client_post('LoadUserProfile', {"username": "donator_2"})
+        response_10 = client_post('LoadUserProfile', {"username": "needy_1"})
+        response_7_result = {'username': 'superAdmin',
+                             'user_type': 1,
+                             'first_name': 'THE super admin first name',
+                             'last_name': 'THE super admin last name',
+                             'melli_code': '1232500',
+                             'email': 'superAdmin@gmail.com',
+                             'job': 'the super admin of NTM charity',
+                             'address': 'ntm charity address 2',
+                             'mobile_number': '09132229999',
+                             'house_phone': '02152254444',
+                             'workplace_phone': '02152253333',
+                             'gender': True,
+                             'married': True,
+                             'birth_date': datetime.date(2021, 1, 23),
+                             'verified_needy': True,
+                             'verified': True,
+                             'verified_mobile': False,
+                             'verified_email': True,
+                             'is_profile_completed': True,
+                             'success': '1'}
+        response_8_result = {'username': 'admin',
+                             'user_type': 2,
+                             'first_name': 'THE admin first name',
+                             'last_name': 'THE admin last name',
+                             'melli_code': '1234444',
+                             'email': 'admin@gmail.com',
+                             'job': 'the admin of NTM charity',
+                             'address': 'ntm charity',
+                             'mobile_number': '09132225555',
+                             'house_phone': '02152256896',
+                             'workplace_phone': '02152254444',
+                             'gender': False,
+                             'married': True,
+                             'birth_date': datetime.date(2020, 8, 11),
+                             'verified_needy': True,
+                             'verified': True, 'verified_mobile': True,
+                             'verified_email': True,
+                             'is_profile_completed': True,
+                             'success': '1'}
+        response_9_result = {'username': 'donator_2',
+                             'user_type': 3,
+                             'first_name': 'donator 2 first name',
+                             'last_name': 'donator 2 last name',
+                             'melli_code': '12344425',
+                             'email': 'donator_2@gmail.com',
+                             'job': 'a donator of NTM charity',
+                             'address': 'ntm charity donator 2 home',
+                             'mobile_number': '09132225665',
+                             'house_phone': '02152256556',
+                             'workplace_phone': '02152254334',
+                             'gender': False,
+                             'married': False,
+                             'birth_date': datetime.date(2018, 8, 11),
+                             'verified_needy': True,
+                             'verified': True,
+                             'verified_mobile': True,
+                             'verified_email': False,
+                             'is_profile_completed': True,
+                             'success': '1'}
+        response_10_result = {'username': 'needy_1',
+                              'user_type': 4,
+                              'first_name': 'needy 1 first name',
+                              'last_name': 'needy 1 last name',
+                              'melli_code': '1234455',
+                              'email': 'needy@gmail.com',
+                              'job': 'a needy of NTM charity',
+                              'address': 'ntm charity needy 1 home',
+                              'mobile_number': '09132225775',
+                              'house_phone': '02152256766',
+                              'workplace_phone': '02152254474',
+                              'gender': True,
+                              'married': False,
+                              'birth_date': datetime.date(2007, 8, 11),
+                              'verified_needy': True,
+                              'verified': True,
+                              'verified_mobile': True,
+                              'verified_email': True,
+                              'is_profile_completed': True,
+                              'success': '1'}
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        self.assertEqual(response_10, response_10_result)
 
     def test_api_submitUserProfile(self):
         pass

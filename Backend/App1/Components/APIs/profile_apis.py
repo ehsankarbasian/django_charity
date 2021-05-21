@@ -59,6 +59,7 @@ def loadUserProfile(request):
                          "married": current_user.married,
                          "birth_date": current_user.birth_date,
                          "verified_needy": current_user.verified,
+                         "verified": current_user.verified,
                          "verified_mobile": current_user.verified_mobile,
                          "verified_email": current_user.verified_email,
                          "is_profile_completed": current_user.completed,
