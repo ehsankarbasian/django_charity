@@ -1039,7 +1039,65 @@ class ProfileAPIsTestCase(TestCase):
         self.assertEqual(donatorProfile_2.birth_date, datetime.date(2000, 10, 23))
 
     def test_api_userBio(self):
-        pass
+        response_1 = client_post('UserBio', {})
+        response_2 = client_post('UserBio', {"username": "Nobody"})
+        response_3 = client_post('UserBio', {"username": "superAdmin"})
+        response_4 = client_post('UserBio', {"username": "admin"})
+        donatorUser_2 = User.objects.get(username="donator_2")
+        donatorProfile_2 = UserProfile.objects.get(user=donatorUser_2)
+        donatorProfile_2.first_name = "donator 2 first name"
+        donatorProfile_2.last_name = "donator 2 last name"
+        donatorProfile_2.save()
+        needyUser_1 = User.objects.get(username="needy_1")
+        needyProfile_1 = UserProfile.objects.get(user=needyUser_1)
+        needyProfile_1.first_name = "needy 1 first name"
+        needyProfile_1.last_name = "needy 1 last name"
+        needyProfile_1.verified = 1
+        needyProfile_1.save()
+        response_5 = client_post('UserBio', {"username": "donator_2"})
+        response_6 = client_post('UserBio', {"username": "needy_1"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'DoesNotExist',
+                             'error_type': "[<class 'django.contrib.auth.models.User.DoesNotExist'>]",
+                             'error_on': "[DoesNotExist('User matching query does not exist.',)]",
+                             'success': '0'}
+        response_3_result = {'username': 'superAdmin',
+                             'user_type': 1,
+                             'first_name': 'super admin first name',
+                             'last_name': 'super admin last name',
+                             'email': 'superAdmin@gmail.com',
+                             'verified_needy': True,
+                             'success': '1'}
+        response_4_result = {'username': 'admin',
+                             'user_type': 2,
+                             'first_name': 'admin first name',
+                             'last_name': 'admin last name',
+                             'email': 'admin@gmail.com',
+                             'verified_needy': True,
+                             'success': '1'}
+        response_5_result = {'username': 'donator_2',
+                             'user_type': 3,
+                             'first_name': 'donator 2 first name',
+                             'last_name': 'donator 2 last name',
+                             'email': 'donator_2@gmail.com',
+                             'verified_needy': False,
+                             'success': '1'}
+        response_6_result = {'username': 'needy_1',
+                             'user_type': 4,
+                             'first_name': 'needy 1 first name',
+                             'last_name': 'needy 1 last name',
+                             'email': 'needy@gmail.com',
+                             'verified_needy': True,
+                             'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
 
 
 class StoreAPIsTestCase(TestCase):
