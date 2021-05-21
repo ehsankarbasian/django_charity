@@ -24,6 +24,7 @@ urlpatterns = [
     path('VerifyOrRejectUser', views.verifyOrRejectUser),
     path('DonateMoney', views.donate_money),
     path('TransactionList', views.transaction_list),
+    path('RecentTransactionList', views.resent_transaction_list),
 
 
     # StoreManagement urls:

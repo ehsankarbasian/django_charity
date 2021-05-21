@@ -456,5 +456,3 @@ def the_product(request):
 
     return Response(product_item(product),
                     status=status.HTTP_200_OK)
-
-

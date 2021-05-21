@@ -150,7 +150,7 @@ def verifyOrRejectUser(request):
             return error("verifiedBefore")
         elif (userProfile.user_type == 1) or (userProfile.user_type == 2):
             return error("userTypeError", {"explanation": "user_type is "
-                                                          + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
+                                           + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
     except Exception:
         return error("userNotFound")
 
@@ -249,19 +249,20 @@ def transaction_list(request):
     user = UserProfile.objects.get(token=TOKEN_ID)
 
     if user.user_type in [3, 4]:
-        user_filter = user
+        user_filter = UserProfile.objects.filter(token=TOKEN_ID)
     else:
         if filter_by_user:
-            user_filter = UserProfile.objects.filter(token=filter_by_user)
+            print (filter_by_user)
+            user_filter = UserProfile.objects.filter(melli_code=filter_by_user)
             if not len(user_filter):
                 return error("filterUserNotFound")
         else:
             user_filter = UserProfile.objects.all()
 
     user_query = Q(donatorOrNeedy__in=user_filter)
-    result_set = Transactions.objects.filter(user_query)
+    result_set = Transactions.objects.filter(user_query).order_by('-create_date')
 
-    if is_in:
+    if is_in is not None:
         is_in = bool(is_in)
         result_set = result_set.filter(is_in=is_in)
 
@@ -275,13 +276,30 @@ def transaction_list(request):
         min_query = Q(amount__gte=amount_min)
         result_set = result_set.filter(min_query)
 
-    if sort_type:
-        sort_type = ['-' if sort_type == "Ascending" else '+']
-    else:
-        sort_type = '-'
+    sort_type = ["" if sort_type == "+" else "-"][0]
 
-    if sort_by:
+    if sort_by is not None:
         sort_by = int(sort_by)
         result_set = result_set.order_by(sort_type + SORT_BY[sort_by])
+
+    return transaction_lister(result_set)
+
+
+@api_view(['POST'])
+def resent_transaction_list(request):
+    """
+    lists the most recent transactions
+
+    potential errors:
+        requiredParams
+    """
+    try:
+        count = get_data_or_none(request, "count")
+    except Exception:
+        return error("requiredParams")
+
+    count = [int(count) if count else 10][0]
+
+    result_set = Transactions.objects.all().order_by('-create_date')[:count]
 
     return transaction_lister(result_set)
