@@ -89,10 +89,12 @@ def submitUserProfile(request):
         return error("requiredParams")
     else:
         # Check user:
-        user = get_object_or_404(User, username=username)
-        userProfile = get_object_or_404(UserProfile, user=user)
-        if not (user and userProfile):
+        user = User.objects.filter(username=username)
+        if not len(user):
             return error("noSuchUser")
+        else:
+            user = user[0]
+        userProfile = UserProfile.objects.get(user=user)
 
         # NOT required fields:
         job = get_data_or_none(request, "job")

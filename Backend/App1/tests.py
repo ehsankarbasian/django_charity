@@ -918,7 +918,125 @@ class ProfileAPIsTestCase(TestCase):
         self.assertEqual(response_10, response_10_result)
 
     def test_api_submitUserProfile(self):
-        pass
+        response_1 = client_post('SubmitUserProfile', {})
+        response_2 = client_post('SubmitUserProfile', {"username": "donator_1",
+                                                       "first_name": "donator_1 f_name"})
+        response_3 = client_post('SubmitUserProfile', {"username": "donator_8",
+                                                       "first_name": "donator_8 f_name",
+                                                       "last_name": "donator_8 l_name",
+                                                       "melli_code": "11111111",
+                                                       "mobile_number": "09138888888"})
+        response_4 = client_post('SubmitUserProfile', {"username": "donator_1",
+                                                       "first_name": "donator_1 f_name",
+                                                       "last_name": "donator_1 l_name",
+                                                       "melli_code": "1170228271",
+                                                       "mobile_number": "09139889999"})
+        response_5 = client_post('SubmitUserProfile', {"username": "admin",
+                                                       "first_name": "admin f_name",
+                                                       "last_name": "admin l_name",
+                                                       "melli_code": "1170228280",
+                                                       "mobile_number": "09139889989"})
+        response_6 = client_post('SubmitUserProfile', {"username": "needy_1",
+                                                       "first_name": "needy f_name",
+                                                       "last_name": "needy l_name",
+                                                       "melli_code": "1170226666",
+                                                       "mobile_number": "09139886655",
+                                                       "job": "NTM needy 1",
+                                                       "address": "needy_1 address",
+                                                       "house_phone": "03152251111",
+                                                       "gender": "1",
+                                                       "married": "0"})
+        response_7 = client_post('SubmitUserProfile', {"username": "donator_2",
+                                                       "first_name": "donator_2 f_name",
+                                                       "last_name": "donator_2 l_name",
+                                                       "melli_code": "1170234567",
+                                                       "mobile_number": "09139881346",
+                                                       "job": "NTM donator 2",
+                                                       "address": "donator_2 address",
+                                                       "house_phone": "03152254545",
+                                                       "workplace_phone": "03152255454",
+                                                       "gender": "0",
+                                                       "married": "1",
+                                                       "birth_date": "2000-10-23"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('last_name',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'noSuchUser',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'username': 'donator_1',
+                             'email': 'donator_1@gmail.com',
+                             'user_type': 3,
+                             'success': '1'}
+        response_5_result = {'username': 'admin',
+                             'email': 'admin@gmail.com',
+                             'user_type': 2,
+                             'success': '1'}
+        response_6_result = {'username': 'needy_1',
+                             'email': 'needy@gmail.com',
+                             'user_type': 4,
+                             'success': '1'}
+        response_7_result = {'username': 'donator_2',
+                             'email': 'donator_2@gmail.com',
+                             'user_type': 3,
+                             'success': '1'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        donatorUser_1 = User.objects.get(username="donator_1")
+        donatorProfile_1 = UserProfile.objects.get(user=donatorUser_1)
+        self.assertEqual(donatorUser_1.first_name, "donator_1 f_name")
+        self.assertEqual(donatorUser_1.last_name, "donator_1 l_name")
+        self.assertEqual(donatorProfile_1.first_name, "donator_1 f_name")
+        self.assertEqual(donatorProfile_1.last_name, "donator_1 l_name")
+        self.assertEqual(donatorProfile_1.melli_code, "1170228271")
+        self.assertEqual(donatorProfile_1.mobile_number, "09139889999")
+        adminUser_1 = User.objects.get(username="admin")
+        adminProfile_1 = UserProfile.objects.get(user=adminUser_1)
+        self.assertEqual(adminUser_1.first_name, "admin f_name")
+        self.assertEqual(adminUser_1.last_name, "admin l_name")
+        self.assertEqual(adminProfile_1.first_name, "admin f_name")
+        self.assertEqual(adminProfile_1.last_name, "admin l_name")
+        self.assertEqual(adminProfile_1.melli_code, "1170228280")
+        self.assertEqual(adminProfile_1.mobile_number, "09139889989")
+        needyUser = User.objects.get(username="needy_1")
+        needyProfile = UserProfile.objects.get(user=needyUser)
+        self.assertEqual(needyUser.first_name, "needy f_name")
+        self.assertEqual(needyUser.last_name, "needy l_name")
+        self.assertEqual(needyProfile.first_name, "needy f_name")
+        self.assertEqual(needyProfile.last_name, "needy l_name")
+        self.assertEqual(needyProfile.melli_code, "1170226666")
+        self.assertEqual(needyProfile.mobile_number, "09139886655")
+        self.assertEqual(needyProfile.job, "NTM needy 1")
+        self.assertEqual(needyProfile.address, "needy_1 address")
+        self.assertEqual(needyProfile.house_phone, "03152251111")
+        self.assertEqual(needyProfile.gender, True)
+        self.assertEqual(needyProfile.married, False)
+        donatorUser_2 = User.objects.get(username="donator_2")
+        donatorProfile_2 = UserProfile.objects.get(user=donatorUser_2)
+        self.assertEqual(donatorUser_2.first_name, "donator_2 f_name")
+        self.assertEqual(donatorUser_2.last_name, "donator_2 l_name")
+        self.assertEqual(donatorProfile_2.first_name, "donator_2 f_name")
+        self.assertEqual(donatorProfile_2.last_name, "donator_2 l_name")
+        self.assertEqual(donatorProfile_2.melli_code, "1170234567")
+        self.assertEqual(donatorProfile_2.mobile_number, "09139881346")
+        self.assertEqual(donatorProfile_2.job, "NTM donator 2")
+        self.assertEqual(donatorProfile_2.address, "donator_2 address")
+        self.assertEqual(donatorProfile_2.house_phone, "03152254545")
+        self.assertEqual(donatorProfile_2.workplace_phone, "03152255454")
+        self.assertEqual(donatorProfile_2.gender, False)
+        self.assertEqual(donatorProfile_2.married, True)
+        self.assertEqual(donatorProfile_2.birth_date, datetime.date(2000, 10, 23))
 
     def test_api_userBio(self):
         pass
