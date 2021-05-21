@@ -66,6 +66,50 @@ def init_db_event():
     pass
 
 
+def init_db_profile():
+    """
+    initials the default database for userProfiles
+    """
+    superAdminUser = User.objects.get(username="superAdmin")
+    adminUser = User.objects.get(username="admin")
+    superAdminProfile = UserProfile.objects.get(user=superAdminUser)
+    adminProfile = UserProfile.objects.get(user=adminUser)
+
+    superAdminProfile.first_name = "super admin first name"
+    superAdminProfile.last_name = "super admin last name"
+    superAdminProfile.melli_code = "1232500"
+    superAdminProfile.job = "the super admin of NTM charity"
+    superAdminProfile.address = "ntm charity"
+    superAdminProfile.mobile_number = "09132224444"
+    superAdminProfile.house_phone = "02152254444"
+    superAdminProfile.workplace_phone = "02152253333"
+    superAdminProfile.gender = 1
+    superAdminProfile.married = 1
+    superAdminProfile.birth_date = "2021-01-23"
+    superAdminProfile.verified = True
+    superAdminProfile.verified_mobile = False
+    superAdminProfile.verified_email = True
+    superAdminProfile.completed = True
+    superAdminProfile.save()
+
+    adminProfile.first_name = "super first name"
+    adminProfile.last_name = "super last name"
+    adminProfile.melli_code = "1234444"
+    adminProfile.job = "the admin of NTM charity"
+    adminProfile.address = "ntm charity"
+    adminProfile.mobile_number = "09132225555"
+    adminProfile.house_phone = "02152256666"
+    adminProfile.workplace_phone = "02152254444"
+    adminProfile.gender = 0
+    adminProfile.married = 1
+    adminProfile.birth_date = "2020-08-11"
+    adminProfile.verified = True
+    adminProfile.verified_mobile = True
+    adminProfile.verified_email = True
+    adminProfile.completed = True
+    adminProfile.save()
+
+
 def init_db_donateIn():
     """
     initials the default database for DonatesIn and Transactions

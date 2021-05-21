@@ -673,7 +673,18 @@ class EventAPIsTestCase(TestCase):
 
 
 class ProfileAPIsTestCase(TestCase):
-    pass
+    def setUp(self):
+        init_db_user()
+        init_db_profile()
+
+    def test_api_loadUserProfile(self):
+        pass
+
+    def test_api_submitUserProfile(self):
+        pass
+
+    def test_api_userBio(self):
+        pass
 
 
 class StoreAPIsTestCase(TestCase):
