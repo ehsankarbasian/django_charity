@@ -59,13 +59,6 @@ def init_db_user():
                                verify_email_token="verifyEmailToken")
 
 
-def init_db_event():
-    """
-    initials the default database for Event
-    """
-    pass
-
-
 def init_db_profile():
     """
     initials the default database for userProfiles
@@ -108,6 +101,78 @@ def init_db_profile():
     adminProfile.verified_email = True
     adminProfile.completed = True
     adminProfile.save()
+
+
+def init_db_event():
+    """
+    initials the default database for Event
+    """
+    superAdminUser = User.objects.get(username="superAdmin")
+    adminUser = User.objects.get(username="admin")
+    donatorUser_1 = User.objects.get(username="donator_1")
+    donatorUser_2 = User.objects.get(username="donator_2")
+    needyUser_1 = User.objects.get(username="needy_1")
+
+    Event.objects.create(title="earthquake 1",
+                         description="a weak earthquake 1",
+                         money_target=5000,
+                         creator=superAdminUser)
+    Event.objects.create(title="earthquake 2",
+                         description="an STRONG earthquake 2",
+                         money_target=80000,
+                         creator=superAdminUser)
+    Event.objects.create(title="earthquake 3",
+                         description="a weak earthquake 3",
+                         money_target=10000,
+                         creator=adminUser)
+    Event.objects.create(title="earthquake 4",
+                         description="a weak earthquake 4",
+                         money_target=500,
+                         creator=adminUser)
+    Event.objects.create(title="earthquake 5",
+                         description="an STRONG earthquake 5",
+                         money_target=1000000,
+                         creator=donatorUser_1)
+    Event.objects.create(title="earthquake 6",
+                         description="an STRONG earthquake 6",
+                         money_target=100000,
+                         creator=donatorUser_1)
+    Event.objects.create(title="earthquake 7",
+                         description="a weak earthquake 7",
+                         money_target=4000,
+                         creator=donatorUser_2)
+    Event.objects.create(title="earthquake 8",
+                         description="a weak earthquake 8",
+                         list_of_needs="oil,rice,clothes,mobile",
+                         creator=donatorUser_2)
+    Event.objects.create(title="earthquake 9",
+                         description="a weak earthquake 9",
+                         list_of_needs="oil,clothes,mobile",
+                         creator=donatorUser_2)
+    Event.objects.create(title="earthquake 10",
+                         description="a weak earthquake 10",
+                         money_target=5000,
+                         creator=donatorUser_2)
+    Event.objects.create(title="earthquake 11",
+                         description="an STRONG earthquake 11",
+                         list_of_needs="oil,rice,car,mobile",
+                         creator=needyUser_1)
+    Event.objects.create(title="earthquake 12",
+                         description="an STRONG earthquake 12",
+                         list_of_needs="oil,rice,car,clothes,mobile",
+                         creator=needyUser_1)
+    Event.objects.create(title="earthquake 13",
+                         description="an STRONG earthquake 13",
+                         list_of_needs="oil,rice,clothes,phone,mobile,car",
+                         creator=needyUser_1)
+    Event.objects.create(title="earthquake 14",
+                         description="an STRONG earthquake 14",
+                         money_target=900000,
+                         creator=needyUser_1)
+    Event.objects.create(title="earthquake 15",
+                         description="a weak earthquake 15",
+                         money_target=100,
+                         creator=needyUser_1)
 
 
 def init_db_donateIn():

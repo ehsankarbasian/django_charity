@@ -64,7 +64,7 @@ class Event(models.Model):
     money_target = models.IntegerField(default=0)
     donated_money = models.IntegerField(default=0)
     creator = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='creator')
-    enabled = models.BooleanField(default=False, )
+    enabled = models.BooleanField(default=False)
     create_date = models.DateField(auto_now=True)
     status = models.IntegerField(default=0, choices=STATUS_CHOICES)
     image_url = models.CharField(max_length=512, null=True, blank=True)

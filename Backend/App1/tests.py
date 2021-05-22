@@ -670,7 +670,40 @@ class AuthAPIsTestCase(TestCase):
 
 
 class EventAPIsTestCase(TestCase):
-    pass
+    def setUp(self):
+        init_db_user()
+        init_db_profile()
+        init_db_event()
+
+    def test_api_createEvent(self):
+        pass
+
+    def test_api_requestedEventList(self):
+        pass
+
+    def test_api_searchEvent(self):
+        pass
+
+    def test_api_editEventByAdmin(self):
+        pass
+
+    def test_api_leaveFeedback(self):
+        pass
+
+    def test_api_disableEvent(self):
+        pass
+
+    def test_api_userEvent(self):
+        pass
+
+    def test_api_deleteEvent(self):
+        pass
+
+    def test_api_editEventByUser(self):
+        pass
+
+    def test_api_donateMoneyEvent(self):
+        pass
 
 
 class ProfileAPIsTestCase(TestCase):
