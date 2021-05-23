@@ -53,18 +53,18 @@ def email(request):
 @api_view(['POST'])
 def generalDonate(request):
     """
-        donates money or product for not an event
+    donates money or product for not an event
 
-        potential errors:
-            requiredParams
-            productQuantity
-            productNotFound
-            donateTypeError
-            userNotFound
-            userIsNeedy
-            userIsNotVerified
-            completeProfileFirstPlease
-        """
+    potential errors:
+        requiredParams
+        productQuantity
+        productNotFound
+        donateTypeError
+        userNotFound
+        userIsNeedy
+        userIsNotVerified
+        completeProfileFirstPlease
+    """
 
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
@@ -272,3 +272,238 @@ def resentTransactionList(request):
     result_set = Transactions.objects.all().order_by('-create_date')[:count]
 
     return transaction_lister(result_set)
+
+
+@api_view(['POST'])
+def createNeedrequest(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        title = request.data["title"]
+        description = request.data["description"]
+        product_token = request.data["Product_TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+
+    # Find user:
+    try:
+        userProfile = UserProfile.objects.get(token=token)
+        user = userProfile.user
+    except Exception:
+        return error("Wrong TOKEN_ID")
+
+    # Find product:
+    try:
+        product = Product.objects.get(token=product_token)
+    except Exception:
+        return error("Wrong Product_TOKEN_ID")
+
+    # Create NeedRequest:
+    NeedRequest.objects.create(
+        creator=user,
+        title=title,
+        description=description,
+        product=product
+    )
+
+    return Response({"message": "NeedRequest created",
+                     "success": "1"
+                     },
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def requestedNeedrequestList(request):
+    try:
+        token = request.data["TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+    else:
+        # Find user:
+        try:
+            userProfile = UserProfile.objects.get(token=token)
+        except Exception:
+            return error("Wrong TOKEN_ID")
+
+        # Check whether SuperAdmin or not:
+        if userProfile.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Find NeedRequests with status 0:
+        needrequest_set = list(NeedRequest.objects.filter(status=0))
+
+        return create_needrequest_set(needrequest_set)
+
+
+@api_view(['POST'])
+def editNeedrequestByAdmin(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        NeedRequest_id = request.data["NeedRequest_id"]
+
+        title = request.data["title"]
+        description = request.data["description"]
+        product_id = request.data["product_TOKEN_ID"]
+        feedback = request.data["feedback"]
+    except Exception:
+        return error("requiredParams")
+    else:
+        # Find user:
+        try:
+            userProfile = UserProfile.objects.get(token=token)
+        except Exception:
+            return error("Wrong TOKEN_ID")
+        # Find Product
+        try:
+            product = Product.objects.get(token=product_id)
+        except Exception:
+            return error("Wrong Product_TOKEN_ID")
+
+        # Check whether SuperAdmin or not:
+        if userProfile.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Edit NeedRequest:
+        try:
+            needRequest = NeedRequest.objects.get(id=NeedRequest_id)
+        except Exception:
+            return error("WrongNeedrequestId")
+        else:
+
+            needRequest.title = title
+            needRequest.description = description
+            needRequest.product = product
+            needRequest.edited = True
+            needRequest.edited_by = userProfile.id
+            needRequest.feedback = feedback
+            needRequest.status = 1
+            needRequest.enabled = True
+            needRequest.save()
+
+        return Response({"message": "NeedRequest edited",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def disableNeedrequest(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        needrequest_id = request.data["NeedRequest_id"]
+    except Exception:
+        return error("requiredParams")
+    else:
+        try:
+            userProfile = UserProfile.objects.get(token=token)
+        except Exception:
+            return error("Wrong TOKEN_ID")
+
+        # Check whether SuperAdmin or not:
+        if userProfile.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Disable the event:
+        needRequest = NeedRequest.objects.get(id=needrequest_id)
+        needRequest.enabled = False
+        needRequest.save()
+
+        return Response({"message": "NeedRequest disabled",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def userNeedrequest(request):
+    try:
+        token = request.data["token"]
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        userProfile = UserProfile.objects.get(token=token)
+        user = userProfile.user
+        needrequestSet = NeedRequest.objects.filter(creator=user)
+        return create_needrequest_set(needrequestSet)
+    except Exception:
+        return error("noSuchUser")
+
+
+@api_view(['POST'])
+def deleteNeedrequest(request):
+    try:
+        needrequest_id = request.data["NeedRequest_id"]
+        token = request.data["token"]
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        needRequest = NeedRequest.objects.get(id=needrequest_id)
+    except Exception:
+        return error("noSuchNeedrequest")
+
+    try:
+        userProfile = UserProfile.objects.get(token=token)
+        user = userProfile.user
+    except Exception:
+        return error("noSuchUser")
+
+    if needRequest.creator.username != user.username:
+        return error("youAreNotCreator")
+
+    if needRequest.status != 1:
+        needRequest.delete()
+    else:
+        return error("acceptedNeedrequest")
+
+    return Response({"success": "1",
+                     "message": "The NeedRequest deleted successfully"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def editNeedrequestByUser(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        needrequest_id = request.data["NeedRequest_id"]
+
+        title = request.data["title"]
+        description = request.data["description"]
+        product_id = request.data["product_TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+    else:
+        # Find user:
+        try:
+            userProfile = UserProfile.objects.get(token=token)
+        except Exception:
+            return error("noSuchUser")
+
+        # Find product:
+        try:
+            product = Product.objects.get(token=product_id)
+        except Exception:
+            return error("noSuchProduct")
+
+        try:
+            needRequest = NeedRequest.objects.get(id=needrequest_id)
+        except Exception:
+            return error("noSuchNeedrequest")
+        else:
+            if needRequest.creator != userProfile.user:
+                return error("youAreNotCreator")
+            elif needRequest.status == -1:
+                return error("rejectedNeedrequest")
+
+            needRequest.title = title
+            needRequest.description = description
+            needRequest.product = product
+            needRequest.edited = True
+            needRequest.edited_by = userProfile.id
+            needRequest.status = 0
+            needRequest.save()
+
+        return Response({"message": "NeedRequest edited",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)

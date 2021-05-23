@@ -49,4 +49,14 @@ urlpatterns = [
     path('TheCategory', views.the_category),
     path('TheSubCategory', views.the_subcategory),
     path('TheProduct', views.the_product),
+
+
+    path('Create_NeedRequest',views.createNeedrequest),
+    path('Requested_NeedRequest_List', views.requestedNeedrequestList),
+    path('Edit_NeedRequest_ByAdmin', views.editNeedrequestByAdmin),
+    path('Edit_NeedRequest_ByUser', views.editNeedrequestByUser),
+    path('LeaveFeedback', views.leaveFeedback),
+    path('Disable_NeedRequest', views.disableNeedrequest),
+    path('User_NeedRequest', views.userNeedrequest),
+    path('Delete_NeedRequest', views.deleteNeedrequest)
 ]
