@@ -50,13 +50,8 @@ urlpatterns = [
     path('TheSubCategory', views.the_subcategory),
     path('TheProduct', views.the_product),
 
-
     path('CreateNeedRequest', views.createNeedRequest),
     path('RequestedNeedRequestList', views.requestedNeedRequestList),
-    path('Edit_NeedRequest_ByAdmin', views.editNeedrequestByAdmin),
-    path('Edit_NeedRequest_ByUser', views.editNeedrequestByUser),
-    path('LeaveFeedback', views.leaveFeedback),
-    path('Disable_NeedRequest', views.disableNeedrequest),
-    path('User_NeedRequest', views.userNeedrequest),
-    path('Delete_NeedRequest', views.deleteNeedrequest)
+    path('NeedRequestList', views.needRequestList),
+    path('AcceeptOrRejectNeedRequest', views.acceptOrRejectNeedRequest)
 ]

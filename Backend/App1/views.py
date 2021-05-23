@@ -355,175 +355,51 @@ def requestedNeedRequestList(request):
 
 
 @api_view(['POST'])
-def editNeedrequestByAdmin(request):
+def needRequestList(request): # userNeedRequest
     try:
-        token = request.data["TOKEN_ID"]
-        NeedRequest_id = request.data["NeedRequest_id"]
-
-        title = request.data["title"]
-        description = request.data["description"]
-        product_id = request.data["product_TOKEN_ID"]
-        feedback = request.data["feedback"]
+        TOKEN_ID = request.data["TOKEN_ID"]
     except Exception:
         return error("requiredParams")
-    else:
-        # Find user:
-        try:
-            userProfile = UserProfile.objects.get(token=token)
-        except Exception:
-            return error("Wrong TOKEN_ID")
-        # Find Product
-        try:
-            product = Product.objects.get(token=product_id)
-        except Exception:
-            return error("Wrong Product_TOKEN_ID")
 
-        # Check whether SuperAdmin or not:
-        if userProfile.user_type != 1:
-            return error("NotSuperAdmin")
-
-        # Edit NeedRequest:
-        try:
-            needRequest = NeedRequest.objects.get(id=NeedRequest_id)
-        except Exception:
-            return error("WrongNeedrequestId")
+    try:
+        userProfile = UserProfile.objects.get(token=TOKEN_ID)
+        if userProfile.user_type != 3:
+            needRequestSet = NeedRequest.objects.filter(status=1)
         else:
-
-            needRequest.title = title
-            needRequest.description = description
-            needRequest.product = product
-            needRequest.edited = True
-            needRequest.edited_by = userProfile.id
-            needRequest.feedback = feedback
-            needRequest.status = 1
-            needRequest.enabled = True
-            needRequest.save()
-
-        return Response({"message": "NeedRequest edited",
-                         "success": "1"
-                         },
-                        status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def disableNeedrequest(request):
-    try:
-        token = request.data["TOKEN_ID"]
-        needrequest_id = request.data["NeedRequest_id"]
-    except Exception:
-        return error("requiredParams")
-    else:
-        try:
-            userProfile = UserProfile.objects.get(token=token)
-        except Exception:
-            return error("Wrong TOKEN_ID")
-
-        # Check whether SuperAdmin or not:
-        if userProfile.user_type != 1:
-            return error("NotSuperAdmin")
-
-        # Disable the event:
-        needRequest = NeedRequest.objects.get(id=needrequest_id)
-        needRequest.enabled = False
-        needRequest.save()
-
-        return Response({"message": "NeedRequest disabled",
-                         "success": "1"
-                         },
-                        status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def userNeedrequest(request):
-    try:
-        token = request.data["token"]
-    except Exception:
-        return error("requiredParams")
-
-    try:
-        userProfile = UserProfile.objects.get(token=token)
-        user = userProfile.user
-        needrequestSet = NeedRequest.objects.filter(creator=user)
-        return create_needrequest_set(needrequestSet)
+            needRequestSet = NeedRequest.objects.filter(creator=userProfile)
+        return needRequest_lister(needRequestSet)
     except Exception:
         return error("noSuchUser")
 
 
 @api_view(['POST'])
-def deleteNeedrequest(request):
+def acceptOrRejectNeedRequest(request):
     try:
-        needrequest_id = request.data["NeedRequest_id"]
-        token = request.data["token"]
+        needRequest_id = request.data["NeedRequest_id"]
+        TOKEN_ID = request.data["TOKEN_ID"]
+        action = bool(request.data["action"])
     except Exception:
         return error("requiredParams")
 
     try:
-        needRequest = NeedRequest.objects.get(id=needrequest_id)
+        needRequest = NeedRequest.objects.get(id=needRequest_id)
     except Exception:
-        return error("noSuchNeedrequest")
+        return error("needRequestNotFound")
 
     try:
-        userProfile = UserProfile.objects.get(token=token)
-        user = userProfile.user
+        userProfile = UserProfile.objects.get(token=TOKEN_ID)
+        if userProfile.user_type not in [1, 2]:
+            return error("userNotSuperAdmin")
     except Exception:
-        return error("noSuchUser")
+        return error("userNotFound")
 
-    if needRequest.creator.username != user.username:
-        return error("youAreNotCreator")
-
-    if needRequest.status != 1:
-        needRequest.delete()
+    if action:
+        needRequest.status = 1
     else:
-        return error("acceptedNeedrequest")
+        needRequest.status = -1
+    needRequest.save()
 
     return Response({"success": "1",
-                     "message": "The NeedRequest deleted successfully"},
+                     "message": "The NeedRequest " + ["accepted" if action else "rejected"][0] + "successfully"},
+
                     status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def editNeedrequestByUser(request):
-    try:
-        token = request.data["TOKEN_ID"]
-        needrequest_id = request.data["NeedRequest_id"]
-
-        title = request.data["title"]
-        description = request.data["description"]
-        product_id = request.data["product_TOKEN_ID"]
-    except Exception:
-        return error("requiredParams")
-    else:
-        # Find user:
-        try:
-            userProfile = UserProfile.objects.get(token=token)
-        except Exception:
-            return error("noSuchUser")
-
-        # Find product:
-        try:
-            product = Product.objects.get(token=product_id)
-        except Exception:
-            return error("noSuchProduct")
-
-        try:
-            needRequest = NeedRequest.objects.get(id=needrequest_id)
-        except Exception:
-            return error("noSuchNeedrequest")
-        else:
-            if needRequest.creator != userProfile.user:
-                return error("youAreNotCreator")
-            elif needRequest.status == -1:
-                return error("rejectedNeedrequest")
-
-            needRequest.title = title
-            needRequest.description = description
-            needRequest.product = product
-            needRequest.edited = True
-            needRequest.edited_by = userProfile.id
-            needRequest.status = 0
-            needRequest.save()
-
-        return Response({"message": "NeedRequest edited",
-                         "success": "1"
-                         },
-                        status=status.HTTP_200_OK)
