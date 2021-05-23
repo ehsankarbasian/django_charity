@@ -11,6 +11,7 @@ from App1.models import Event
 from App1.models import Transactions
 from App1.models import DonatesIn
 from App1.models import Product
+from App1.models import NeedRequest
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
@@ -275,39 +276,49 @@ def resentTransactionList(request):
 
 
 @api_view(['POST'])
-def createNeedrequest(request):
+def createNeedRequest(request):
+    """
+    creates NeedRequest
+
+    potential errors:
+        requireParams
+        userNotFound
+        userTypeError
+        productNotFound
+    """
     try:
-        token = request.data["TOKEN_ID"]
+        TOKEN_ID = request.data["TOKEN_ID"]
         title = request.data["title"]
         description = request.data["description"]
-        product_token = request.data["Product_TOKEN_ID"]
+        product_id = int(request.data["product_id"])
     except Exception:
         return error("requiredParams")
 
     # Find user:
-    try:
-        userProfile = UserProfile.objects.get(token=token)
-        user = userProfile.user
-    except Exception:
-        return error("Wrong TOKEN_ID")
+    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
+    if not len(userProfile):
+        return error("userNotFound")
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
+
+    if userProfile.user_type != 4:
+        return error("userTypeError", {"message": "you are not needy"})
+    elif not userProfile.verified:
+        return error("notVerifiedNeedy")
 
     # Find product:
     try:
-        product = Product.objects.get(token=product_token)
+        product = Product.objects.get(id=product_id)
     except Exception:
-        return error("Wrong Product_TOKEN_ID")
+        return error("productNotFound")
 
     # Create NeedRequest:
-    NeedRequest.objects.create(
-        creator=user,
-        title=title,
-        description=description,
-        product=product
-    )
+    NeedRequest.objects.create(creator=userProfile,
+                               title=title,
+                               description=description,
+                               product=product)
 
-    return Response({"message": "NeedRequest created",
-                     "success": "1"
-                     },
+    return Response({"message": "NeedRequest created successfully",
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 

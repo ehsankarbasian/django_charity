@@ -139,7 +139,7 @@ class DonatesIn(models.Model):
             return "Quantity: " + str(self.quantity) + "/ Product_id: " + str(self.product.id)
 
 
-class DonatesOut(models.Model):
+class DonatesOut(): # models.Model
     quantity = models.IntegerField(
         null=True,
         default=-1
@@ -170,52 +170,12 @@ class NeedRequest(models.Model):
         (-1, 'failed'),
     ]
 
-    creator = models.ForeignKey(
-        UserProfile,
-        null=False,
-        blank=False,
-        related_name='needy',
-        on_delete=models.DO_NOTHING
-    )
-    product = models.ForeignKey(
-        Product,
-        null=False,
-        blank=False,
-        on_delete=models.DO_NOTHING
-    )
-    title = models.CharField(
-        null=False,
-        blank=False,
-        max_length=127
-    )
-    description = models.TextField(
-        null=True,
-        blank=True
-    )
-    status = models.IntegerField(
-        default=0,
-        choices=STATUS_CHOICES
-    )
-    enabled = models.BooleanField(
-        default=False
-    )
-    feedback = models.TextField(
-        default="",
-        null=True
-    )
-    edited = models.BooleanField(
-        default=False
-    )
-    edited_by = models.ForeignKey(
-        UserProfile,
-        null=False,
-        blank=False,
-        related_name='admin',
-        on_delete=models.DO_NOTHING
-    )
-    create_date = models.DateTimeField(
-        auto_now=True
-    )
+    title = models.CharField(null=False, blank=True, max_length=127)
+    description = models.TextField(null=True, blank=True)
+    creator = models.ForeignKey(UserProfile, null=False, related_name='needy', on_delete=models.DO_NOTHING)
+    product = models.ForeignKey(Product, null=False, on_delete=models.DO_NOTHING)
+    status = models.IntegerField(default=0, choices=STATUS_CHOICES)
+    create_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return "Title: " + self.title

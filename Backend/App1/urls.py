@@ -51,7 +51,7 @@ urlpatterns = [
     path('TheProduct', views.the_product),
 
 
-    path('Create_NeedRequest',views.createNeedrequest),
+    path('CreateNeedRequest', views.createNeedRequest),
     path('Requested_NeedRequest_List', views.requestedNeedrequestList),
     path('Edit_NeedRequest_ByAdmin', views.editNeedrequestByAdmin),
     path('Edit_NeedRequest_ByUser', views.editNeedrequestByUser),
