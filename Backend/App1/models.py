@@ -2,8 +2,6 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-# Create your models here.
-
 class UserProfile(models.Model):
     # Statics:
     USER_TYPE_CHOICES = [
@@ -66,7 +64,7 @@ class Event(models.Model):
     money_target = models.IntegerField(default=0)
     donated_money = models.IntegerField(default=0)
     creator = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='creator')
-    enabled = models.BooleanField(default=False, )
+    enabled = models.BooleanField(default=False)
     create_date = models.DateField(auto_now=True)
     status = models.IntegerField(default=0, choices=STATUS_CHOICES)
     image_url = models.CharField(max_length=512, null=True, blank=True)
@@ -128,17 +126,20 @@ class DonatesIn(models.Model):
     product = models.ForeignKey(Product, null=True, on_delete=models.DO_NOTHING)
     transaction = models.ForeignKey(Transactions, null=True, on_delete=models.DO_NOTHING)
     event = models.ForeignKey(Event, null=True, on_delete=models.DO_NOTHING)
-    donator = models.ForeignKey(UserProfile, null=False, on_delete=models.CASCADE)
+    donator = models.ForeignKey(UserProfile, null=False, related_name='donator', on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now=True)
+    transferee = models.ForeignKey(UserProfile, null=True, default=None, related_name='transferee', on_delete=models.DO_NOTHING)
 
-    # DeliveredTo (optional)
     # ExpDate (optional)
 
     def __str__(self):
-        return "Quantity: " + str(self.quantity) + " / Amount: " + str(self.transaction.amount)
+        if self.transaction:
+            return "Amount: " + str(self.transaction.amount)
+        else:
+            return "Quantity: " + str(self.quantity) + "/ Product_id: " + str(self.product.id)
 
 
-class DonatesOut(models.Model):
+class DonatesOut(): # models.Model
     quantity = models.IntegerField(
         null=True,
         default=-1
@@ -160,3 +161,21 @@ class DonatesOut(models.Model):
         related_name='admin',
         on_delete=models.DO_NOTHING
     )
+
+
+class NeedRequest(models.Model):
+    STATUS_CHOICES = [
+        (0, 'no feedback'),
+        (1, 'accepted'),
+        (-1, 'failed'),
+    ]
+
+    title = models.CharField(null=False, blank=True, max_length=127)
+    description = models.TextField(null=True, blank=True)
+    creator = models.ForeignKey(UserProfile, null=False, related_name='needy', on_delete=models.DO_NOTHING)
+    product = models.ForeignKey(Product, null=False, on_delete=models.DO_NOTHING)
+    status = models.IntegerField(default=0, choices=STATUS_CHOICES)
+    create_date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return "Title: " + self.title

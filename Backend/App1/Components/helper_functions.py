@@ -23,13 +23,29 @@ contains:
 import sys
 
 from rest_framework.response import Response
+from re import search as validateRegex
 from rest_framework import status
 from secrets import token_hex
 
+from django.contrib.auth.models import User
 from App1.models import UserProfile
 
+from django.test import Client
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+
+
+def client_post(url, json):
+    if url in ['ResetPassword', 'ResetPasswordTokenBased',
+               'VerifyEmail', 'VerifyEmailTokenBased']:
+        url = "0xAjE2MT6eiOi538574I1NiJ467f4378A9iOiJ821A5IiLC695e6b88FFxkZ1a997F/" + url
+    response = Client().post('/App1/' + url, json, format='json')
+    return response.data
+
+
+def client_get():
+    # response = Client().get(...)
+    pass
 
 
 def error(message, additional_data=None):
@@ -60,6 +76,9 @@ def simplify_email(email):
     (it's done in views.py before pass it to this function)
     returns email and tags as strings (tags are '+' joined)
     """
+    EMAIL_REGEX = r'^(\w|\.|\_|\-|\+)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
+    if not validateRegex(EMAIL_REGEX, email):
+        return {'success': 0}
     try:
         simplified_email = "".join(
             email.split("@")[0]
@@ -71,7 +90,7 @@ def simplify_email(email):
         return {'success': 1,
                 'email': simplified_email,
                 'tags': email_tags_string}
-    except e:
+    except Exception:
         return {'success': 0}
 
 
@@ -124,128 +143,14 @@ def get_data_or_none(request, key):
         return None
 
 
-# TODO: move to lister_functions.py
-def create_user_items(queryset):
+def set_email_verified(username):
     """
-    helps the function create_user_set() to not double write the code
-
-    it structs user items in a JSON
+    set userProfile.verified_email True
     """
-    result = {}
-    for user in queryset:
-        result[user.id] = {
-            "id": user.id,
-            "username": user.user.username,
-            "user_type": user.user_type,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "melli_code": user.melli_code,
-            "email": user.email,
-            "job": user.job,
-            "address": user.address,
-            "mobile_number": user.mobile_number,
-            "house_phone": user.house_phone,
-            "workplace_phone": user.workplace_phone,
-            "gender": ["male" if user.gender == 1 else "female"][0],
-            "married": user.married,
-            "birth_date": user.birth_date,
-            "signup_date": user.signup_date,
-        }
-    return result
-
-
-# TODO: move to lister_functions.py
-def create_user_set(needy_queryset, donator_queryset, pagination_params=None):
-    """
-    creates json-based user set to show
-
-    the JSON contains: "id", "username", "user_type", "first_name", "last_name",
-    "melli_code", "email", "job", "address", "mobile_number", "house_phone",
-    "workplace_phone", "gender", "married", "birth_date", "signup_date"
-
-    it gets help from create_user_item() function
-    """
-    if pagination_params:
-        return error("TODO", {"message": "Have no pagination yet; coming soon"})
-
-    needy_json = create_user_items(needy_queryset)
-    donator_json = create_user_items(donator_queryset)
-
-    empty_needy = [0 if len(needy_json) else 1]
-    empty_donator = [0 if len(donator_json) else 1]
-
-    final_json = {"success": "1",
-                  "empty_needy": empty_needy[0],
-                  "empty_donator": empty_donator[0],
-                  "pagination_params": pagination_params,
-                  "needy_set": needy_json,
-                  "donator_set": donator_json}
-
-    return Response(final_json,
-                    status=status.HTTP_200_OK)
-
-
-# TODO: move to lister_functions.py
-def create_event_set(event_queryset, pagination_params=None):
-    """
-    creates an event_set according to queryset
-    it's used in APIs that return several events to front
-    it passes pagination params to front if exists too
-
-    the event_set structure is as below:
-        {
-            "success": "1",
-            "empty": "0",
-            "pagination_params":{"current_page", "the_last_page", "pagination_bar"}
-            "event_set": {
-                "<<id_of_event>>": {
-                    "status", "id", "title", "description", "list_of_needs", "feedback", "creator_username",
-                    "create_date", "image_url", "money_target", "donated_money, "to_money_target"
-                    "list_of_needs":{
-                        "1":
-                        "2":
-                        ...
-                        "n":
-                    }
-                }
-            }
-        }
-    """
-    # Create a json for an event:
-    event_json = {}
-    for event in event_queryset:
-        list_of_needs = {}
-        if event.list_of_needs is None:
-            list_of_needs = ""
-        else:
-            counter = 0
-            for need in event.list_of_needs.split(","):
-                counter += 1
-                list_of_needs[counter] = need
-        user = event.creator
-        event_json[event.id] = {
-            "status": event.status,
-            "id": event.id,
-            "title": event.title,
-            "description": event.description,
-            "list_of_needs": list_of_needs,
-            "feedback": [event.feedback if len(event.feedback) else None][0],
-            "creator_username": user.username,
-            "create_date": event.create_date,
-            "image_url": event.image_url,
-            "money_target": event.money_target,
-            "donated_money": event.donated_money,
-            "to_money_target": event.to_money_target(),
-        }
-
-    empty = [0 if len(event_json) else 1]
-    final_json = {"success": "1",
-                  "empty": empty[0],
-                  "pagination_params": pagination_params,
-                  "event_set": event_json}
-
-    return Response(final_json,
-                    status=status.HTTP_200_OK)
+    user = User.objects.get(username=username)
+    profile = UserProfile.objects.get(user=user)
+    profile.verified_email = True
+    profile.save()
 
 
 def create_pagination_bar(page):

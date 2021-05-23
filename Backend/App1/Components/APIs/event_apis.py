@@ -4,12 +4,14 @@ APIs for create, edit, enable, disable, feedback, and etc will be here
 contains:
     createEvent
     requestedEventList
+    searchEvent
     editEventByAdmin
     leaveFeedback
     disableEvent
     userEvent
     deleteEvent
     editEventByUser
+    donateMoneyEvent
 """
 
 
@@ -19,12 +21,18 @@ from rest_framework.response import Response
 from rest_framework import status
 import json
 
+from django.core.paginator import Paginator
+from django.db.models import Q
+
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
+from App1.Components.lister_functions import *
 
 from django.contrib.auth.models import User
 from App1.models import UserProfile
 from App1.models import Event
+from App1.models import Transactions
+from App1.models import DonatesIn
 
 
 @api_view(['POST'])
@@ -36,14 +44,17 @@ def createEvent(request):
     potential errors:
         requiredParams
         Wrong TOKEN_ID
+        ListAndTargetAreNone
+        ListAndTargetAreGivenBoth
+        MoneyTargetIntError
     """
     try:
         token = request.data["TOKEN_ID"]
         title = request.data["title"]
         description = request.data["description"]
-        list_of_needs = request.data["list_of_needs"]
-        money_target = int(request.data["money_target"])
-        image_url = request.data["image_url"]
+        list_of_needs = get_data_or_none(request, "list_of_needs")
+        money_target = get_data_or_none(request, "money_target")
+        image_url = get_data_or_none(request, "image_url")
     except Exception:
         return error("requiredParams")
 
@@ -54,9 +65,21 @@ def createEvent(request):
     except Exception:
         return error("Wrong TOKEN_ID")
 
+    if (list_of_needs is None) and (money_target is None):
+        return error("ListAndTargetAreNone")
+    elif (list_of_needs is not None) and (money_target is not None):
+        return error("ListAndTargetAreGivenBoth")
+
     needs_list = []
+    list_of_needs = ["" if list_of_needs is None else list_of_needs.split(",")][0]
     for value in list_of_needs:
         needs_list.append(value)
+
+    if money_target is not None:
+        try:
+            money_target = int(money_target)
+        except Exception:
+            return error("MoneyTargetIntError")
 
     # Create event:
     Event.objects.create(
@@ -64,7 +87,7 @@ def createEvent(request):
         title=title,
         description=description,
         list_of_needs=",".join(needs_list),
-        money_target=money_target,
+        money_target=[money_target if money_target is not None else 0][0],
         image_url=image_url
     )
 
@@ -103,7 +126,45 @@ def requestedEventList(request):
         # Find events with status 0:
         event_set = list(Event.objects.filter(status=0))
 
-        return create_event_set(event_set)
+        return event_lister(event_set)
+
+
+@api_view(['POST'])
+@limiter([SearchLimiter])
+def searchEvent(request):
+    PAGINATED_BY = 10
+    """
+    searches for events according to title and description
+    just for 'enabled' & 'accepted' events
+    it's not case-sensitive
+    it paginates event by PAGINATED_BY
+
+    potential errors:
+        requiredParams
+        pageOverFlowError
+        noResultForSearch
+    """
+    try:
+        search_key = request.data["search_key"]
+        page_number = int(request.data["page_number"])
+    except Exception:
+        return error("requiredParams")
+
+    # Search:
+    search_query = Q(title__contains=search_key) | Q(description__contains=search_key)
+    allowed_event_query = Q(enabled=1) & Q(status=1)
+    result_set = Event.objects.filter(search_query).filter(allowed_event_query)
+
+    if not len(result_set):
+        return error("noResultForSearch")
+
+    # Paginate:
+    paginator = Paginator(result_set, PAGINATED_BY)
+    if page_number > paginator.num_pages:
+        return error("pageOverFlowError", {"the_last_page": paginator.num_pages})
+    page = paginator.page(page_number)
+
+    return event_lister(page, pagination_bar_params(page))
 
 
 @api_view(['POST'])
@@ -280,7 +341,7 @@ def userEvent(request):
         userProfile = UserProfile.objects.get(token=token)
         user = userProfile.user
         eventSet = Event.objects.filter(creator=user)
-        return create_event_set(eventSet)
+        return event_lister(eventSet)
     except Exception:
         return error("noSuchUser")
 
@@ -387,3 +448,57 @@ def editEventByUser(request):
                          "success": "1"
                          },
                         status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def donateMoneyEvent(request):
+    """
+    donates money for an event
+
+    potential errors:
+        requiredParams
+        eventNotFound
+        userNotFound
+        userIsNotDonator
+        userIsNotVerified
+        eventIsNotEnabled
+        lessenTheAmount
+    """
+
+    try:
+        event_id = int(request.data["event_id"])
+        TOKEN_ID = request.data["TOKEN_ID"]
+        amount = int(request.data["amount"])
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        event = Event.objects.get(id=event_id)
+        if not event.enabled:
+            return error("eventIsNotEnabled")
+        if amount > event.to_money_target():
+            return error("lessenTheAmount")
+    except Exception:
+        return error("eventNotFound")
+
+    try:
+        donator = UserProfile.objects.get(token=TOKEN_ID)
+        if donator.user_type not in [1, 3]:
+            return error("userIsNotDonator")
+        elif not donator.verified:
+            return error("userIsNotVerified")
+    except Exception:
+        return error("userNotFound")
+
+    transaction = Transactions.objects.create(amount=amount,
+                                              donatorOrNeedy=donator,
+                                              is_in=True)
+
+    DonatesIn.objects.create(transaction=transaction,
+                             event=event, donator=donator)
+    event.donated_money += amount
+    event.save()
+
+    return Response({"message": "money donated successfully",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)

@@ -10,9 +10,12 @@ from App1.models import UserProfile
 from App1.models import Event
 from App1.models import Transactions
 from App1.models import DonatesIn
+from App1.models import Product
+from App1.models import NeedRequest
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
+from App1.Components.lister_functions import *
 
 from App1.Components.APIs.auth_apis import *
 from App1.Components.APIs.profile_apis import *
@@ -49,179 +52,147 @@ def email(request):
 
 
 @api_view(['POST'])
-@limiter([SearchLimiter])
-def search(request):
-    PAGINATED_BY = 10
+def generalDonate(request):
     """
-    searches for events according to title and description
-    just for 'enabled' & 'accepted' events
-    it's not case-sensitive
-    it paginates event by PAGINATED_BY
+    donates money or product for not an event
 
     potential errors:
         requiredParams
-        pageOverFlowError
-        noResultForSearch
-    """
-    try:
-        search_key = request.data["search_key"]
-        page_number = int(request.data["page_number"])
-    except e:
-        return error("requiredParams")
-
-    # Search:
-    search_query = Q(title__contains=search_key) | Q(description__contains=search_key)
-    allowed_event_query = Q(enabled=1) & Q(status=1)
-    result_set = Event.objects.filter(search_query).filter(allowed_event_query)
-
-    if not len(result_set):
-        return error("noResultForSearch")
-
-    # Paginate:
-    paginator = Paginator(result_set, PAGINATED_BY)
-    if page_number > paginator.num_pages:
-        return error("pageOverFlowError", {"the_last_page": paginator.num_pages})
-    page = paginator.page(page_number)
-
-    return create_event_set(page, pagination_bar_params(page))
-
-
-@api_view(['POST'])
-@limiter([NotVerifiedUserSetLimiter])
-def notVerifiedUserSet(request):
-    """
-    returns the list of not verified users to verify by super admin
-
-    potential errors:
-        requiredParams
-        adminNotFound
-        notSuperAdmin
-    """
-    try:
-        TOKEN_API = request.data["TOKEN_API"]
-    except Exception:
-        return error("requiredParams")
-
-    try:
-        adminProfile = UserProfile.objects.get(token=TOKEN_API)
-    except Exception:
-        return error("adminNotFound")
-
-    if adminProfile.user_type != 1:
-        return error("notSuperAdmin")
-
-    donator_list = UserProfile.objects.filter(verified=False).filter(user_type=3)
-    needy_list = UserProfile.objects.filter(verified=False).filter(user_type=4)
-
-    return create_user_set(needy_list, donator_list)
-
-
-@api_view(['POST'])
-@limiter([VerifyOrRejectUserLimiter])
-def verifyOrRejectUser(request):
-    """
-    verifies or rejects user by superAdmin
-
-    potential errors:
-        requiredParams
-        notSuperAdmin
-        adminNotFound
-        verifiedBefore
-        userTypeError
+        productQuantity
+        productNotFound
+        donateTypeError
         userNotFound
+        userIsNeedy
+        userIsNotVerified
+        completeProfileFirstPlease
     """
-    try:
-        TOKEN_API = request.data["TOKEN_API"]
-        user_id = int(request.data["user_id"])
-        action = int(request.data["action"])
-    except Exception:
-        return error("requiredParams")
 
     try:
-        superAdmin = UserProfile.objects.get(token=TOKEN_API)
-        if superAdmin.user_type != 1:
-            return error("notSuperAdmin")
+        TOKEN_ID = request.data["TOKEN_ID"]
+        money_amount = get_data_or_none(request, "money_amount")
+        product_id = get_data_or_none(request, "product_id")
     except Exception:
-        return error("adminNotFound")
+        return error("requiredParams", {"message": "user TOKEN_API is not passed"})
 
     try:
-        userProfile = UserProfile.objects.get(id=user_id)
-        if userProfile.verified:
-            return error("verifiedBefore")
-        elif (userProfile.user_type == 1) or (userProfile.user_type == 2):
+        userProfile = UserProfile.objects.get(token=TOKEN_ID)
+        if (userProfile.user_type == 1) or (userProfile.user_type == 2):
             return error("userTypeError", {"explanation": "user_type is "
                                            + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
+        elif not len(userProfile.melli_code):
+            return error("completeProfileFirstPlease")
     except Exception:
         return error("userNotFound")
-
-    if action:
-        userProfile.verified = True
-        userProfile.save()
     else:
-        userProfile.user.delete()
-        userProfile.delete()
+        user = UserProfile.objects.get(token=TOKEN_ID)
+        if user.user_type == 4:
+            return error("userIsNeedy")
+        if not user.verified:
+            return error("userIsNotVerified")
 
-    return Response({"message": "user " + str(["verified" if action else "rejected (deleted)"][0]) + " successfully",
+    # Detect donate type (money/product) and then create donate:
+    if product_id:
+        if money_amount:
+            return error("donateTypeError", {"message": "product_id & money_amount can't be passed both"})
+        try:
+            product_id = int(product_id)
+            quantity = int(request.data["quantity"])
+            product = Product.objects.filter(id=product_id)
+            if not len(product):
+                return error("productNotFound")
+            else:
+                product = Product.objects.get(id=product_id)
+            # Donate product:
+            DonatesIn.objects.create(donator=user,
+                                     product=product,
+                                     quantity=quantity)
+            product.quantity += quantity
+            product.save()
+        except Exception:
+            return error("productQuantity")
+    else:
+        if not money_amount:
+            return error("requiredParams", {"message": "money_amount & product_id can't be null both"})
+        else:
+            money_amount = int(money_amount)
+            transaction = Transactions.objects.create(amount=money_amount,
+                                                      donatorOrNeedy=user,
+                                                      is_in=True)
+            DonatesIn.objects.create(donator=user,
+                                     transaction=transaction)
+
+    return Response({"message": "donate recorded successfully",
                      "success": "1"},
                     status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
-def donate_money(request):
+def pending_donates(request):
     """
-    donates money for an event
+    returns all pending donates list or pending donates according to donator melli_code
+     to delivery to admin or superAdmin
+
+    potential error:
+        donatorNotFound
+    """
+    pending_query = Q(transferee=None)
+    donate_set = DonatesIn.objects.filter(pending_query).order_by('-create_date')
+
+    melli_code = get_data_or_none(request, "melli_code")
+    if melli_code is not None:
+        donator = UserProfile.objects.filter(melli_code=melli_code)
+        if not len(donator):
+            return error("donatorNotFound")
+        donator = UserProfile.objects.get(melli_code=melli_code)
+        result_set = []
+        for donate in donate_set:
+            if donate.donator == donator:
+                result_set.append(donate)
+    else:
+        result_set = donate_set
+
+    return donateIn_lister(result_set)
+
+
+@api_view(['POST'])
+def delivery(request):
+    """
+    records delivery product by admin for a donate
 
     potential errors:
         requiredParams
-        eventNotFound
         userNotFound
-        userIsNotDonator
-        userIsNotVerified
-        eventIsNotEnabled
-        lessenTheAmount
+        userNotAdmin
+        donateNotFound
     """
-
     try:
-        event_id = int(request.data["event_id"])
+        donate_id = int(request.data["donate_id"])
         TOKEN_ID = request.data["TOKEN_ID"]
-        amount = int(request.data["amount"])
     except Exception:
         return error("requiredParams")
 
-    try:
-        event = Event.objects.get(id=event_id)
-        if not event.enabled:
-            return error("eventIsNotEnabled")
-        if amount > event.to_money_target():
-            return error("lessenTheAmount")
-    except Exception:
-        return error("eventNotFound")
-
-    try:
-        donator = UserProfile.objects.get(token=TOKEN_ID)
-        if donator.user_type not in [1, 3]:
-            return error("userIsNotDonator")
-        elif not donator.verified:
-            return error("userIsNotVerified")
-    except Exception:
+    transferee = UserProfile.objects.filter(token=TOKEN_ID)
+    if not len(transferee):
         return error("userNotFound")
+    transferee = UserProfile.objects.get(token=TOKEN_ID)
+    if transferee.user_type not in [1, 2]:
+        return error("userNotAdmin")
 
-    transaction = Transactions.objects.create(amount=amount,
-                                              donatorOrNeedy=donator,
-                                              is_in=True)
+    donate = DonatesIn.objects.filter(id=donate_id)
+    if not len(donate):
+        return error("donateNotFound")
+    donate = DonatesIn.objects.get(id=donate_id)
 
-    DonatesIn.objects.create(transaction=transaction,
-                             event=event, donator=donator)
-    event.donated_money += amount
-    event.save()
+    donate.transferee = transferee
+    donate.save()
 
-    return Response({"message": "money donated successfully",
+    return Response({"message": "delivered successfully",
                      "success": "1"},
                     status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
-def transaction_list(request):
+def transactionList(request):
     """
     lists all or filtered money transactions
 
@@ -252,7 +223,6 @@ def transaction_list(request):
         user_filter = UserProfile.objects.filter(token=TOKEN_ID)
     else:
         if filter_by_user:
-            print (filter_by_user)
             user_filter = UserProfile.objects.filter(melli_code=filter_by_user)
             if not len(user_filter):
                 return error("filterUserNotFound")
@@ -286,7 +256,7 @@ def transaction_list(request):
 
 
 @api_view(['POST'])
-def resent_transaction_list(request):
+def resentTransactionList(request):
     """
     lists the most recent transactions
 
@@ -303,3 +273,248 @@ def resent_transaction_list(request):
     result_set = Transactions.objects.all().order_by('-create_date')[:count]
 
     return transaction_lister(result_set)
+
+
+@api_view(['POST'])
+def createNeedRequest(request):
+    """
+    creates NeedRequest
+
+    potential errors:
+        requireParams
+        userNotFound
+        userTypeError
+        productNotFound
+    """
+    try:
+        TOKEN_ID = request.data["TOKEN_ID"]
+        title = request.data["title"]
+        description = request.data["description"]
+        product_id = int(request.data["product_id"])
+    except Exception:
+        return error("requiredParams")
+
+    # Find user:
+    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
+    if not len(userProfile):
+        return error("userNotFound")
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
+
+    if userProfile.user_type != 4:
+        return error("userTypeError", {"message": "you are not needy"})
+    elif not userProfile.verified:
+        return error("notVerifiedNeedy")
+
+    # Find product:
+    try:
+        product = Product.objects.get(id=product_id)
+    except Exception:
+        return error("productNotFound")
+
+    # Create NeedRequest:
+    NeedRequest.objects.create(creator=userProfile,
+                               title=title,
+                               description=description,
+                               product=product)
+
+    return Response({"message": "NeedRequest created successfully",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def requestedNeedrequestList(request):
+    try:
+        token = request.data["TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+    else:
+        # Find user:
+        try:
+            userProfile = UserProfile.objects.get(token=token)
+        except Exception:
+            return error("Wrong TOKEN_ID")
+
+        # Check whether SuperAdmin or not:
+        if userProfile.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Find NeedRequests with status 0:
+        needrequest_set = list(NeedRequest.objects.filter(status=0))
+
+        return create_needrequest_set(needrequest_set)
+
+
+@api_view(['POST'])
+def editNeedrequestByAdmin(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        NeedRequest_id = request.data["NeedRequest_id"]
+
+        title = request.data["title"]
+        description = request.data["description"]
+        product_id = request.data["product_TOKEN_ID"]
+        feedback = request.data["feedback"]
+    except Exception:
+        return error("requiredParams")
+    else:
+        # Find user:
+        try:
+            userProfile = UserProfile.objects.get(token=token)
+        except Exception:
+            return error("Wrong TOKEN_ID")
+        # Find Product
+        try:
+            product = Product.objects.get(token=product_id)
+        except Exception:
+            return error("Wrong Product_TOKEN_ID")
+
+        # Check whether SuperAdmin or not:
+        if userProfile.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Edit NeedRequest:
+        try:
+            needRequest = NeedRequest.objects.get(id=NeedRequest_id)
+        except Exception:
+            return error("WrongNeedrequestId")
+        else:
+
+            needRequest.title = title
+            needRequest.description = description
+            needRequest.product = product
+            needRequest.edited = True
+            needRequest.edited_by = userProfile.id
+            needRequest.feedback = feedback
+            needRequest.status = 1
+            needRequest.enabled = True
+            needRequest.save()
+
+        return Response({"message": "NeedRequest edited",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def disableNeedrequest(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        needrequest_id = request.data["NeedRequest_id"]
+    except Exception:
+        return error("requiredParams")
+    else:
+        try:
+            userProfile = UserProfile.objects.get(token=token)
+        except Exception:
+            return error("Wrong TOKEN_ID")
+
+        # Check whether SuperAdmin or not:
+        if userProfile.user_type != 1:
+            return error("NotSuperAdmin")
+
+        # Disable the event:
+        needRequest = NeedRequest.objects.get(id=needrequest_id)
+        needRequest.enabled = False
+        needRequest.save()
+
+        return Response({"message": "NeedRequest disabled",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def userNeedrequest(request):
+    try:
+        token = request.data["token"]
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        userProfile = UserProfile.objects.get(token=token)
+        user = userProfile.user
+        needrequestSet = NeedRequest.objects.filter(creator=user)
+        return create_needrequest_set(needrequestSet)
+    except Exception:
+        return error("noSuchUser")
+
+
+@api_view(['POST'])
+def deleteNeedrequest(request):
+    try:
+        needrequest_id = request.data["NeedRequest_id"]
+        token = request.data["token"]
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        needRequest = NeedRequest.objects.get(id=needrequest_id)
+    except Exception:
+        return error("noSuchNeedrequest")
+
+    try:
+        userProfile = UserProfile.objects.get(token=token)
+        user = userProfile.user
+    except Exception:
+        return error("noSuchUser")
+
+    if needRequest.creator.username != user.username:
+        return error("youAreNotCreator")
+
+    if needRequest.status != 1:
+        needRequest.delete()
+    else:
+        return error("acceptedNeedrequest")
+
+    return Response({"success": "1",
+                     "message": "The NeedRequest deleted successfully"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def editNeedrequestByUser(request):
+    try:
+        token = request.data["TOKEN_ID"]
+        needrequest_id = request.data["NeedRequest_id"]
+
+        title = request.data["title"]
+        description = request.data["description"]
+        product_id = request.data["product_TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+    else:
+        # Find user:
+        try:
+            userProfile = UserProfile.objects.get(token=token)
+        except Exception:
+            return error("noSuchUser")
+
+        # Find product:
+        try:
+            product = Product.objects.get(token=product_id)
+        except Exception:
+            return error("noSuchProduct")
+
+        try:
+            needRequest = NeedRequest.objects.get(id=needrequest_id)
+        except Exception:
+            return error("noSuchNeedrequest")
+        else:
+            if needRequest.creator != userProfile.user:
+                return error("youAreNotCreator")
+            elif needRequest.status == -1:
+                return error("rejectedNeedrequest")
+
+            needRequest.title = title
+            needRequest.description = description
+            needRequest.product = product
+            needRequest.edited = True
+            needRequest.edited_by = userProfile.id
+            needRequest.status = 0
+            needRequest.save()
+
+        return Response({"message": "NeedRequest edited",
+                         "success": "1"
+                         },
+                        status=status.HTTP_200_OK)
