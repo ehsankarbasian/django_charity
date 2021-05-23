@@ -366,7 +366,7 @@ def requestedNeedRequestList(request):
 
 
 @api_view(['POST'])
-def needRequestList(request): # userNeedRequest
+def needRequestList(request):
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
     except Exception:

@@ -45,7 +45,6 @@ def createEvent(request):
         requiredParams
         Wrong TOKEN_ID
         ListAndTargetAreNone
-        ListAndTargetAreGivenBoth
         MoneyTargetIntError
     """
     try:
@@ -67,11 +66,9 @@ def createEvent(request):
 
     if (list_of_needs is None) and (money_target is None):
         return error("ListAndTargetAreNone")
-    elif (list_of_needs is not None) and (money_target is not None):
-        return error("ListAndTargetAreGivenBoth")
 
     needs_list = []
-    list_of_needs = ["" if list_of_needs is None else list_of_needs.split(",")][0]
+    list_of_needs = [[] if list_of_needs is None else list_of_needs][0]
     for value in list_of_needs:
         needs_list.append(value)
 
