@@ -8,6 +8,7 @@ contains:
     subcategory_item
     product_item
     transaction_item
+    donateIn_item
 """
 
 
@@ -34,7 +35,6 @@ def user_item(user):
 
 
 def event_item(event):
-    event_json = {}
     list_of_needs = {}
 
     if event.list_of_needs is None:
@@ -97,4 +97,17 @@ def transaction_item(transactions):
             "amount": transactions.amount,
             "create_date": transactions.create_date,
             "user_id": transactions.donatorOrNeedy.id}
+    return item
+
+
+def donateIn_item(donate):
+    product = donate.product
+    donator = donate.donator
+    item = {"donate_id": donate.id,
+            "product_name": product.title,
+            "product_id": product.id,
+            "quantity": donate.quantity,
+            "melli_code": donator.melli_code,
+            "donator_fname": donator.first_name,
+            "donator_lname": donator.last_name}
     return item

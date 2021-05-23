@@ -27,8 +27,8 @@ urlpatterns = [
     # path('DonateMoney', views.donate_money),
     
     path('GeneralDonate', views.generalDonate),
+    path('PendingDonate', views.pending_donates),
     path('Delivery', views.delivery),
-    path('test', views.test),
 
     path('TransactionList', views.transactionList),
     path('RecentTransactionList', views.resentTransactionList),

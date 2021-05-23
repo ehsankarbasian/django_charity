@@ -63,6 +63,7 @@ def generalDonate(request):
             userNotFound
             userIsNeedy
             userIsNotVerified
+            completeProfileFirstPlease
         """
 
     try:
@@ -73,12 +74,12 @@ def generalDonate(request):
         return error("requiredParams", {"message": "user TOKEN_API is not passed"})
 
     try:
-        userProfile = UserProfile.objects.get(id=user_id)
-        if userProfile.verified:
-            return error("verifiedBefore")
-        elif (userProfile.user_type == 1) or (userProfile.user_type == 2):
+        userProfile = UserProfile.objects.get(token=TOKEN_ID)
+        if (userProfile.user_type == 1) or (userProfile.user_type == 2):
             return error("userTypeError", {"explanation": "user_type is "
                                            + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
+        elif not len(userProfile.melli_code):
+            return error("completeProfileFirstPlease")
     except Exception:
         return error("userNotFound")
     else:
@@ -125,6 +126,34 @@ def generalDonate(request):
 
 
 @api_view(['POST'])
+def pending_donates(request):
+    """
+    returns all pending donates list or pending donates according to donator melli_code
+     to delivery to admin or superAdmin
+
+    potential error:
+        donatorNotFound
+    """
+    pending_query = Q(transferee=None)
+    donate_set = DonatesIn.objects.filter(pending_query).order_by('-create_date')
+
+    melli_code = get_data_or_none(request, "melli_code")
+    if melli_code is not None:
+        donator = UserProfile.objects.filter(melli_code=melli_code)
+        if not len(donator):
+            return error("donatorNotFound")
+        donator = UserProfile.objects.get(melli_code=melli_code)
+        result_set = []
+        for donate in donate_set:
+            if donate.donator == donator:
+                result_set.append(donate)
+    else:
+        result_set = donate_set
+
+    return donateIn_lister(result_set)
+
+
+@api_view(['POST'])
 def delivery(request):
     """
     records delivery product by admin for a donate
@@ -157,14 +186,6 @@ def delivery(request):
     donate.save()
 
     return Response({"message": "delivered successfully",
-                     "success": "1"},
-                    status=status.HTTP_200_OK)
-
-
-@api_view(['GET'])
-def test(request):
-    string = request.GET.get("input")
-    return Response({"message": string,
                      "success": "1"},
                     status=status.HTTP_200_OK)
 
