@@ -10,6 +10,7 @@ contains:
     product_lister
     transaction_lister
     donateIn_lister
+    needRequest_lister
 """
 
 
@@ -147,6 +148,21 @@ def donateIn_lister(donates_queryset):
                   "count": len(donates_queryset),
                   # "pagination_params": pagination_params,
                   "donate_set": donate_json}
+
+    return Response(final_json,
+                    status=status.HTTP_200_OK)
+
+
+def needRequest_lister(needRequest_queryset):
+    needRequest_json = {}
+    for needRequest in needRequest_queryset:
+        needRequest_json[needRequest.id] = needRequest_item(needRequest)
+
+    final_json = {"success": "1",
+                  "empty": [0 if len(needRequest_json) else 1][0],
+                  "count": len(needRequest_queryset),
+                  # "pagination_params": pagination_params,
+                  "needRequest_set": needRequest_json}
 
     return Response(final_json,
                     status=status.HTTP_200_OK)

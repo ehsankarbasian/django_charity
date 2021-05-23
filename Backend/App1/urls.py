@@ -52,7 +52,7 @@ urlpatterns = [
 
 
     path('CreateNeedRequest', views.createNeedRequest),
-    path('Requested_NeedRequest_List', views.requestedNeedrequestList),
+    path('RequestedNeedRequestList', views.requestedNeedRequestList),
     path('Edit_NeedRequest_ByAdmin', views.editNeedrequestByAdmin),
     path('Edit_NeedRequest_ByUser', views.editNeedrequestByUser),
     path('LeaveFeedback', views.leaveFeedback),

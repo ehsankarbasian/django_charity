@@ -165,7 +165,7 @@ class DonatesOut(): # models.Model
 
 class NeedRequest(models.Model):
     STATUS_CHOICES = [
-        (0, 'no feedback'),
+        (0, 'pending'),
         (1, 'accepted'),
         (-1, 'failed'),
     ]

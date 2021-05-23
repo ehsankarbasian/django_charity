@@ -313,6 +313,7 @@ def createNeedRequest(request):
 
     # Create NeedRequest:
     NeedRequest.objects.create(creator=userProfile,
+                               status=1,  # TODO: delete this line after verify NeedRequest by admin
                                title=title,
                                description=description,
                                product=product)
@@ -323,26 +324,34 @@ def createNeedRequest(request):
 
 
 @api_view(['POST'])
-def requestedNeedrequestList(request):
+def requestedNeedRequestList(request):
+    """
+    list of NeedRequest with status 0
+
+    potential errors:
+        requiredParams
+        userNotFound
+        userNotSuperAdmin
+    """
     try:
-        token = request.data["TOKEN_ID"]
+        TOKEN_ID = request.data["TOKEN_ID"]
     except Exception:
         return error("requiredParams")
-    else:
-        # Find user:
-        try:
-            userProfile = UserProfile.objects.get(token=token)
-        except Exception:
-            return error("Wrong TOKEN_ID")
 
-        # Check whether SuperAdmin or not:
-        if userProfile.user_type != 1:
-            return error("NotSuperAdmin")
+    # Find user:
+    try:
+        userProfile = UserProfile.objects.get(token=TOKEN_ID)
+    except Exception:
+        return error("userNotFound")
 
-        # Find NeedRequests with status 0:
-        needrequest_set = list(NeedRequest.objects.filter(status=0))
+    # Check whether superAdmin/admin or not:
+    if userProfile.user_type not in [1, 2]:
+        return error("userNotSuperAdmin")
 
-        return create_needrequest_set(needrequest_set)
+    # Find NeedRequests with status 0:
+    needRequest_set = list(NeedRequest.objects.filter(status=0))
+
+    return needRequest_lister(needRequest_set)
 
 
 @api_view(['POST'])
