@@ -12,6 +12,9 @@ contains:
 """
 
 
+from App1.models import *
+
+
 def user_item(user):
     item = {
         "id": user.id,
@@ -91,12 +94,29 @@ def product_item(product):
     return item
 
 
-def transaction_item(transactions):
-    item = {"id": transactions.id,
-            "is_in": transactions.is_in,
-            "amount": transactions.amount,
-            "create_date": transactions.create_date,
-            "user_id": transactions.donatorOrNeedy.id}
+def transaction_item(transaction):
+    try:
+        donate_in = DonatesIn.objects.get(transaction=transaction)
+        event = donate_in.event
+        event_title = event.title
+        if event is not None:
+            event_id = event.id
+        else:
+            event_id = None
+    except Exception:
+        event_id = None
+        event_title = ""
+
+    user = User.objects.get(user=transaction.donatorOrNeedy
+
+    item = {"id": transaction.id,
+            "is_in": transaction.is_in,
+            "amount": transaction.amount,
+            "create_date": transaction.create_date,
+            "user_id": transaction.donatorOrNeedy.id,
+            "username": user.username,
+            "event_id": event_id,
+            "event_title": event_title}
     return item
 
 
