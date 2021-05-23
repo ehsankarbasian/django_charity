@@ -45,7 +45,7 @@ def event_item(event):
             counter += 1
             list_of_needs[counter] = need
     user = event.creator
-    event_json[event.id] = {
+    event_json = {
         "status": event.status,
         "id": event.id,
         "title": event.title,

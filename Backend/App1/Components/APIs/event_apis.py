@@ -44,14 +44,17 @@ def createEvent(request):
     potential errors:
         requiredParams
         Wrong TOKEN_ID
+        ListAndTargetAreNone
+        ListAndTargetAreGivenBoth
+        MoneyTargetIntError
     """
     try:
         token = request.data["TOKEN_ID"]
         title = request.data["title"]
         description = request.data["description"]
-        list_of_needs = request.data["list_of_needs"]
-        money_target = int(request.data["money_target"])
-        image_url = request.data["image_url"]
+        list_of_needs = get_data_or_none(request, "list_of_needs")
+        money_target = get_data_or_none(request, "money_target")
+        image_url = get_data_or_none(request, "image_url")
     except Exception:
         return error("requiredParams")
 
@@ -62,9 +65,21 @@ def createEvent(request):
     except Exception:
         return error("Wrong TOKEN_ID")
 
+    if (list_of_needs is None) and (money_target is None):
+        return error("ListAndTargetAreNone")
+    elif (list_of_needs is not None) and (money_target is not None):
+        return error("ListAndTargetAreGivenBoth")
+
     needs_list = []
+    list_of_needs = ["" if list_of_needs is None else list_of_needs.split(",")][0]
     for value in list_of_needs:
         needs_list.append(value)
+
+    if money_target is not None:
+        try:
+            money_target = int(money_target)
+        except Exception:
+            return error("MoneyTargetIntError")
 
     # Create event:
     Event.objects.create(
@@ -72,7 +87,7 @@ def createEvent(request):
         title=title,
         description=description,
         list_of_needs=",".join(needs_list),
-        money_target=money_target,
+        money_target=[money_target if money_target is not None else 0][0],
         image_url=image_url
     )
 
