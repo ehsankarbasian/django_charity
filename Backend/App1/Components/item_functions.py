@@ -135,12 +135,9 @@ def donateIn_item(donate):
 
 def needRequest_item(needRequest):
     creator = needRequest.creator
-    product = needRequest.product
     item = {"title": needRequest.title,
             "description": needRequest.description,
-            "product_name": product.title,
-            "product_id": product.id,
-            "creator_id": creator.id,
+            "creator_username": creator.user.username,
             "creator_fname": creator.first_name,
             "creator_lname": creator.last_name}
     return item

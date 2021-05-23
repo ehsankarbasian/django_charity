@@ -304,13 +304,11 @@ def createNeedRequest(request):
         requireParams
         userNotFound
         userTypeError
-        productNotFound
     """
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
         title = request.data["title"]
         description = request.data["description"]
-        product_id = int(request.data["product_id"])
     except Exception:
         return error("requiredParams")
 
@@ -325,18 +323,11 @@ def createNeedRequest(request):
     elif not userProfile.verified:
         return error("notVerifiedNeedy")
 
-    # Find product:
-    try:
-        product = Product.objects.get(id=product_id)
-    except Exception:
-        return error("productNotFound")
-
     # Create NeedRequest:
     NeedRequest.objects.create(creator=userProfile,
                                status=1,  # TODO: delete this line after verify NeedRequest by admin
                                title=title,
-                               description=description,
-                               product=product)
+                               description=description)
 
     return Response({"message": "NeedRequest created successfully",
                      "success": "1"},

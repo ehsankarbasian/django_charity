@@ -173,7 +173,6 @@ class NeedRequest(models.Model):
     title = models.CharField(null=False, blank=True, max_length=127)
     description = models.TextField(null=True, blank=True)
     creator = models.ForeignKey(UserProfile, null=False, related_name='needy', on_delete=models.DO_NOTHING)
-    product = models.ForeignKey(Product, null=False, on_delete=models.DO_NOTHING)
     status = models.IntegerField(default=0, choices=STATUS_CHOICES)
     create_date = models.DateTimeField(auto_now=True)
 
