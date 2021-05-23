@@ -107,7 +107,7 @@ def transaction_item(transaction):
         event_id = None
         event_title = ""
 
-    user = User.objects.get(user=transaction.donatorOrNeedy
+    user = User.objects.get(user=transaction.donatorOrNeedy)
 
     item = {"id": transaction.id,
             "is_in": transaction.is_in,

@@ -276,6 +276,26 @@ def resentTransactionList(request):
 
 
 @api_view(['POST'])
+def biggestTransactionList(request):
+    """
+    lists the most big-amount transactions
+
+    potential errors:
+        requiredParams
+    """
+    try:
+        count = get_data_or_none(request, "count")
+    except Exception:
+        return error("requiredParams")
+
+    count = [int(count) if count else 10][0]
+
+    result_set = Transactions.objects.all().order_by('-amount')[:count]
+
+    return transaction_lister(result_set)
+
+
+@api_view(['POST'])
 def createNeedRequest(request):
     """
     creates NeedRequest

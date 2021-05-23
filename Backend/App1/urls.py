@@ -32,6 +32,7 @@ urlpatterns = [
 
     path('TransactionList', views.transactionList),
     path('RecentTransactionList', views.resentTransactionList),
+    path('BiggestTransactionList', views.biggestTransactionList),
 
     # StoreManagement urls:
     path('CreateCategory', views.create_category),
