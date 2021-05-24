@@ -93,9 +93,14 @@ def generalDonate(request):
     else:
         userProfile = None
 
-    if type is not None:
-        if int(type) == 1:
-            userProfile = None
+    try:
+        if type is not None:
+            print(type(type))
+            print(type)
+            if type == "1":
+                userProfile = None
+    except Exception:
+        userProfile = None
 
     # Detect donate type (money/product) and then create donate:
     if product_id:
