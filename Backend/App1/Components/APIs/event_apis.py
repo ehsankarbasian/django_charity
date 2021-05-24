@@ -67,10 +67,7 @@ def createEvent(request):
     if (list_of_needs is None) and (money_target is None):
         return error("ListAndTargetAreNone")
 
-    needs_list = []
-    list_of_needs = [[] if list_of_needs is None else list_of_needs][0]
-    for value in list_of_needs:
-        needs_list.append(value)
+    list_of_needs = ['' if list_of_needs is None else list_of_needs][0]
 
     if money_target is not None:
         try:
@@ -83,7 +80,7 @@ def createEvent(request):
         creator=user,
         title=title,
         description=description,
-        list_of_needs=",".join(needs_list),
+        list_of_needs=list_of_needs,
         money_target=[money_target if money_target is not None else 0][0],
         image_url=image_url
     )
