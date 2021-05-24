@@ -124,20 +124,28 @@ def donateIn_item(donate):
     product = donate.product
     if product is not None:
         donator = donate.donator
+        try:
+            m = donate.melli_code
+        except:
+            m = ""
         item = {"donate_id": donate.id,
                 "product_name": product.title,
                 "product_id": product.id,
                 "quantity": donate.quantity,
-                "melli_code": donator.melli_code,
+                "melli_code": m,
                 "donator_fname": donator.first_name,
                 "donator_lname": donator.last_name}
     else:
         donator = donate.donator
+        try:
+            m = donate.melli_code
+        except:
+            m = ""
         item = {"donate_id": donate.id,
                 "product_name": "None",
                 "product_id": "None",
                 "quantity": donate.quantity,
-                "melli_code": donator.melli_code,
+                "melli_code": m,
                 "donator_fname": donator.first_name,
                 "donator_lname": donator.last_name}
     return item

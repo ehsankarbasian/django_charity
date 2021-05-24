@@ -151,17 +151,19 @@ def pending_donates(request):
     donate_set = DonatesIn.objects.filter(pending_query).order_by('-create_date')
 
     melli_code = get_data_or_none(request, "melli_code")
+    result_set = []
     if melli_code is not None:
         donator = UserProfile.objects.filter(melli_code=melli_code)
         if not len(donator):
             return error("donatorNotFound")
         donator = UserProfile.objects.get(melli_code=melli_code)
-        result_set = []
         for donate in donate_set:
             if donate.donator == donator:
                 result_set.append(donate)
     else:
-        result_set = donate_set
+        for donate in donate_set:
+            if donate.product is not None:
+                result_set.append(donate)
 
     return donateIn_lister(result_set)
 
