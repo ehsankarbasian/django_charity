@@ -122,14 +122,24 @@ def transaction_item(transaction):
 
 def donateIn_item(donate):
     product = donate.product
-    donator = donate.donator
-    item = {"donate_id": donate.id,
-            "product_name": product.title,
-            "product_id": product.id,
-            "quantity": donate.quantity,
-            "melli_code": donator.melli_code,
-            "donator_fname": donator.first_name,
-            "donator_lname": donator.last_name}
+    if product is not None:
+        donator = donate.donator
+        item = {"donate_id": donate.id,
+                "product_name": product.title,
+                "product_id": product.id,
+                "quantity": donate.quantity,
+                "melli_code": donator.melli_code,
+                "donator_fname": donator.first_name,
+                "donator_lname": donator.last_name}
+    else:
+        donator = donate.donator
+        item = {"donate_id": donate.id,
+                "product_name": "None",
+                "product_id": "None",
+                "quantity": donate.quantity,
+                "melli_code": donator.melli_code,
+                "donator_fname": donator.first_name,
+                "donator_lname": donator.last_name}
     return item
 
 
