@@ -68,27 +68,34 @@ def generalDonate(request):
     """
 
     try:
-        TOKEN_ID = request.data["TOKEN_ID"]
+        TOKEN_ID = get_data_or_none(request, "TOKEN_ID")
+        type = get_data_or_none(request, "type")
         money_amount = get_data_or_none(request, "money_amount")
         product_id = get_data_or_none(request, "product_id")
     except Exception:
-        return error("requiredParams", {"message": "user TOKEN_API is not passed"})
+        return error("requiredParams")
 
-    try:
-        userProfile = UserProfile.objects.get(token=TOKEN_ID)
-        if (userProfile.user_type == 1) or (userProfile.user_type == 2):
-            return error("userTypeError", {"explanation": "user_type is "
-                                           + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
-        elif not len(userProfile.melli_code):
-            return error("completeProfileFirstPlease")
-    except Exception:
-        return error("userNotFound")
-    else:
-        user = UserProfile.objects.get(token=TOKEN_ID)
-        if user.user_type == 4:
+    if TOKEN_ID is not None:
+        try:
+            userProfile = UserProfile.objects.get(token=TOKEN_ID)
+            if (userProfile.user_type == 1) or (userProfile.user_type == 2):
+                return error("userTypeError", {"explanation": "user_type is "
+                                               + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
+            elif not len(userProfile.melli_code):
+                if product_id is not None:
+                    return error("completeProfileFirstPlease")
+        except Exception:
+            return error("userNotFound")
+        if userProfile.user_type == 4:
             return error("userIsNeedy")
-        if not user.verified:
+        if not userProfile.verified:
             return error("userIsNotVerified")
+    else:
+        userProfile = None
+
+    if type is not None:
+        if int(type) == 1:
+            userProfile = None
 
     # Detect donate type (money/product) and then create donate:
     if product_id:
@@ -103,7 +110,7 @@ def generalDonate(request):
             else:
                 product = Product.objects.get(id=product_id)
             # Donate product:
-            DonatesIn.objects.create(donator=user,
+            DonatesIn.objects.create(donator=userProfile,
                                      product=product,
                                      quantity=quantity)
             product.quantity += quantity
@@ -116,9 +123,9 @@ def generalDonate(request):
         else:
             money_amount = int(money_amount)
             transaction = Transactions.objects.create(amount=money_amount,
-                                                      donatorOrNeedy=user,
+                                                      donatorOrNeedy=userProfile,
                                                       is_in=True)
-            DonatesIn.objects.create(donator=user,
+            DonatesIn.objects.create(donator=userProfile,
                                      transaction=transaction)
 
     return Response({"message": "donate recorded successfully",
