@@ -126,6 +126,7 @@ def demoteAdmin(request):
         youAreNotSuperAdmin
         userNotFound
         userIsSuperAdmin
+        dontDemoteToSuperAdmin
     """
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
@@ -154,6 +155,8 @@ def demoteAdmin(request):
         return error("userIsSuperAdmin")
 
     # Demote User
+    if user_type == 1:
+        return error("dontDemoteToSuperAdmin")
     userProfile.user_type = user_type
     userProfile.save()
 
