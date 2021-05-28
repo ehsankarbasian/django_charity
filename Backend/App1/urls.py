@@ -56,4 +56,8 @@ urlpatterns = [
     path('MyNeedRequestList', views.myNeedRequestList),
     path('AcceeptOrRejectNeedRequest', views.acceptOrRejectNeedRequest),
     path('AcceptedNeedRequestList', views.acceptedNeedRequestList),
+
+    path('PromoteToSuperAdmin', views.promoteToSuperAdmin),
+    path('PromoteToAdmin', views.promoteToAdmin),
+    path('DemoteAdmin', views.demoteAdmin),
 ]

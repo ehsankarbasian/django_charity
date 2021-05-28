@@ -160,5 +160,7 @@ def acceptOrRejectNeedRequest(request):
 
 @api_view(['POST'])
 def acceptedNeedRequestList(request):
-    needRequestSet = NeedRequest.objects.filter(status=1)
+    count = get_data_or_none(request, "count")
+    count = [int(count) if count is not None else 10][0]
+    needRequestSet = NeedRequest.objects.filter(status=1)[:count]
     return needRequest_lister(needRequestSet)

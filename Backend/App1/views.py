@@ -24,6 +24,7 @@ from App1.Components.APIs.store_apis import *
 from App1.Components.APIs.transaction_apis import *
 from App1.Components.APIs.donate_apis import *
 from App1.Components.APIs.need_request_apis import *
+from App1.Components.APIs.admin_management_apis import *
 
 
 # API functions:
@@ -52,109 +53,3 @@ def email(request):
     return Response({"message": "email sent",
                      "success": "1"},
                     status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def promoteToSuperadmin(request):
-    try:
-        token = request.data["TOKEN_ID"]
-        user_id = request.data["user_id"]
-    except Exception:
-        return error("requiredParams")
-    else:
-        try:
-            adminProfile = UserProfile.objects.get(token=token)
-        except Exception:
-            return error("Wrong TOKEN_ID")
-        try:
-            userProfile = UserProfile.objects.get(token=user_id)
-        except Exception:
-            return error("Wrong User_ID")
-
-        # Check whether SuperAdmin or not:
-        if adminProfile.user_type != 1:
-            return error("NotSuperAdmin")
-
-        # Check user is SuperAdmin or not:
-        if userProfile.user_type == 1:
-            return error("UserIsSuperAdmin")
-
-        # Promote User To SuperAdmin
-        userProfile.user_type = 1
-        userProfile.save()
-
-        return Response({"message": "User Promoted To SuperAdmin",
-                         "success": "1"
-                         },
-                        status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def promoteToAdmin(request):
-    try:
-        token = request.data["TOKEN_ID"]
-        user_id = request.data["user_id"]
-    except Exception:
-        return error("requiredParams")
-    else:
-        try:
-            adminProfile = UserProfile.objects.get(token=token)
-        except Exception:
-            return error("Wrong TOKEN_ID")
-        try:
-            userProfile = UserProfile.objects.get(token=user_id)
-        except Exception:
-            return error("Wrong User_ID")
-
-        # Check whether SuperAdmin or not:
-        if adminProfile.user_type != 1:
-            return error("NotSuperAdmin")
-
-        # Check user is Admin or not:
-        if userProfile.user_type == 2:
-            return error("UserIsAdmin")
-
-        # Promote User To SuperAdmin
-        userProfile.user_type = 2
-        userProfile.save()
-
-        return Response({"message": "User Promoted To Admin",
-                         "success": "1"
-                         },
-                        status=status.HTTP_200_OK)
-
-
-@api_view(['POST'])
-def demoteAdmin(request):
-    try:
-        token = request.data["TOKEN_ID"]
-        user_id = request.data["user_id"]
-        user_type = request.data["user_type"]
-    except Exception:
-        return error("requiredParams")
-    else:
-        try:
-            adminProfile = UserProfile.objects.get(token=token)
-        except Exception:
-            return error("Wrong TOKEN_ID")
-        try:
-            userProfile = UserProfile.objects.get(token=user_id)
-        except Exception:
-            return error("Wrong User_ID")
-
-        # Check whether SuperAdmin or not:
-        if adminProfile.user_type != 1:
-            return error("NotSuperAdmin")
-
-        # Check user is Admin or not:
-        if userProfile.user_type != 1:
-            return error("UserIsNotAdmin")
-
-        # Demote User
-        userProfile.user_type = user_type
-        userProfile.save()
-
-        return Response({"message": "User Demoted",
-                         "success": "1"
-                         },
-                        status=status.HTTP_200_OK)
