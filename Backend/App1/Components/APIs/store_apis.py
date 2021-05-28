@@ -217,7 +217,7 @@ def edit_category(request):
         categoryNotFound
     """
     try:
-        category_id = request.data["category_id"]
+        category_id = int(request.data["category_id"])
         title = request.data["title"]
     except Exception:
         return error("requiredParams")
@@ -248,7 +248,7 @@ def edit_subcategory(request):
         categoryNotFound
     """
     try:
-        subcategory_id = request.data["subcategory_id"]
+        subcategory_id = int(request.data["subcategory_id"])
         title = get_data_or_none(request, "title")
         category_id = get_data_or_none(request, "category_id")
     except Exception:

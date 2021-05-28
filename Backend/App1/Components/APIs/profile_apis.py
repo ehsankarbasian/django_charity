@@ -59,6 +59,7 @@ def loadUserProfile(request):
                          "married": current_user.married,
                          "birth_date": current_user.birth_date,
                          "verified_needy": current_user.verified,
+                         "verified": current_user.verified,
                          "verified_mobile": current_user.verified_mobile,
                          "verified_email": current_user.verified_email,
                          "is_profile_completed": current_user.completed,
@@ -88,10 +89,12 @@ def submitUserProfile(request):
         return error("requiredParams")
     else:
         # Check user:
-        user = get_object_or_404(User, username=username)
-        userProfile = get_object_or_404(UserProfile, user=user)
-        if not (user and userProfile):
+        user = User.objects.filter(username=username)
+        if not len(user):
             return error("noSuchUser")
+        else:
+            user = user[0]
+        userProfile = UserProfile.objects.get(user=user)
 
         # NOT required fields:
         job = get_data_or_none(request, "job")

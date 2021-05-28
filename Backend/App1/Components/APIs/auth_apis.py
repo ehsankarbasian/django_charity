@@ -12,6 +12,9 @@ contains:
     forgotPassword
     resetPasswordTokenBased
     resetPasswordCodeBased
+
+    notVerifiedUserSet
+    verifyOrRejectUser
 """
 
 
@@ -25,6 +28,7 @@ from django.template.loader import get_template
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
+from App1.Components.lister_functions import *
 from re import search as validateRegex
 from random import randint
 
@@ -271,25 +275,28 @@ def forgotPassword(request):
     to_email = simple_email_set['email']
 
     # Check if email verified:
-    user = UserProfile.objects.get(email=to_email)
+    userProfile = UserProfile.objects.filter(email=to_email)
 
-    if user is None:
+    if not len(userProfile):
         return error("noSuchUser")
-    elif not user.verified_email:
+    else:
+        userProfile = UserProfile.objects.get(email=to_email)
+
+    if not userProfile.verified_email:
         return error("notVerifiedEmailError")
 
     token = token_hex(128)
     code = randint(10000000, 99999999)
-    user.reset_pass_token = token
-    user.reset_pass_code = code
-    user.save()
+    userProfile.reset_pass_token = token
+    userProfile.reset_pass_code = code
+    userProfile.save()
 
     html_content = get_template('ResetPass.html').render(context={
         'HOST': HOST,
         'PORT': PORT,
         'EMAIL_TOKEN_API': EMAIL_TOKEN_API,
         'email': to_email,
-        'name': user.user.username,
+        'name': userProfile.user.username,
         'private_code': code,
         'private_token': token
     })
@@ -384,4 +391,84 @@ def resetPasswordCodeBased(request):
 
     return Response({"message": "password changed",
                     "success": "1"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@limiter([NotVerifiedUserSetLimiter])
+def notVerifiedUserSet(request):
+    """
+    returns the list of not verified users to verify by super admin
+
+    potential errors:
+        requiredParams
+        adminNotFound
+        notSuperAdmin
+    """
+    try:
+        TOKEN_API = request.data["TOKEN_API"]
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        adminProfile = UserProfile.objects.get(token=TOKEN_API)
+    except Exception:
+        return error("adminNotFound")
+
+    if adminProfile.user_type != 1:
+        return error("notSuperAdmin")
+
+    donator_list = UserProfile.objects.filter(verified=False).filter(user_type=3)
+    needy_list = UserProfile.objects.filter(verified=False).filter(user_type=4)
+
+    return requested_user_lister(needy_list, donator_list)
+
+
+@api_view(['POST'])
+@limiter([VerifyOrRejectUserLimiter])
+def verifyOrRejectUser(request):
+    """
+    verifies or rejects user by superAdmin
+
+    potential errors:
+        requiredParams
+        notSuperAdmin
+        adminNotFound
+        verifiedBefore
+        userTypeError
+        userNotFound
+    """
+    try:
+        TOKEN_API = request.data["TOKEN_API"]
+        user_id = int(request.data["user_id"])
+        action = int(request.data["action"])
+    except Exception:
+        return error("requiredParams")
+
+    try:
+        superAdmin = UserProfile.objects.get(token=TOKEN_API)
+        if superAdmin.user_type != 1:
+            return error("notSuperAdmin")
+    except Exception:
+        return error("adminNotFound")
+
+    try:
+        userProfile = UserProfile.objects.get(id=user_id)
+        if userProfile.verified:
+            return error("verifiedBefore")
+        elif (userProfile.user_type == 1) or (userProfile.user_type == 2):
+            return error("userTypeError", {"explanation": "user_type is "
+                                                          + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
+    except Exception:
+        return error("userNotFound")
+
+    if action:
+        userProfile.verified = True
+        userProfile.save()
+    else:
+        userProfile.user.delete()
+        userProfile.delete()
+
+    return Response({"message": "user " + str(["verified" if action else "rejected (deleted)"][0]) + " successfully",
+                     "success": "1"},
                     status=status.HTTP_200_OK)

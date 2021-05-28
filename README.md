@@ -5,4 +5,4 @@ django
 djangorest
 sqlite
 
-deploy url: TODO
+deploy url: 185.231.115.150:port
