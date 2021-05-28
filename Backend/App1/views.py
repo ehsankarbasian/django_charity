@@ -428,3 +428,7 @@ def acceptOrRejectNeedRequest(request):
                      "message": "The NeedRequest " + ["accepted" if action else "rejected"][0] + "successfully"},
 
                     status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def promoteToSuperadmin(request):
+    
