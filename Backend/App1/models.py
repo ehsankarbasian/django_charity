@@ -113,12 +113,17 @@ class Transactions(models.Model):
     is_in = models.BooleanField(default=True)
     amount = models.IntegerField(null=False, default=0)
     create_date = models.DateTimeField(auto_now=True)
-    donatorOrNeedy = models.ForeignKey(UserProfile, null=False, on_delete=models.DO_NOTHING)
+    donatorOrNeedy = models.ForeignKey(UserProfile, null=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
+        try:
+            username = self.donatorOrNeedy.user.username
+        except Exception:
+            username = "null"
+
         return "Amount: " + str(self.amount) + \
                " / Is in? :" + str(self.is_in) + \
-               " / From: " + str(self.donatorOrNeedy.user.username)
+               " / From: " + username
 
 
 class DonatesIn(models.Model):
@@ -126,7 +131,7 @@ class DonatesIn(models.Model):
     product = models.ForeignKey(Product, null=True, on_delete=models.DO_NOTHING)
     transaction = models.ForeignKey(Transactions, null=True, on_delete=models.DO_NOTHING)
     event = models.ForeignKey(Event, null=True, on_delete=models.DO_NOTHING)
-    donator = models.ForeignKey(UserProfile, null=False, related_name='donator', on_delete=models.CASCADE)
+    donator = models.ForeignKey(UserProfile, null=True, related_name='donator', on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now=True)
     transferee = models.ForeignKey(UserProfile, null=True, default=None, related_name='transferee', on_delete=models.DO_NOTHING)
 
@@ -165,7 +170,7 @@ class DonatesOut(): # models.Model
 
 class NeedRequest(models.Model):
     STATUS_CHOICES = [
-        (0, 'no feedback'),
+        (0, 'pending'),
         (1, 'accepted'),
         (-1, 'failed'),
     ]
@@ -173,7 +178,6 @@ class NeedRequest(models.Model):
     title = models.CharField(null=False, blank=True, max_length=127)
     description = models.TextField(null=True, blank=True)
     creator = models.ForeignKey(UserProfile, null=False, related_name='needy', on_delete=models.DO_NOTHING)
-    product = models.ForeignKey(Product, null=False, on_delete=models.DO_NOTHING)
     status = models.IntegerField(default=0, choices=STATUS_CHOICES)
     create_date = models.DateTimeField(auto_now=True)
 

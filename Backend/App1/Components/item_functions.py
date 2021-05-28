@@ -12,6 +12,9 @@ contains:
 """
 
 
+from App1.models import *
+
+
 def user_item(user):
     item = {
         "id": user.id,
@@ -91,23 +94,56 @@ def product_item(product):
     return item
 
 
-def transaction_item(transactions):
-    item = {"id": transactions.id,
-            "is_in": transactions.is_in,
-            "amount": transactions.amount,
-            "create_date": transactions.create_date,
-            "user_id": transactions.donatorOrNeedy.id}
+def transaction_item(transaction):
+    try:
+        donate_in = DonatesIn.objects.get(transaction=transaction)
+        event = donate_in.event
+        event_id = event.id
+        event_title = event.title
+    except Exception:
+        event_id = None
+        event_title = ""
+
+    userProfile = transaction.donatorOrNeedy
+    user_id = [userProfile.user.id if userProfile is not None else None][0]
+    username = [userProfile.user.username if userProfile is not None else None][0]
+
+    item = {"id": transaction.id,
+            "is_in": transaction.is_in,
+            "amount": transaction.amount,
+            "create_date": transaction.create_date,
+            "user_id": user_id,
+            "username": username,
+            "event_id": event_id,
+            "event_title": event_title}
     return item
 
 
 def donateIn_item(donate):
-    product = donate.product
     donator = donate.donator
+    melli_code = [donator.melli_code if donator is not None else None][0]
+    donator_fname = [donator.first_name if donator is not None else None][0]
+    donator_lname = [donator.last_name if donator is not None else None][0]
+
+    product = donate.product
+    product_name = [product.title if product is not None else None][0]
+    product_id = [product.id if product is not None else None][0]
+
     item = {"donate_id": donate.id,
-            "product_name": product.title,
-            "product_id": product.id,
+            "product_name": product_name,
+            "product_id": product_id,
             "quantity": donate.quantity,
-            "melli_code": donator.melli_code,
-            "donator_fname": donator.first_name,
-            "donator_lname": donator.last_name}
+            "melli_code": melli_code,
+            "donator_fname": donator_fname,
+            "donator_lname": donator_lname}
+    return item
+
+
+def needRequest_item(needRequest):
+    creator = needRequest.creator
+    item = {"title": needRequest.title,
+            "description": needRequest.description,
+            "creator_username": creator.user.username,
+            "creator_fname": creator.first_name,
+            "creator_lname": creator.last_name}
     return item

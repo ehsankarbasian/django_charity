@@ -694,14 +694,11 @@ class EventAPIsTestCase(TestCase):
                                                  "list_of_needs": "oil,rice,car"})
         response_6 = client_post('CreateEvent', {"TOKEN_ID": "defaultDonator_1",
                                                  "title": "earthquake 16",
-                                                 "description": "an STRONG earthquake 2",
-                                                 "money_target": "1000",
-                                                 "list_of_needs": "oil,rice,car"})
+                                                 "description": "an STRONG earthquake 2"})
         response_7 = client_post('CreateEvent', {"TOKEN_ID": "defaultDonator_1",
                                                  "title": "earthquake 16",
                                                  "description": "an STRONG earthquake 2",
-                                                 "money_target": 5000,
-                                                 "list_of_needs": "oil,rice,car"})
+                                                 "money_target": "5000 Dollar"})
         response_8 = client_post('CreateEvent', {"TOKEN_ID": "defaultDonator_1",
                                                  "title": "earthquake 16",
                                                  "description": "an STRONG earthquake 16",
@@ -751,12 +748,18 @@ class EventAPIsTestCase(TestCase):
                              'error_type': "[<class 'ValueError'>]",
                              'error_on': '[ValueError("invalid literal for int() with base 10: \'one hundred\'",)]',
                              'success': '0'}
-        response_5_result = {'status': 'ListAndTargetAreGivenBoth',
+        response_5_result = {'status': 'MoneyTargetIntError',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'one hundred\'",)]',
+                             'success': '0'}
+        response_6_result = {'status': 'ListAndTargetAreNone',
                              'error_type': 'CUSTOM',
                              'error_on': 'CUSTOM',
                              'success': '0'}
-        response_6_result = response_5_result
-        response_7_result = response_5_result
+        response_7_result = {'status': 'MoneyTargetIntError',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'5000 Dollar\'",)]',
+                             'success': '0'}
         response_8_result = {'message': 'event created', 'success': '1'}
         response_10_result = response_8_result
         response_9_result = response_8_result

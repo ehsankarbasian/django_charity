@@ -1,7 +1,11 @@
 from django.urls import path
 from . import views
 
-urlpatterns = [
+doing_urls = [
+
+]
+
+auth_urls = [
     path('login', views.login),
     path('signup', views.signup),
     path('logout', views.logout),
@@ -10,7 +14,11 @@ urlpatterns = [
     path('SubmitUserProfile', views.submitUserProfile),
     path('UserBio', views.userBio),
     path('SendEmail', views.email),
+    path('NotVerifiedUserSet', views.notVerifiedUserSet),
+    path('VerifyOrRejectUser', views.verifyOrRejectUser),
+]
 
+event_urls = [
     path('CreateEvent', views.createEvent),
     path('GetEventRequested', views.requestedEventList),
     path('EditEventByAdmin', views.editEventByAdmin),
@@ -20,20 +28,22 @@ urlpatterns = [
     path('Search', views.searchEvent),
     path('UserEvent', views.userEvent),
     path('DeleteEvent', views.deleteEvent),
-    path('NotVerifiedUserSet', views.notVerifiedUserSet),
-    path('VerifyOrRejectUser', views.verifyOrRejectUser),
-
     path('DonateMoney', views.donateMoneyEvent),
-    # path('DonateMoney', views.donate_money),
-    
+]
+
+donate_urls = [
     path('GeneralDonate', views.generalDonate),
-    path('PendingDonate', views.pending_donates),
+    path('PendingDonate', views.pendingDonates),
     path('Delivery', views.delivery),
+]
 
+transaction_urls = [
     path('TransactionList', views.transactionList),
-    path('RecentTransactionList', views.resentTransactionList),
+    path('RecentTransactionList', views.recentTransactionList),
+    path('BiggestTransactionList', views.biggestTransactionList),
+]
 
-    # StoreManagement urls:
+store_management_urls = [
     path('CreateCategory', views.create_category),
     path('CreateSubCategory', views.create_subcategory),
     path('CreateProduct', views.create_product),
@@ -49,14 +59,34 @@ urlpatterns = [
     path('TheCategory', views.the_category),
     path('TheSubCategory', views.the_subcategory),
     path('TheProduct', views.the_product),
-
-
-    path('CreateNeedRequest', views.createNeedRequest),
-    path('Requested_NeedRequest_List', views.requestedNeedrequestList),
-    path('Edit_NeedRequest_ByAdmin', views.editNeedrequestByAdmin),
-    path('Edit_NeedRequest_ByUser', views.editNeedrequestByUser),
-    path('LeaveFeedback', views.leaveFeedback),
-    path('Disable_NeedRequest', views.disableNeedrequest),
-    path('User_NeedRequest', views.userNeedrequest),
-    path('Delete_NeedRequest', views.deleteNeedrequest)
 ]
+
+needRequest_urls = [
+    path('CreateNeedRequest', views.createNeedRequest),
+    path('RequestedNeedRequestList', views.requestedNeedRequestList),
+    path('MyNeedRequestList', views.myNeedRequestList),
+    path('AcceeptOrRejectNeedRequest', views.acceptOrRejectNeedRequest),
+    path('AcceptedNeedRequestList', views.acceptedNeedRequestList),
+]
+
+admin_management_urls = [
+    path('PromoteToSuperAdmin', views.promoteToSuperAdmin),
+    path('PromoteToAdmin', views.promoteToAdmin),
+    path('DemoteAdmin', views.demoteAdmin),
+]
+
+pack_list = [
+    doing_urls,
+    auth_urls,
+    event_urls,
+    donate_urls,
+    transaction_urls,
+    store_management_urls,
+    needRequest_urls,
+    admin_management_urls
+]
+
+urlpatterns = []
+for pack in pack_list:
+    for url in pack:
+        urlpatterns.append(url)
