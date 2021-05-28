@@ -28,15 +28,6 @@ def user_lister(user_queryset):
 
 
 def requested_user_lister(needy_queryset, donator_queryset, pagination_params=None):
-    """
-    creates json-based user set to show
-
-    the JSON contains: "id", "username", "user_type", "first_name", "last_name",
-    "melli_code", "email", "job", "address", "mobile_number", "house_phone",
-    "workplace_phone", "gender", "married", "birth_date", "signup_date"
-
-    it gets help from user_item() function
-    """
     if pagination_params:
         return error("TODO", {"message": "Have no pagination yet; coming soon"})
 
@@ -59,9 +50,7 @@ def requested_user_lister(needy_queryset, donator_queryset, pagination_params=No
 
 def event_lister(event_queryset, pagination_params=None):
     """
-    creates an event_set according to queryset
-    it's used in APIs that return several events to front
-    it passes pagination params to front if exists too
+    it passes pagination params to front if exists
     """
     # Create a json for an event:
     event_json = {}

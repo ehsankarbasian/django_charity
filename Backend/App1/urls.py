@@ -27,11 +27,11 @@ urlpatterns = [
     # path('DonateMoney', views.donate_money),
     
     path('GeneralDonate', views.generalDonate),
-    path('PendingDonate', views.pending_donates),
+    path('PendingDonate', views.pendingDonates),
     path('Delivery', views.delivery),
 
     path('TransactionList', views.transactionList),
-    path('RecentTransactionList', views.resentTransactionList),
+    path('RecentTransactionList', views.recentTransactionList),
     path('BiggestTransactionList', views.biggestTransactionList),
 
     # StoreManagement urls:
@@ -53,6 +53,7 @@ urlpatterns = [
 
     path('CreateNeedRequest', views.createNeedRequest),
     path('RequestedNeedRequestList', views.requestedNeedRequestList),
-    path('NeedRequestList', views.needRequestList),
-    path('AcceeptOrRejectNeedRequest', views.acceptOrRejectNeedRequest)
+    path('MyNeedRequestList', views.myNeedRequestList),
+    path('AcceeptOrRejectNeedRequest', views.acceptOrRejectNeedRequest),
+    path('AcceptedNeedRequestList', views.acceptedNeedRequestList),
 ]
