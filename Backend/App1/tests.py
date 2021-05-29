@@ -2324,3 +2324,51 @@ class AdminManagementAPIsTestCase(TestCase):
         self.assertEqual(response_15, response_15_result)
         formerly_admin = UserProfile.objects.get(token="defaultAdmin")
         self.assertEqual(formerly_admin.user_type, 4)
+
+
+class DonateAPIsTestCase(TestCase):
+    def setUp(self):
+        pass
+
+    def test_api_generalDonate(self):
+        pass
+
+    def test_api_pendingDonates(self):
+        pass
+
+    def test_api_delivery(self):
+        pass
+
+
+class NeedRequestAPIsTestCase(TestCase):
+    def setUp(self):
+        pass
+
+    def test_api_createNeedRequest(self):
+        pass
+
+    def test_api_requestedNeedRequestList(self):
+        pass
+
+    def test_api_myNeedRequestList(self):
+        pass
+
+    def test_api_acceptOrRejectNeedRequest(self):
+        pass
+
+    def test_api_acceptedNeedRequestList(self):
+        pass
+
+
+class TransactionAPIsTestCase(TestCase):
+    def setUp(self):
+        pass
+
+    def test_api_transactionList(self):
+        pass
+
+    def test_api_resentTransactionList(self):
+        pass
+
+    def test_api_biggestTransactionList(self):
+        pass
