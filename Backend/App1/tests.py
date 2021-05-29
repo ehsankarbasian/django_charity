@@ -2075,3 +2075,252 @@ class StoreAPIsTestCase(TestCase):
         self.assertEqual(response_2, response_2_result)
         self.assertEqual(response_3, response_3_result)
         self.assertEqual(response_4, response_4_result)
+
+
+class AdminManagementAPIsTestCase(TestCase):
+    def setUp(self):
+        init_db_user()
+
+    def test_api_promoteToSuperAdmin(self):
+        response_1 = client_post('PromoteToSuperAdmin', {})
+        response_2 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultSuperAdmin"})
+        response_3 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultSuperAdminLie", "username": "donator_1"})
+        response_4 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultAdmin", "username": "donator_1"})
+        response_5 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultDonator_2", "username": "donator_1"})
+        response_6 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultNeedy_1", "username": "donator_1"})
+        response_7 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "donator_3"})
+        response_8 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "superAdmin"})
+        response_9 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "admin"})
+        response_10 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "donator_2"})
+        response_11 = client_post('PromoteToSuperAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "needy_1"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('TOKEN_ID',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'superAdminNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'status': 'youAreNotSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = response_4_result
+        response_6_result = response_4_result
+        response_7_result = {'status': 'userNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_8_result = {'status': 'userIsSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_9_result = {'message': 'User promoted to SuperAdmin',
+                             'success': '1'}
+        response_10_result = response_9_result
+        response_11_result = response_9_result
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        self.assertEqual(response_10, response_10_result)
+        self.assertEqual(response_11, response_11_result)
+        superAdmin = UserProfile.objects.get(token="defaultSuperAdmin")
+        self.assertEqual(superAdmin.user_type, 1)
+        formerly_admin = UserProfile.objects.get(token="defaultAdmin")
+        self.assertEqual(formerly_admin.user_type, 1)
+        formerly_donator_2 = UserProfile.objects.get(token="defaultDonator_2")
+        self.assertEqual(formerly_donator_2.user_type, 1)
+        formerly_needy_1 = UserProfile.objects.get(token="defaultNeedy_1")
+        self.assertEqual(formerly_needy_1.user_type, 1)
+
+    def test_api_promoteToAdmin(self):
+        response_1 = client_post('PromoteToAdmin', {})
+        response_2 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultSuperAdmin"})
+        response_3 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultSuperAdminLie", "username": "donator_1"})
+        response_4 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultAdmin", "username": "donator_1"})
+        response_5 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultDonator_2", "username": "donator_1"})
+        response_6 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultNeedy_1", "username": "donator_1"})
+        response_7 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "donator_3"})
+        response_8 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "superAdmin"})
+        response_9 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "admin"})
+        response_10 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "donator_2"})
+        response_11 = client_post('PromoteToAdmin', {"TOKEN_ID": "defaultSuperAdmin", "username": "needy_1"})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('TOKEN_ID',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'superAdminNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'status': 'youAreNotSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = response_4_result
+        response_6_result = response_4_result
+        response_7_result = {'status': 'userNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_8_result = {'status': 'userIsSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_9_result = {'status': 'userIsAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_10_result = {'message': 'User promoted to Admin',
+                              'success': '1'}
+        response_11_result = response_10_result
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        self.assertEqual(response_10, response_10_result)
+        self.assertEqual(response_11, response_11_result)
+        superAdmin = UserProfile.objects.get(token="defaultSuperAdmin")
+        self.assertEqual(superAdmin.user_type, 1)
+        admin = UserProfile.objects.get(token="defaultAdmin")
+        self.assertEqual(admin.user_type, 2)
+        formerly_donator_2 = UserProfile.objects.get(token="defaultDonator_2")
+        self.assertEqual(formerly_donator_2.user_type, 2)
+        formerly_needy_1 = UserProfile.objects.get(token="defaultNeedy_1")
+        self.assertEqual(formerly_needy_1.user_type, 2)
+
+    def test_api_demoteAdmin(self):
+        response_1 = client_post('DemoteAdmin', {})
+        response_2 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin"})
+        response_3 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdminLie",
+                                                 "username": "donator_1",
+                                                 "user_type": 3})
+        response_4 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultAdmin",
+                                                 "username": "donator_1",
+                                                 "user_type": 3})
+        response_5 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultDonator_2",
+                                                 "username": "donator_1",
+                                                 "user_type": 4})
+        response_6 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultNeedy_1",
+                                                 "username": "donator_1",
+                                                 "user_type": 3})
+        response_7 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                 "username": "donator_3",
+                                                 "user_type": 4})
+        response_8 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                 "username": "superAdmin",
+                                                 "user_type": 3})
+        response_9 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                 "username": "admin",
+                                                 "user_type": "one"})
+        response_10 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                  "username": "admin",
+                                                  "user_type": "1"})
+        response_11 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                  "username": "admin",
+                                                  "user_type": 1})
+        response_12 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                  "username": "admin",
+                                                  "user_type": 3})
+        response_13 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                  "username": "donator_2",
+                                                  "user_type": 3})
+        response_14 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                  "username": "needy_1",
+                                                  "user_type": 3})
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('TOKEN_ID',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('username',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'superAdminNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_4_result = {'status': 'youAreNotSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = response_4_result
+        response_6_result = response_4_result
+        response_7_result = {'status': 'userNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_8_result = {'status': 'userIsSuperAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_9_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'ValueError'>]",
+                             'error_on': '[ValueError("invalid literal for int() with base 10: \'one\'",)]',
+                             'success': '0'}
+        response_10_result = {'status': 'dontDemoteToSuperAdmin',
+                              'error_type': 'CUSTOM',
+                              'error_on': 'CUSTOM',
+                              'success': '0'}
+        response_11_result = response_10_result
+        response_12_result = {'message': 'User Demoted',
+                              'success': '1'}
+        response_13_result = {'status': 'userIsDonator',
+                              'error_type': 'CUSTOM',
+                              'error_on': 'CUSTOM',
+                              'success': '0'}
+        response_14_result = {'status': 'userIsNeedy',
+                              'error_type': 'CUSTOM',
+                              'error_on': 'CUSTOM',
+                              'success': '0'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        self.assertEqual(response_10, response_10_result)
+        self.assertEqual(response_11, response_11_result)
+        self.assertEqual(response_12, response_12_result)
+        self.assertEqual(response_13, response_13_result)
+        self.assertEqual(response_14, response_14_result)
+        superAdmin = UserProfile.objects.get(token="defaultSuperAdmin")
+        self.assertEqual(superAdmin.user_type, 1)
+        formerly_admin = UserProfile.objects.get(token="defaultAdmin")
+        self.assertEqual(formerly_admin.user_type, 3)
+        donator_2 = UserProfile.objects.get(token="defaultDonator_2")
+        self.assertEqual(donator_2.user_type, 3)
+        needy_1 = UserProfile.objects.get(token="defaultNeedy_1")
+        self.assertEqual(needy_1.user_type, 4)
+        formerly_admin.user_type = 2
+        formerly_admin.save()
+        response_15 = client_post('DemoteAdmin', {"TOKEN_ID": "defaultSuperAdmin",
+                                                  "username": "admin",
+                                                  "user_type": 4})
+        response_15_result = {'message': 'User Demoted',
+                              'success': '1'}
+        self.assertEqual(response_15, response_15_result)
+        formerly_admin = UserProfile.objects.get(token="defaultAdmin")
+        self.assertEqual(formerly_admin.user_type, 4)
