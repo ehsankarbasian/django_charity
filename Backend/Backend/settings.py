@@ -11,7 +11,12 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
+from typing import List, Tuple
 import os
+
+HOST = "127.0.0.1"
+PORT = "8000"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -43,7 +48,22 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'App1',
     'rest_framework',
+    'django_minio_backend.apps.DjangoMinioBackendConfig',
 ]
+
+# MINIO_ENDPOINT = 'minio.your-company.co.uk'
+# MINIO_ACCESS_KEY = 'yourMinioAccessKey'
+# MINIO_SECRET_KEY = 'yourVeryS3cr3tP4ssw0rd'
+# MINIO_USE_HTTPS = True
+# MINIO_URL_EXPIRY_HOURS = timedelta(days=1)  # Default is 7 days (longest) if not defined
+# MINIO_CONSISTENCY_CHECK_ON_START = True
+# MINIO_PRIVATE_BUCKETS = [
+#     'django-backend-dev-private',
+# ]
+# MINIO_PUBLIC_BUCKETS = [
+#     'django-backend-dev-public',
+# ]
+# MINIO_POLICY_HOOKS: List[Tuple[str, dict]] = []
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -147,3 +167,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_URL = '/images/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/images')

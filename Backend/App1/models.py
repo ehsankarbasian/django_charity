@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from Backend import settings
 
 
 class UserProfile(models.Model):
@@ -67,7 +68,8 @@ class Event(models.Model):
     enabled = models.BooleanField(default=False)
     create_date = models.DateField(auto_now=True)
     status = models.IntegerField(default=0, choices=STATUS_CHOICES)
-    image_url = models.CharField(max_length=512, null=True, blank=True)
+    image = models.ImageField(default="default.png", null=True, blank=True)
+    image_url = models.CharField(default=settings.HOST + ":" + settings.PORT + "/images/default.png", max_length=512, null=True, blank=True)
     feedback = models.TextField(default="", null=True)
     edited = models.BooleanField(default=False)
     edited_by = models.IntegerField(default=-1)  # The super admin PROFILE id

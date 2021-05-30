@@ -53,7 +53,6 @@ def createEvent(request):
         description = request.data["description"]
         list_of_needs = get_data_or_none(request, "list_of_needs")
         money_target = get_data_or_none(request, "money_target")
-        image_url = get_data_or_none(request, "image_url")
     except Exception:
         return error("requiredParams")
 
@@ -82,7 +81,6 @@ def createEvent(request):
         description=description,
         list_of_needs=list_of_needs,
         money_target=[money_target if money_target is not None else 0][0],
-        image_url=image_url
     )
 
     return Response({"message": "event created",
