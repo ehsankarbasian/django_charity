@@ -14,6 +14,7 @@ contains:
     resetPasswordCodeBased
 
     notVerifiedUserSet
+    verifiedDonatorSet
     verifyOrRejectUser
 """
 
@@ -30,6 +31,7 @@ from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
 from App1.Components.lister_functions import *
 from re import search as validateRegex
+from django.db.models import Q
 from random import randint
 
 from django.contrib.auth.models import User
@@ -422,6 +424,36 @@ def notVerifiedUserSet(request):
     needy_list = UserProfile.objects.filter(verified=False).filter(user_type=4)
 
     return requested_user_lister(needy_list, donator_list)
+
+
+@api_view(['POST'])
+def verifiedDonatorSet(request):
+    """
+    returns the list of verified donators (verified by admin and verified email)
+
+    potential errors:
+        requiredParams
+        adminNotFound
+        notSuperAdminOrAdmin
+    """
+    try:
+        TOKEN_API = request.data["TOKEN_API"]
+    except Exception:
+        return error("requiredParams")
+
+    adminProfile = UserProfile.objects.filter(token=TOKEN_API)
+    if not len(adminProfile):
+        return error("adminNotFound")
+    adminProfile = UserProfile.objects.get(token=TOKEN_API)
+
+    if adminProfile.user_type not in [1, 2]:
+        return error("notSuperAdminOrAdmin")
+
+    donator_query = Q(user_type=3) & Q(verified=True) & Q(verified_email=True)
+    donator_list = UserProfile.objects.filter(donator_query)
+
+    return Response(user_lister(donator_list),
+                    status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
