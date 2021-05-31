@@ -53,19 +53,6 @@ INSTALLED_APPS = [
     'django_minio_backend.apps.DjangoMinioBackendConfig',
 ]
 
-# MINIO_ENDPOINT = 'minio.your-company.co.uk'
-# MINIO_ACCESS_KEY = 'yourMinioAccessKey'
-# MINIO_SECRET_KEY = 'yourVeryS3cr3tP4ssw0rd'
-# MINIO_USE_HTTPS = True
-# MINIO_URL_EXPIRY_HOURS = timedelta(days=1)  # Default is 7 days (longest) if not defined
-# MINIO_CONSISTENCY_CHECK_ON_START = True
-# MINIO_PRIVATE_BUCKETS = [
-#     'django-backend-dev-private',
-# ]
-# MINIO_PUBLIC_BUCKETS = [
-#     'django-backend-dev-public',
-# ]
-# MINIO_POLICY_HOOKS: List[Tuple[str, dict]] = []
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

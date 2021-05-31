@@ -24,10 +24,7 @@ import json
 from django.core.paginator import Paginator
 from django.db.models import Q
 
-from App1.serializers import *
-from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser
-from rest_framework.parsers import FormParser
+from Backend.settings import HOST, PORT
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
@@ -38,39 +35,6 @@ from App1.models import UserProfile
 from App1.models import Event
 from App1.models import Transactions
 from App1.models import DonatesIn
-
-
-class EventView(APIView):
-    parser_classes = (MultiPartParser, FormParser)
-
-    def get(self, request, *args, **kwargs):
-        print("")
-        print("")
-        print("def get has been run")
-        print("")
-        print("")
-        events = Event.objects.all()
-        serializer = EventSerializer(events, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, *args, **kwargs):
-        print("")
-        print("")
-        print("def post has been run")
-        event_serializer = EventSerializer(data=request.data)
-        if event_serializer.is_valid():
-            event_serializer.save()
-            print("")
-            print("if")
-            print("")
-            print("serializer.data is:")
-            print(event_serializer.data)
-            print("")
-            print("")
-            return Response(event_serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            print('EVENT SERIALIZER ERROR', event_serializer.errors)
-            return Response(event_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -91,6 +55,7 @@ def createEvent(request):
         description = request.data["description"]
         list_of_needs = get_data_or_none(request, "list_of_needs")
         money_target = get_data_or_none(request, "money_target")
+        image_url = get_data_or_none(request, "image_url")
     except Exception:
         return error("requiredParams")
 
@@ -112,6 +77,9 @@ def createEvent(request):
         except Exception:
             return error("MoneyTargetIntError")
 
+    if image_url is None:
+        image_url = settings.HOST + ":" + PORT + "/images/default.png"
+
     # Create event:
     Event.objects.create(
         creator=user,
@@ -119,6 +87,7 @@ def createEvent(request):
         description=description,
         list_of_needs=list_of_needs,
         money_target=[money_target if money_target is not None else 0][0],
+        image_url=image_url
     )
 
     return Response({"message": "event created",

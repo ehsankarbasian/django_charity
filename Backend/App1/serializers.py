@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import Event
+from .models import Image
 
 
-class EventSerializer(serializers.ModelSerializer):
+class ImageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Event
+        model = Image
         fields = '__all__'
