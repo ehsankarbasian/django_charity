@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="af27e988-ae8e-4f7b-97d5-75b5231538fe" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App1/Components/APIs/event_apis.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/Components/APIs/event_apis.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App1/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/settings.py" afterDir="false" />
-    </list>
+    <list default="true" id="af27e988-ae8e-4f7b-97d5-75b5231538fe" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -103,7 +98,7 @@
       <workItem from="1622208492041" duration="3914000" />
       <workItem from="1622282695571" duration="8399000" />
       <workItem from="1622325377656" duration="3717000" />
-      <workItem from="1622470185804" duration="3891000" />
+      <workItem from="1622470185804" duration="7725000" />
     </task>
     <servers />
   </component>

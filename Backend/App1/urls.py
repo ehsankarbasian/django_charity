@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 doing_urls = [
-    path('events/', views.EventView.as_view(), name='events_list'),
+    path('events', views.EventView.as_view(), name='events_list'),
 ]
 
 auth_urls = [

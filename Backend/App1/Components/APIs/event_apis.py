@@ -44,17 +44,32 @@ class EventView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
+        print("")
+        print("")
+        print("def get has been run")
+        print("")
+        print("")
         events = Event.objects.all()
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
+        print("")
+        print("")
+        print("def post has been run")
         event_serializer = EventSerializer(data=request.data)
         if event_serializer.is_valid():
             event_serializer.save()
+            print("")
+            print("if")
+            print("")
+            print("serializer.data is:")
+            print(event_serializer.data)
+            print("")
+            print("")
             return Response(event_serializer.data, status=status.HTTP_201_CREATED)
         else:
-            print('error', event_serializer.errors)
+            print('EVENT SERIALIZER ERROR', event_serializer.errors)
             return Response(event_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
