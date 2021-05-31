@@ -24,6 +24,11 @@ import json
 from django.core.paginator import Paginator
 from django.db.models import Q
 
+from App1.serializers import *
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import FormParser
+
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
 from App1.Components.lister_functions import *
@@ -33,6 +38,24 @@ from App1.models import UserProfile
 from App1.models import Event
 from App1.models import Transactions
 from App1.models import DonatesIn
+
+
+class EventView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        events = Event.objects.all()
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        event_serializer = EventSerializer(data=request.data)
+        if event_serializer.is_valid():
+            event_serializer.save()
+            return Response(event_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print('error', event_serializer.errors)
+            return Response(event_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
