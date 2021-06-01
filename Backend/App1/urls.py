@@ -16,6 +16,7 @@ auth_urls = [
     path('SendEmail', views.email),
     path('NotVerifiedUserSet', views.notVerifiedUserSet),
     path('VerifiedDonatorSet', views.verifiedDonatorSet),
+    path('AdminSet', views.adminSet),
     path('VerifyOrRejectUser', views.verifyOrRejectUser),
 ]
 

@@ -15,6 +15,7 @@ contains:
 
     notVerifiedUserSet
     verifiedDonatorSet
+    adminSet
     verifyOrRejectUser
 """
 
@@ -453,6 +454,36 @@ def verifiedDonatorSet(request):
     donator_list = UserProfile.objects.filter(donator_query)
 
     return Response(user_lister(donator_list),
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def adminSet(request):
+    """
+    returns the list of verified donators (verified by admin and verified email)
+
+    potential errors:
+        requiredParams
+        adminNotFound
+        notSuperAdminOrAdmin
+    """
+    try:
+        TOKEN_API = request.data["TOKEN_API"]
+    except Exception:
+        return error("requiredParams")
+
+    adminProfile = UserProfile.objects.filter(token=TOKEN_API)
+    if not len(adminProfile):
+        return error("adminNotFound")
+    adminProfile = UserProfile.objects.get(token=TOKEN_API)
+
+    if adminProfile.user_type not in [1, 2]:
+        return error("notSuperAdminOrAdmin")
+
+    admin_query = Q(user_type=2)
+    admin_list = UserProfile.objects.filter(admin_query)
+
+    return Response(user_lister(admin_list),
                     status=status.HTTP_200_OK)
 
 
