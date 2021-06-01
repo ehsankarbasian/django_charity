@@ -31,6 +31,7 @@ event_urls = [
     path('UserEvent', views.userEvent),
     path('DeleteEvent', views.deleteEvent),
     path('DonateMoney', views.donateMoneyEvent),
+    path('EditEventImage', views.editEventImage),
 ]
 
 donate_urls = [

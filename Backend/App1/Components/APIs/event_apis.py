@@ -91,8 +91,54 @@ def createEvent(request):
     )
 
     return Response({"message": "event created",
-                    "success": "1"
-                     },
+                    "success": "1"},
+                    status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def editEventImage(request):
+    """
+    Edits image of an event
+
+    potential errors:
+        requiredParams
+        eventNotFound
+        userNotFound
+        notSuperAdmin
+        eventIsActive
+    """
+    try:
+        TOKEN_ID = request.data["TOKEN_ID"]
+        event_id = int(request.data["event_id"])
+        image_url = request.data["image_url"]
+    except Exception:
+        return error("requiredParams")
+
+    event = Event.objects.filter(id=event_id)
+    if not len(event):
+        return error("eventNotFound")
+    event = Event.objects.get(id=event_id)
+
+    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
+    if not len(userProfile):
+        return error("userNotFound")
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
+    user = userProfile.user
+
+    if user != event.creator:
+        if userProfile.user_type not in [1, 2]:
+            return error("notSuperAdmin")
+        event.image_url = image_url
+    else:
+        if event.status != 1 and not event.enabled:
+            event.image_url = image_url
+        else:
+            return error("eventIsActive")
+
+    event.save()
+
+    return Response({"message": "event image changed successfully",
+                    "success": "1"},
                     status=status.HTTP_200_OK)
 
 
