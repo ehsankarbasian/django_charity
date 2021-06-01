@@ -28,6 +28,7 @@ class UserProfile(models.Model):
     # TODO:image_url
     user = models.OneToOneField(User, related_name='user', null=True, on_delete=models.CASCADE)
     user_type = models.IntegerField(choices=USER_TYPE_CHOICES, default=-1)
+    profile_image_url = models.CharField(max_length=512, null=True, blank=True)
     verified = models.BooleanField(default=False)
     first_name = models.CharField(max_length=127, blank=True)
     last_name = models.CharField(max_length=127, blank=True)

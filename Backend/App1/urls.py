@@ -12,6 +12,7 @@ auth_urls = [
     path('ForgotPassword', views.forgotPassword),
     path('LoadUserProfile', views.loadUserProfile),
     path('SubmitUserProfile', views.submitUserProfile),
+    path('EditProfileImage', views.editProfileImage),
     path('UserBio', views.userBio),
     path('SendEmail', views.email),
     path('NotVerifiedUserSet', views.notVerifiedUserSet),

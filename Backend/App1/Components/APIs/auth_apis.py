@@ -35,6 +35,8 @@ from re import search as validateRegex
 from django.db.models import Q
 from random import randint
 
+from Backend.settings import HOST, PORT
+
 from django.contrib.auth.models import User
 from App1.models import UserProfile
 
@@ -62,25 +64,24 @@ def login(request):
         return error("requiredParams")
     else:
         # Authenticate:
-        user = authenticate(
-            username=username,
-            password=password
-        )
+        user = authenticate(username=username,
+                            password=password)
         if user is None:
             return error("wrongUsernameOrPass")
 
         user = User.objects.get(username=username)
-        user_profile = UserProfile.objects.get(user=user)
+        userProfile = UserProfile.objects.get(user=user)
 
         # Check verified_email:
-        if not user_profile.verified_email:
+        if not userProfile.verified_email:
             return error("emailVerificationError")
 
         request.session['user_id'] = user.id
         return Response({"username": user.username,
-                         "email": user_profile.email,
-                         "token": user_profile.token,
-                         "user_type": user_profile.user_type,
+                         "email": userProfile.email,
+                         "token": userProfile.token,
+                         "user_type": userProfile.user_type,
+                         "image_url": userProfile.profile_image_url,
                          "success": "1"},
                         status=status.HTTP_200_OK)
 
@@ -153,7 +154,8 @@ def signup(request):
                 email_tags=email_tags_string,
                 user_type=user_type,
                 verify_email_code=verify_email_code,
-                verify_email_token=verify_email_token
+                verify_email_token=verify_email_token,
+                profile_image_url=HOST + ":" + PORT + "/images/default_profile.png"
             )
 
             # Sending html based email to user to verify his/her email:

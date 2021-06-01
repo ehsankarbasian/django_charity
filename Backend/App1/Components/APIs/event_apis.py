@@ -3,6 +3,7 @@ APIs for create, edit, enable, disable, feedback, and etc will be here
 
 contains:
     createEvent
+    editEventImage
     requestedEventList
     searchEvent
     editEventByAdmin
@@ -78,7 +79,7 @@ def createEvent(request):
             return error("MoneyTargetIntError")
 
     if image_url is None:
-        image_url = settings.HOST + ":" + PORT + "/images/default.png"
+        image_url = HOST + ":" + PORT + "/images/default.png"
 
     # Create event:
     Event.objects.create(

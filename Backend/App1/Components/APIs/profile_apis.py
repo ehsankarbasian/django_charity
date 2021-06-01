@@ -4,6 +4,7 @@ APIs related to show and edit profile, will be here
 contains:
     loadUserProfile
     submitUserProfile
+    editProfileImage
     userBio
 """
 
@@ -14,6 +15,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from django.shortcuts import get_object_or_404
+from django.contrib.auth import authenticate
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
@@ -63,6 +65,7 @@ def loadUserProfile(request):
                          "verified_mobile": current_user.verified_mobile,
                          "verified_email": current_user.verified_email,
                          "is_profile_completed": current_user.completed,
+                         "image_url": current_user.profile_image_url,
                          "success": "1"
                          },
                         status=status.HTTP_200_OK)
@@ -104,6 +107,7 @@ def submitUserProfile(request):
         gender = get_data_or_none(request, "gender")
         married = get_data_or_none(request, "married")
         birth_date = get_data_or_none(request, "birth_date")
+        profile_image_url = get_data_or_none(request, "image_url")
 
         # Update User:
         user.first_name = first_name
@@ -123,6 +127,9 @@ def submitUserProfile(request):
         userProfile.married = married
         userProfile.birth_date = birth_date
 
+        if profile_image_url is not None:
+            userProfile.profile_image_url = profile_image_url
+
         userProfile.completed = True
         userProfile.save()
 
@@ -131,6 +138,37 @@ def submitUserProfile(request):
                          "user_type": userProfile.user_type,
                          "success": "1"},
                         status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def editProfileImage(request):
+    """
+    changes profile image
+
+    potential errors:
+        requiredParams
+        wrongUsernameOrPass
+    """
+    try:
+        username = request.data["username"]
+        password = request.data["password"]
+        image_url = request.data["image_url"]
+    except Exception:
+        return error("requiredParams")
+
+    user = authenticate(username=username,
+                        password=password)
+    if user is None:
+        return error("wrongUsernameOrPass")
+
+    user = User.objects.get(username=username)
+    user_profile = UserProfile.objects.get(user=user)
+    user_profile.profile_image_url = image_url
+    user_profile.save()
+
+    return Response({"message": "profile image changed successfully",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -161,6 +199,7 @@ def userBio(request):
                          "first_name": userProfile.first_name,
                          "last_name": userProfile.last_name,
                          "email": userProfile.email,
+                         "image_url": userProfile.profile_image_url,
                          "verified_needy": userProfile.verified,
                          "success": "1"
                          },
