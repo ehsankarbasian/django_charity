@@ -1,5 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from Backend import settings
+
+
+class Image(models.Model):
+    image = models.ImageField(default="default.png", null=True, blank=True)
 
 
 class UserProfile(models.Model):
@@ -23,6 +28,7 @@ class UserProfile(models.Model):
     # TODO:image_url
     user = models.OneToOneField(User, related_name='user', null=True, on_delete=models.CASCADE)
     user_type = models.IntegerField(choices=USER_TYPE_CHOICES, default=-1)
+    profile_image_url = models.CharField(max_length=512, null=True, blank=True)
     verified = models.BooleanField(default=False)
     first_name = models.CharField(max_length=127, blank=True)
     last_name = models.CharField(max_length=127, blank=True)
@@ -63,7 +69,7 @@ class Event(models.Model):
     list_of_needs = models.TextField(null=True, blank=True)
     money_target = models.IntegerField(default=0)
     donated_money = models.IntegerField(default=0)
-    creator = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='creator')
+    creator = models.ForeignKey(User, null=True, blank=True, on_delete=models.DO_NOTHING, related_name='creator')
     enabled = models.BooleanField(default=False)
     create_date = models.DateField(auto_now=True)
     status = models.IntegerField(default=0, choices=STATUS_CHOICES)
