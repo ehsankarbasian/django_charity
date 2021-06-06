@@ -268,3 +268,65 @@ def init_db_storeManagement():
     Product.objects.create(title="gta vice city", subCategory=gta, quantity=1500)
     Product.objects.create(title="gta V", subCategory=gta, quantity=500)
     Product.objects.create(title="gta III", subCategory=gta, quantity=1000)
+
+
+def init_db_transaction():
+    superAdminProfile = UserProfile.objects.get(token="defaultSuperAdmin")
+    adminProfile = UserProfile.objects.get(token="defaultAdmin")
+    donatorProfile_1 = UserProfile.objects.get(token="defaultDonator_1")
+    donatorProfile_2 = UserProfile.objects.get(token="defaultDonator_2")
+    needyProfile_1 = UserProfile.objects.get(token="defaultNeedy_1")
+
+    superAdminProfile.melli_code = 11111
+    adminProfile.melli_code = 22222
+    donatorProfile_1.melli_code = 33333
+    donatorProfile_2.melli_code = 44444
+    needyProfile_1.melli_code = 55555
+    superAdminProfile.save()
+    adminProfile.save()
+    donatorProfile_1.save()
+    donatorProfile_2.save()
+    needyProfile_1.save()
+
+    Transactions.objects.create(is_in=True,
+                                amount=100,
+                                donatorOrNeedy=superAdminProfile)
+    Transactions.objects.create(is_in=False,
+                                amount=500,
+                                donatorOrNeedy=donatorProfile_1)
+    Transactions.objects.create(is_in=True,
+                                amount=80000,
+                                donatorOrNeedy=adminProfile)
+    Transactions.objects.create(is_in=True,
+                                amount=4000,
+                                donatorOrNeedy=donatorProfile_1)
+    Transactions.objects.create(is_in=False,
+                                amount=10,
+                                donatorOrNeedy=donatorProfile_2)
+    Transactions.objects.create(is_in=True,
+                                amount=300,
+                                donatorOrNeedy=adminProfile)
+    Transactions.objects.create(is_in=False,
+                                amount=50000,
+                                donatorOrNeedy=needyProfile_1)
+    Transactions.objects.create(is_in=True,
+                                amount=1000000,
+                                donatorOrNeedy=donatorProfile_2)
+    Transactions.objects.create(is_in=True,
+                                amount=9000,
+                                donatorOrNeedy=donatorProfile_1)
+    Transactions.objects.create(is_in=False,
+                                amount=60000,
+                                donatorOrNeedy=donatorProfile_2)
+    Transactions.objects.create(is_in=True,
+                                amount=1500,
+                                donatorOrNeedy=donatorProfile_2)
+    Transactions.objects.create(is_in=False,
+                                amount=5800,
+                                donatorOrNeedy=needyProfile_1)
+    Transactions.objects.create(is_in=False,
+                                amount=8000,
+                                donatorOrNeedy=donatorProfile_2)
+    Transactions.objects.create(is_in=True,
+                                amount=40,
+                                donatorOrNeedy=donatorProfile_1)

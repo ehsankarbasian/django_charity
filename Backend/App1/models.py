@@ -118,7 +118,7 @@ class Transactions(models.Model):
 
     is_in = models.BooleanField(default=True)
     amount = models.IntegerField(null=False, default=0)
-    create_date = models.DateTimeField(auto_now=True)
+    create_date = models.DateField(auto_now=True)
     donatorOrNeedy = models.ForeignKey(UserProfile, null=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
