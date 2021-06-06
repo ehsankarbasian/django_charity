@@ -204,31 +204,31 @@ def init_db_donateIn():
     DonatesIn.objects.create(donator=donatorProfile_1,
                              product=product_3,
                              quantity=4)
-    DonatesIn.objects.create(donator=donatorProfile_1,
+    DonatesIn.objects.create(donator=donatorProfile_2,
                              product=product_5,
                              quantity=50)
-    DonatesIn.objects.create(donator=donatorProfile_1,
+    DonatesIn.objects.create(donator=superAdminProfile,
                              product=product_2,
                              quantity=2)
     DonatesIn.objects.create(donator=donatorProfile_1,
                              product=product_6,
                              quantity=10000)
-    DonatesIn.objects.create(donator=donatorProfile_1,
+    DonatesIn.objects.create(donator=donatorProfile_2,
                              product=product_1,
                              quantity=80)
-    DonatesIn.objects.create(donator=donatorProfile_1,
+    DonatesIn.objects.create(donator=superAdminProfile,
                              product=product_4,
                              quantity=29)
-    DonatesIn.objects.create(donator=donatorProfile_1,
+    DonatesIn.objects.create(donator=adminProfile,
                              product=product_5,
                              quantity=30)
-    DonatesIn.objects.create(donator=donatorProfile_1,
+    DonatesIn.objects.create(donator=adminProfile,
                              product=product_7,
                              quantity=36)
-    DonatesIn.objects.create(donator=donatorProfile_1,
+    DonatesIn.objects.create(donator=donatorProfile_2,
                              product=product_2,
                              quantity=1)
-    DonatesIn.objects.create(donator=donatorProfile_1,
+    DonatesIn.objects.create(donator=superAdminProfile,
                              product=product_4,
                              quantity=48)
     DonatesIn.objects.create(donator=superAdminProfile,
@@ -397,11 +397,3 @@ def init_db_transaction():
     Transactions.objects.create(is_in=True,
                                 amount=40,
                                 donatorOrNeedy=donatorProfile_1)
-
-
-init_db_user()
-init_db_profile()
-init_db_storeManagement()
-init_db_event()
-init_db_transaction()
-init_db_donateIn()
