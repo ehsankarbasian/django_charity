@@ -138,7 +138,7 @@ class DonatesIn(models.Model):
     transaction = models.ForeignKey(Transactions, null=True, on_delete=models.DO_NOTHING)
     event = models.ForeignKey(Event, null=True, on_delete=models.DO_NOTHING)
     donator = models.ForeignKey(UserProfile, null=True, related_name='donator', on_delete=models.CASCADE)
-    create_date = models.DateTimeField(auto_now=True)
+    create_date = models.DateField(auto_now=True)
     transferee = models.ForeignKey(UserProfile, null=True, default=None, related_name='transferee', on_delete=models.DO_NOTHING)
 
     # ExpDate (optional)

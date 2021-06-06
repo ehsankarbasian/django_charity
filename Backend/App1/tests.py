@@ -2345,7 +2345,10 @@ class AdminManagementAPIsTestCase(TestCase):
 
 class DonateAPIsTestCase(TestCase):
     def setUp(self):
-        pass
+        init_db_user()
+        init_db_transaction()
+        init_db_storeManagement()
+        init_db_donateIn()
 
     def test_api_generalDonate(self):
         pass
@@ -2378,6 +2381,9 @@ class NeedRequestAPIsTestCase(TestCase):
 
 
 class TransactionAPIsTestCase(TestCase):
+    now = str(datetime.datetime.now()).split("-")
+    today = datetime.date(int(now[0]), int(now[1]), int(now[2][:2]))
+
     def setUp(self):
         init_db_user()
         init_db_transaction()
@@ -2421,8 +2427,7 @@ class TransactionAPIsTestCase(TestCase):
         response_15 = client_post('TransactionList', {"TOKEN_ID": "defaultDonator_2",
                                                       "is_in": 0})
         response_16 = client_post('TransactionList', {"TOKEN_ID": "defaultDonator_2"})
-        now = str(datetime.datetime.now()).split("-")
-        today = datetime.date(int(now[0]), int(now[1]), int(now[2][:2]))
+        today = self.today
         response_1_result = {'status': 'requiredParams',
                              'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
                              'error_on': "[MultiValueDictKeyError('TOKEN_ID',)]",
@@ -2563,19 +2568,20 @@ class TransactionAPIsTestCase(TestCase):
         response_4 = client_post('RecentTransactionList', {"count": 6})
         response_5 = client_post('RecentTransactionList', {"count": 19})
         response_6 = client_post('RecentTransactionList', {"count": 2})
+        today = self.today
         response_1_result = {'success': '1',
                              'empty': 0,
                              'count': 10,
-                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''}}}
         response_2_result = {'status': 'countIsNotInt',
                              'error_type': "[<class 'ValueError'>]",
                              'error_on': '[ValueError("invalid literal for int() with base 10: \'five\'",)]',
@@ -2583,49 +2589,49 @@ class TransactionAPIsTestCase(TestCase):
         response_3_result = {'success': '1',
                              'empty': 0,
                              'count': 12,
-                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''}}}
         response_4_result = {'success': '1',
                              'empty': 0,
                              'count': 6,
-                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''}}}
         response_5_result = {'success': '1',
                              'empty': 0,
                              'count': 14,
-                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 2: {'id': 2, 'is_in': False, 'amount': 500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 1: {'id': 1, 'is_in': True, 'amount': 100, 'create_date': datetime.date(2021, 6, 6), 'user_id': 1, 'username': 'superAdmin', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 2: {'id': 2, 'is_in': False, 'amount': 500, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 1: {'id': 1, 'is_in': True, 'amount': 100, 'create_date': today, 'user_id': 1, 'username': 'superAdmin', 'event_id': None, 'event_title': ''}}}
         response_6_result = {'success': '1',
                              'empty': 0,
                              'count': 2,
-                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''}}}
         self.assertEqual(response_1, response_1_result)
         self.assertEqual(response_2, response_2_result)
         self.assertEqual(response_3, response_3_result)
@@ -2640,19 +2646,20 @@ class TransactionAPIsTestCase(TestCase):
         response_4 = client_post('BiggestTransactionList', {"count": 6})
         response_5 = client_post('BiggestTransactionList', {"count": 19})
         response_6 = client_post('BiggestTransactionList', {"count": 2})
+        today = self.today
         response_1_result = {'success': '1',
                              'empty': 0,
                              'count': 10,
-                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 2: {'id': 2, 'is_in': False, 'amount': 500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 2: {'id': 2, 'is_in': False, 'amount': 500, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''}}}
         response_2_result = {'status': 'countIsNotInt',
                              'error_type': "[<class 'ValueError'>]",
                              'error_on': '[ValueError("invalid literal for int() with base 10: \'five\'",)]',
@@ -2660,49 +2667,49 @@ class TransactionAPIsTestCase(TestCase):
         response_3_result = {'success': '1',
                              'empty': 0,
                              'count': 12,
-                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 2: {'id': 2, 'is_in': False, 'amount': 500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 1: {'id': 1, 'is_in': True, 'amount': 100, 'create_date': datetime.date(2021, 6, 6), 'user_id': 1, 'username': 'superAdmin', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 2: {'id': 2, 'is_in': False, 'amount': 500, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 1: {'id': 1, 'is_in': True, 'amount': 100, 'create_date': today, 'user_id': 1, 'username': 'superAdmin', 'event_id': None, 'event_title': ''}}}
         response_4_result = {'success': '1',
                              'empty': 0,
                              'count': 6,
-                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''}}}
         response_5_result = {'success': '1',
                              'empty': 0,
                              'count': 14,
-                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': datetime.date(2021, 6, 6), 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
-                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 2: {'id': 2, 'is_in': False, 'amount': 500, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
-                                                 1: {'id': 1, 'is_in': True, 'amount': 100, 'create_date': datetime.date(2021, 6, 6), 'user_id': 1, 'username': 'superAdmin', 'event_id': None, 'event_title': ''},
-                                                 14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': datetime.date(2021, 6, 6), 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
-                                                 5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 13: {'id': 13, 'is_in': False, 'amount': 8000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 12: {'id': 12, 'is_in': False, 'amount': 5800, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 11: {'id': 11, 'is_in': True, 'amount': 1500, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 2: {'id': 2, 'is_in': False, 'amount': 500, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
+                                                 1: {'id': 1, 'is_in': True, 'amount': 100, 'create_date': today, 'user_id': 1, 'username': 'superAdmin', 'event_id': None, 'event_title': ''},
+                                                 14: {'id': 14, 'is_in': True, 'amount': 40, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
+                                                 5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''}}}
         response_6_result = {'success': '1',
                              'empty': 0,
                              'count': 2,
-                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': datetime.date(2021, 6, 6), 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''}}}
+                             'transaction_set': {8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
+                                                 3: {'id': 3, 'is_in': True, 'amount': 80000, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''}}}
         self.assertEqual(response_1, response_1_result)
         self.assertEqual(response_2, response_2_result)
         self.assertEqual(response_3, response_3_result)

@@ -179,7 +179,74 @@ def init_db_donateIn():
     """
     initials the default database for DonatesIn and Transactions
     """
-    pass
+    superAdminProfile = UserProfile.objects.get(token="defaultSuperAdmin")
+    adminProfile = UserProfile.objects.get(token="defaultAdmin")
+    donatorProfile_1 = UserProfile.objects.get(token="defaultDonator_1")
+    donatorProfile_2 = UserProfile.objects.get(token="defaultDonator_2")
+
+    product_1 = Product.objects.get(id=1)
+    product_2 = Product.objects.get(id=2)
+    product_3 = Product.objects.get(id=3)
+    product_4 = Product.objects.get(id=4)
+    product_5 = Product.objects.get(id=5)
+    product_6 = Product.objects.get(id=6)
+    product_7 = Product.objects.get(id=7)
+
+    transaction_1 = Transactions.objects.get(id=1)
+    transaction_3 = Transactions.objects.get(id=3)
+    transaction_4 = Transactions.objects.get(id=4)
+    transaction_6 = Transactions.objects.get(id=6)
+    transaction_8 = Transactions.objects.get(id=8)
+    transaction_9 = Transactions.objects.get(id=9)
+    transaction_11 = Transactions.objects.get(id=11)
+    transaction_14 = Transactions.objects.get(id=14)
+
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_3,
+                             quantity=4)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_5,
+                             quantity=50)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_2,
+                             quantity=2)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_6,
+                             quantity=10000)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_1,
+                             quantity=80)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_4,
+                             quantity=29)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_5,
+                             quantity=30)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_7,
+                             quantity=36)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_2,
+                             quantity=1)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             product=product_4,
+                             quantity=48)
+    DonatesIn.objects.create(donator=superAdminProfile,
+                             transaction=transaction_1)
+    DonatesIn.objects.create(donator=adminProfile,
+                             transaction=transaction_3)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             transaction=transaction_4)
+    DonatesIn.objects.create(donator=adminProfile,
+                             transaction=transaction_6)
+    DonatesIn.objects.create(donator=donatorProfile_2,
+                             transaction=transaction_8)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             transaction=transaction_9)
+    DonatesIn.objects.create(donator=donatorProfile_2,
+                             transaction=transaction_11)
+    DonatesIn.objects.create(donator=donatorProfile_1,
+                             transaction=transaction_14)
 
 
 def init_db_storeManagement():
@@ -330,3 +397,11 @@ def init_db_transaction():
     Transactions.objects.create(is_in=True,
                                 amount=40,
                                 donatorOrNeedy=donatorProfile_1)
+
+
+init_db_user()
+init_db_profile()
+init_db_storeManagement()
+init_db_event()
+init_db_transaction()
+init_db_donateIn()
