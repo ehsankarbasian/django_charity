@@ -17,7 +17,6 @@ contains:
     verifyOrRejectUser
 """
 
-
 from rest_framework.decorators import throttle_classes as limiter
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -34,9 +33,9 @@ from random import randint
 
 from django.contrib.auth.models import User
 from App1.models import UserProfile
+from App1.models import ExpiredTokens
 
 from Backend.urls import TOKEN_API, EMAIL_TOKEN_API, HOST, PORT
-
 
 EMAIL_REGEX = r'^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
 
@@ -181,9 +180,23 @@ def logout(request):
     """
     logs out user from sessions
     """
-    request.session['user_id'] = None
+    try:
+        TOKEN_ID = request.data["TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+
+    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
+    if not len(userProfile):
+        return error("userNotFound")
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
+
+    ExpiredTokens.objects.create(token=TOKEN_ID)
+
+    userProfile.token = unique_user_token()
+    userProfile.save()
+
     return Response({"message": "successfully logged out",
-                    "success": "1"},
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -308,7 +321,7 @@ def forgotPassword(request):
                )
 
     return Response({"message": "email sent",
-                    "success": "1"},
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -349,7 +362,7 @@ def resetPasswordTokenBased(request):
         user.save()
 
     return Response({"message": "password changed",
-                    "success": "1"},
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -390,7 +403,7 @@ def resetPasswordCodeBased(request):
         user.save()
 
     return Response({"message": "password changed",
-                    "success": "1"},
+                     "success": "1"},
                     status=status.HTTP_200_OK)
 
 
@@ -458,7 +471,8 @@ def verifyOrRejectUser(request):
             return error("verifiedBefore")
         elif (userProfile.user_type == 1) or (userProfile.user_type == 2):
             return error("userTypeError", {"explanation": "user_type is "
-                                                          + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
+                                                          + str(
+                ["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
     except Exception:
         return error("userNotFound")
 

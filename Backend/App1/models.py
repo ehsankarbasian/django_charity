@@ -133,7 +133,8 @@ class DonatesIn(models.Model):
     event = models.ForeignKey(Event, null=True, on_delete=models.DO_NOTHING)
     donator = models.ForeignKey(UserProfile, null=True, related_name='donator', on_delete=models.CASCADE)
     create_date = models.DateTimeField(auto_now=True)
-    transferee = models.ForeignKey(UserProfile, null=True, default=None, related_name='transferee', on_delete=models.DO_NOTHING)
+    transferee = models.ForeignKey(UserProfile, null=True, default=None, related_name='transferee',
+                                   on_delete=models.DO_NOTHING)
 
     # ExpDate (optional)
 
@@ -144,7 +145,7 @@ class DonatesIn(models.Model):
             return "Quantity: " + str(self.quantity) + "/ Product_id: " + str(self.product.id)
 
 
-class DonatesOut(): # models.Model
+class DonatesOut():  # models.Model
     quantity = models.IntegerField(
         null=True,
         default=-1
@@ -183,3 +184,10 @@ class NeedRequest(models.Model):
 
     def __str__(self):
         return "Title: " + self.title
+
+
+class ExpiredTokens(models.Model):
+    token = models.CharField(max_length=128, null=True, default="")
+
+    def __str__(self):
+        return "Token: " + self.token
