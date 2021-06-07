@@ -201,9 +201,20 @@ class AuthAPIsTestCase(TestCase):
     def test_api_logout(self):
         set_email_verified("donator_1")
         client_post('login', {"username": "donator_1", "password": "12345"})
-        response_1 = client_post('logout', {})
-        response_1_result = {'message': 'successfully logged out', 'success': '1'}
+        response_1 = client_post('logout', {"TOKEN_ID": "theToken"})
+        response_2 = client_post('logout', {"TOKEN_ID": "defaultDonator_1"})
+        response_1_result = {'status': 'userNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_2_result = {'message': 'successfully logged out',
+                             'success': '1'}
         self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        user = User.objects.get(username="donator_1")
+        userProfile = UserProfile.objects.get(user=user)
+        if userProfile.token == "defaultDonator_1":
+            self.assertEqual(1, 2)
 
     def test_api_verifyEmailTokenBased(self):
         response_1 = client_post('VerifyEmailTokenBased', {})
@@ -2168,7 +2179,7 @@ class TransactionAPIsTestCase(TestCase):
                              'transaction_set': {10: {'id': 10, 'is_in': False, 'amount': 60000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
                                                  9: {'id': 9, 'is_in': True, 'amount': 9000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
                                                  8: {'id': 8, 'is_in': True, 'amount': 1000000, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
-                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date':today , 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
+                                                 7: {'id': 7, 'is_in': False, 'amount': 50000, 'create_date': today, 'user_id': 5, 'username': 'needy_1', 'event_id': None, 'event_title': ''},
                                                  6: {'id': 6, 'is_in': True, 'amount': 300, 'create_date': today, 'user_id': 2, 'username': 'admin', 'event_id': None, 'event_title': ''},
                                                  4: {'id': 4, 'is_in': True, 'amount': 4000, 'create_date': today, 'user_id': 3, 'username': 'donator_1', 'event_id': None, 'event_title': ''},
                                                  5: {'id': 5, 'is_in': False, 'amount': 10, 'create_date': today, 'user_id': 4, 'username': 'donator_2', 'event_id': None, 'event_title': ''},
@@ -2442,4 +2453,3 @@ class TransactionAPIsTestCase(TestCase):
         self.assertEqual(response_4, response_4_result)
         self.assertEqual(response_5, response_5_result)
         self.assertEqual(response_6, response_6_result)
-

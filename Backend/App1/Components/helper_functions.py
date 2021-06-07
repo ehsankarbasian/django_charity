@@ -126,7 +126,7 @@ def unique_user_token():
     """
     token = token_hex(64)
     notExpired = True
-    for expiredToken in ExpiredTokens.obkects.all():
+    for expiredToken in ExpiredTokens.objects.all():
         if token == expiredToken.token:
             notExpired = False
 

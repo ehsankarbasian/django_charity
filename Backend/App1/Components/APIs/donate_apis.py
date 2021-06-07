@@ -87,8 +87,6 @@ def generalDonate(request):
         DonatesIn.objects.create(donator=userProfile,
                                  product=product,
                                  quantity=quantity)
-        product.quantity += quantity
-        product.save()
     else:
         if money_amount is None:
             return error("requiredParams",
@@ -164,6 +162,10 @@ def delivery(request):
     donate = DonatesIn.objects.get(id=donate_id)
     if donate.transferee is not None:
         return error("deliveredBefore")
+
+    product = donate.product
+    product.quantity += donate.quantity
+    product.save()
 
     donate.transferee = transferee
     donate.save()
