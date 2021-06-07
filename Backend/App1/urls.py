@@ -3,7 +3,6 @@ from . import views
 
 doing_urls = [
     path('UploadImage', views.ImageView.as_view(), name='upload_image'),
-    path('DataAnalyze', views.dataAnalyze)
 ]
 
 auth_urls = [
@@ -64,6 +63,8 @@ store_management_urls = [
     path('TheCategory', views.the_category),
     path('TheSubCategory', views.the_subcategory),
     path('TheProduct', views.the_product),
+
+    path('DataAnalyze', views.dataAnalyze)
 ]
 
 needRequest_urls = [

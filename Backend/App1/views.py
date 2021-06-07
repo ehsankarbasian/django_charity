@@ -65,71 +65,20 @@ def email(request):
                     status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-def dataAnalyze(request):
-    category_number = len(Category.objects.all())
-    subcategory_number = len(SubCategory.objects.all())
-    category_product = {}
-    subcategory_product = {}
-
-    for category in Category.objects.all():
-        category_product[category.title] = 0
-        for subcategory in SubCategory.objects.filter(category=category):
-            subcategory_product[subcategory.title] = len(Product.objects.filter(subCategory=subcategory))
-            category_product[category.title] += subcategory_product[subcategory.title]
-
-    zero = 0
-    one_ten = 0
-    eleven_hundred = 0
-    hundred_plus = 0
-    for product in Product.objects.all():
-        quantity = product.quantity
-        if quantity == 0:
-            zero += 1
-        elif 1 <= quantity <= 10:
-            one_ten += 1
-        elif 11 <= quantity <= 100:
-            eleven_hundred += 1
-        else:
-            hundred_plus += 1
-
-    return Response({"category_number": category_number,
-                     "subcategory_number": subcategory_number,
-                     "category_product": category_product,
-                     "subcategory_product": subcategory_product,
-                     "zero": zero,
-                     "one_ten": one_ten,
-                     "eleven_hundred": eleven_hundred,
-                     "hundred_plus": hundred_plus,
-                     "success": "1"},
-                    status=status.HTTP_200_OK)
-
-
 class ImageView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
     def get(self, request, *args, **kwargs):
-        print("")
-        print("def get has been run")
-        print("")
         images = Image.objects.all()
         serializer = ImageSerializer(images, many=True)
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
-        print("")
-        print("def post has been run")
         image_serializer = ImageSerializer(data=request.data)
         if image_serializer.is_valid():
             image_serializer.save()
-            print("")
-            print("if block")
-            print("serializer.data is:")
-            print(image_serializer.data)
-            print("")
             return Response({"image_url": HOST + ":" + PORT + image_serializer.data["image"]},
                             status=status.HTTP_200_OK)
         else:
             print('IMAGE SERIALIZER ERROR', image_serializer.errors)
             return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

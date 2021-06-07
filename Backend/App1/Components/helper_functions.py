@@ -82,7 +82,7 @@ def simplify_email(email):
     try:
         simplified_email = "".join(
             email.split("@")[0]
-                .split("+")[0].split(".")
+            .split("+")[0].split(".")
         ) + "@" + email.split("@")[1]
 
         email_tags_string = "+".join(email.split("@")[0].split("+")[1:])
