@@ -334,7 +334,68 @@ class DonateAPIsTestCase(TestCase):
         self.assertEqual(response_7, response_7_result)
 
     def test_api_delivery(self):
-        pass
+        response_1 = client_post('Delivery', {})
+        response_2 = client_post('Delivery', {"donate_id": 5})
+        response_3 = client_post('Delivery', {"TOKEN_ID": "theToken"})
+        response_4 = client_post('Delivery', {"donate_id": 5, "TOKEN_ID": "theToken"})
+        response_5 = client_post('Delivery', {"donate_id": 5, "TOKEN_ID": "defaultNeedy_1"})
+        response_6 = client_post('Delivery', {"donate_id": 5, "TOKEN_ID": "defaultDonator_2"})
+        response_7 = client_post('Delivery', {"donate_id": 5, "TOKEN_ID": "defaultAdmin"})
+        response_8 = client_post('Delivery', {"donate_id": 5, "TOKEN_ID": "defaultSuperAdmin"})
+        response_9 = client_post('Delivery', {"donate_id": 6, "TOKEN_ID": "defaultSuperAdmin"})
+        response_10 = client_post('Delivery', {"donate_id": 500, "TOKEN_ID": "defaultSuperAdmin"})
+        donate_5 = DonatesIn.objects.get(id=5)
+        donate_6 = DonatesIn.objects.get(id=6)
+        adminProfile = UserProfile.objects.get(token="defaultAdmin")
+        superAdminProfile = UserProfile.objects.get(token="defaultSuperAdmin")
+        self.assertEqual(donate_5.transferee, adminProfile)
+        self.assertEqual(donate_6.transferee, superAdminProfile)
+        response_1_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('donate_id',)]",
+                             'success': '0'}
+        response_2_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('TOKEN_ID',)]",
+                             'success': '0'}
+        response_3_result = {'status': 'requiredParams',
+                             'error_type': "[<class 'django.utils.datastructures.MultiValueDictKeyError'>]",
+                             'error_on': "[MultiValueDictKeyError('donate_id',)]",
+                             'success': '0'}
+        response_4_result = {'status': 'userNotFound',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_5_result = {'status': 'userIsNotAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_6_result = {'status': 'userIsNotAdmin',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_7_result = {'message': 'delivered successfully',
+                             'success': '1'}
+        response_8_result = {'status': 'deliveredBefore',
+                             'error_type': 'CUSTOM',
+                             'error_on': 'CUSTOM',
+                             'success': '0'}
+        response_9_result = {'message': 'delivered successfully',
+                             'success': '1'}
+        response_10_result = {'status': 'donateNotFound',
+                              'error_type': 'CUSTOM',
+                              'error_on': 'CUSTOM',
+                              'success': '0'}
+        self.assertEqual(response_1, response_1_result)
+        self.assertEqual(response_2, response_2_result)
+        self.assertEqual(response_3, response_3_result)
+        self.assertEqual(response_4, response_4_result)
+        self.assertEqual(response_5, response_5_result)
+        self.assertEqual(response_6, response_6_result)
+        self.assertEqual(response_7, response_7_result)
+        self.assertEqual(response_8, response_8_result)
+        self.assertEqual(response_9, response_9_result)
+        self.assertEqual(response_10, response_10_result)
 
 
 class NeedRequestAPIsTestCase(TestCase):

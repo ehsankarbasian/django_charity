@@ -143,6 +143,7 @@ def delivery(request):
         userNotFound
         userIsNotAdmin
         donateNotFound
+        deliveredBefore
     """
     try:
         donate_id = int(request.data["donate_id"])
@@ -161,6 +162,8 @@ def delivery(request):
     if not len(donate):
         return error("donateNotFound")
     donate = DonatesIn.objects.get(id=donate_id)
+    if donate.transferee is not None:
+        return error("deliveredBefore")
 
     donate.transferee = transferee
     donate.save()
