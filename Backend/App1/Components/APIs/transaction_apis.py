@@ -98,7 +98,7 @@ def recentTransactionList(request):
     except Exception:
         return error("countIsNotInt")
 
-    result_set = Transactions.objects.all().order_by('-create_date')[::-1][:count]
+    result_set = Transactions.objects.all().order_by('-create_date')[:count]
     return transaction_lister(result_set)
 
 
