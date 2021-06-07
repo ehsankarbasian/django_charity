@@ -12,14 +12,6 @@ from App1.models import *
 from App1.passed_tests import *
 
 
-init_db_user()
-init_db_profile()
-init_db_storeManagement()
-init_db_transaction()
-init_db_donateIn()
-init_db_event()
-
-
 class EventAPIsTestCase(TestCase):
     def setUp(self):
         init_db_user()
