@@ -59,7 +59,7 @@ def transactionList(request):
             user_filter = UserProfile.objects.all()
 
     user_query = Q(donatorOrNeedy__in=user_filter)
-    result_set = Transactions.objects.filter(user_query).order_by('-create_date')
+    result_set = Transactions.objects.filter(user_query).order_by('-create_date_time')
 
     if is_in is not None:
         is_in = bool(is_in)
@@ -98,7 +98,7 @@ def recentTransactionList(request):
     except Exception:
         return error("countIsNotInt")
 
-    result_set = Transactions.objects.all().order_by('-create_date')[:count]
+    result_set = Transactions.objects.all().order_by('-create_date_time')[:count]
     return transaction_lister(result_set)
 
 
