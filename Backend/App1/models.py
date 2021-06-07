@@ -150,7 +150,7 @@ class DonatesIn(models.Model):
             return "Quantity: " + str(self.quantity) + "/ Product_id: " + str(self.product.id)
 
 
-class DonatesOut(): # models.Model
+class DonatesOut():  # models.Model
     quantity = models.IntegerField(
         null=True,
         default=-1
@@ -189,3 +189,10 @@ class NeedRequest(models.Model):
 
     def __str__(self):
         return "Title: " + self.title
+
+
+class ExpiredTokens(models.Model):
+    token = models.CharField(max_length=128, null=True, default="")
+
+    def __str__(self):
+        return "Token: " + self.token
