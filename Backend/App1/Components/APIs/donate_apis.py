@@ -126,9 +126,9 @@ def pendingDonates(request):
         donator = UserProfile.objects.get(melli_code=melli_code)
         donator_query = Q(donator=donator)
         donate_set = donate_set.filter(donator_query)
-    else:
-        product_query = ~Q(product=None)
-        donate_set = donate_set.filter(product_query)
+
+    product_query = ~Q(product=None)
+    donate_set = donate_set.filter(product_query)
 
     return donateIn_lister(donate_set)
 
@@ -143,6 +143,7 @@ def delivery(request):
         userNotFound
         userIsNotAdmin
         donateNotFound
+        deliveredBefore
     """
     try:
         donate_id = int(request.data["donate_id"])
@@ -161,6 +162,8 @@ def delivery(request):
     if not len(donate):
         return error("donateNotFound")
     donate = DonatesIn.objects.get(id=donate_id)
+    if donate.transferee is not None:
+        return error("deliveredBefore")
 
     donate.transferee = transferee
     donate.save()

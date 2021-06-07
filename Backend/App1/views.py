@@ -6,6 +6,7 @@ from rest_framework import status
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.contrib.auth.models import User
+from App1.models import Image
 from App1.models import UserProfile
 from App1.models import Event
 from App1.models import Transactions
@@ -14,6 +15,13 @@ from App1.models import Product
 from App1.models import NeedRequest
 from App1.models import Category
 from App1.models import SubCategory
+
+from Backend.settings import HOST, PORT
+
+from App1.serializers import *
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import FormParser
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
@@ -95,3 +103,33 @@ def dataAnalyze(request):
                      "hundred_plus": hundred_plus,
                      "success": "1"},
                     status=status.HTTP_200_OK)
+
+
+class ImageView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get(self, request, *args, **kwargs):
+        print("")
+        print("def get has been run")
+        print("")
+        images = Image.objects.all()
+        serializer = ImageSerializer(images, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        print("")
+        print("def post has been run")
+        image_serializer = ImageSerializer(data=request.data)
+        if image_serializer.is_valid():
+            image_serializer.save()
+            print("")
+            print("if block")
+            print("serializer.data is:")
+            print(image_serializer.data)
+            print("")
+            return Response({"image_url": HOST + ":" + PORT + image_serializer.data["image"]},
+                            status=status.HTTP_200_OK)
+        else:
+            print('IMAGE SERIALIZER ERROR', image_serializer.errors)
+            return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

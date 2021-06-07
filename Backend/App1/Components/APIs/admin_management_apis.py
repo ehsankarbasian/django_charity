@@ -81,7 +81,7 @@ def promoteToAdmin(request):
         """
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
-        username = request.data["user_id"]
+        username = request.data["username"]
     except Exception:
         return error("requiredParams")
 
@@ -126,6 +126,8 @@ def demoteAdmin(request):
         youAreNotSuperAdmin
         userNotFound
         userIsSuperAdmin
+        userIsDonator
+        userIsNeedy
         dontDemoteToSuperAdmin
     """
     try:
@@ -150,9 +152,13 @@ def demoteAdmin(request):
         return error("userNotFound")
     userProfile = UserProfile.objects.get(user_query)
 
-    # Check user is Admin or not:
+    # Check user is superAdmin or not:
     if userProfile.user_type == 1:
         return error("userIsSuperAdmin")
+    elif userProfile.user_type == 3:
+        return error("userIsDonator")
+    elif userProfile.user_type == 4:
+        return error("userIsNeedy")
 
     # Demote User
     if user_type == 1:

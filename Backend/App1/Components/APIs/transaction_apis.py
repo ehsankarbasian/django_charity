@@ -88,11 +88,17 @@ def transactionList(request):
 def recentTransactionList(request):
     """
     lists the most recent transactions
-    """
-    count = get_data_or_none(request, "count")
-    count = [int(count) if count is not None else 10][0]
 
-    result_set = Transactions.objects.all().order_by('-create_date')[:count]
+    potential error:
+        countIsNotInt
+    """
+    try:
+        count = get_data_or_none(request, "count")
+        count = [int(count) if count is not None else 10][0]
+    except Exception:
+        return error("countIsNotInt")
+
+    result_set = Transactions.objects.all().order_by('-create_date')[::-1][:count]
     return transaction_lister(result_set)
 
 
@@ -100,9 +106,15 @@ def recentTransactionList(request):
 def biggestTransactionList(request):
     """
     lists the most big-amount transactions
+
+    potential error:
+        countIsNotInt
     """
-    count = get_data_or_none(request, "count")
-    count = [int(count) if count is not None else 10][0]
+    try:
+        count = get_data_or_none(request, "count")
+        count = [int(count) if count is not None else 10][0]
+    except Exception:
+        return error("countIsNotInt")
 
     result_set = Transactions.objects.all().order_by('-amount')[:count]
     return transaction_lister(result_set)

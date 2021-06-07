@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 doing_urls = [
-
+    path('UploadImage', views.ImageView.as_view(), name='upload_image'),
 ]
 
 auth_urls = [
@@ -12,9 +12,12 @@ auth_urls = [
     path('ForgotPassword', views.forgotPassword),
     path('LoadUserProfile', views.loadUserProfile),
     path('SubmitUserProfile', views.submitUserProfile),
+    path('EditProfileImage', views.editProfileImage),
     path('UserBio', views.userBio),
     path('SendEmail', views.email),
     path('NotVerifiedUserSet', views.notVerifiedUserSet),
+    path('VerifiedDonatorSet', views.verifiedDonatorSet),
+    path('AdminSet', views.adminSet),
     path('VerifyOrRejectUser', views.verifyOrRejectUser),
 ]
 
@@ -29,6 +32,7 @@ event_urls = [
     path('UserEvent', views.userEvent),
     path('DeleteEvent', views.deleteEvent),
     path('DonateMoney', views.donateMoneyEvent),
+    path('EditEventImage', views.editEventImage),
 ]
 
 donate_urls = [
