@@ -56,10 +56,7 @@ def generalDonate(request):
         return error("userNotFound")
     else:
         userProfile = UserProfile.objects.get(token=TOKEN_ID)
-        if (userProfile.user_type == 1) or (userProfile.user_type == 2):
-            return error("userTypeError", {"explanation": "user_type is "
-                                           + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
-        elif (userProfile.melli_code == "") and (product_id is not None):
+        if (userProfile.melli_code == "") and (product_id is not None):
             return error("completeProfileFirstPlease")
         elif userProfile.user_type == 4:
             return error("userIsNeedy")
