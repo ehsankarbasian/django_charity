@@ -536,8 +536,7 @@ def verifyOrRejectUser(request):
             return error("verifiedBefore")
         elif (userProfile.user_type == 1) or (userProfile.user_type == 2):
             return error("userTypeError", {"explanation": "user_type is "
-                                                          + str(
-                ["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
+                         + str(["superAdmin" if userProfile.user_type == 1 else "admin"][0])})
     except Exception:
         return error("userNotFound")
 

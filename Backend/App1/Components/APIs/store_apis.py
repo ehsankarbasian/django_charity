@@ -471,10 +471,12 @@ def dataAnalyze(request):
     subcategory_product = {}
 
     for category in Category.objects.all():
-        category_product[category.title] = 0
+        category_product[category.id] = {"count": 0}
         for subcategory in SubCategory.objects.filter(category=category):
-            subcategory_product[subcategory.title] = len(Product.objects.filter(subCategory=subcategory))
-            category_product[category.title] += subcategory_product[subcategory.title]
+            subcategory_product[subcategory.id] = {"count": len(Product.objects.filter(subCategory=subcategory)),
+                                                   "title": subcategory.title}
+            category_product[category.id]["count"] += subcategory_product[subcategory.id]["count"]
+            category_product[category.id]["title"] = category.title
 
     zero = 0
     one_ten = 0
