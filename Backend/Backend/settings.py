@@ -15,7 +15,7 @@ from datetime import timedelta
 from typing import List, Tuple
 import os
 
-HOST = "185.231.115.150"
+HOST = "127.0.0.1"
 PORT = "8000"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
