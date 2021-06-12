@@ -1,5 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
+from Backend import settings
+
+
+class Image(models.Model):
+    image = models.ImageField(default="default.png", null=True, blank=True)
 
 
 class UserProfile(models.Model):
@@ -23,6 +28,7 @@ class UserProfile(models.Model):
     # TODO:image_url
     user = models.OneToOneField(User, related_name='user', null=True, on_delete=models.CASCADE)
     user_type = models.IntegerField(choices=USER_TYPE_CHOICES, default=-1)
+    profile_image_url = models.CharField(max_length=512, null=True, blank=True)
     verified = models.BooleanField(default=False)
     first_name = models.CharField(max_length=127, blank=True)
     last_name = models.CharField(max_length=127, blank=True)
@@ -63,7 +69,7 @@ class Event(models.Model):
     list_of_needs = models.TextField(null=True, blank=True)
     money_target = models.IntegerField(default=0)
     donated_money = models.IntegerField(default=0)
-    creator = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='creator')
+    creator = models.ForeignKey(User, null=True, blank=True, on_delete=models.DO_NOTHING, related_name='creator')
     enabled = models.BooleanField(default=False)
     create_date = models.DateField(auto_now=True)
     status = models.IntegerField(default=0, choices=STATUS_CHOICES)
@@ -112,7 +118,8 @@ class Transactions(models.Model):
 
     is_in = models.BooleanField(default=True)
     amount = models.IntegerField(null=False, default=0)
-    create_date = models.DateTimeField(auto_now=True)
+    create_date = models.DateField(auto_now=True)
+    create_date_time = models.DateTimeField(auto_now=True)
     donatorOrNeedy = models.ForeignKey(UserProfile, null=True, on_delete=models.DO_NOTHING)
 
     def __str__(self):
@@ -132,7 +139,7 @@ class DonatesIn(models.Model):
     transaction = models.ForeignKey(Transactions, null=True, on_delete=models.DO_NOTHING)
     event = models.ForeignKey(Event, null=True, on_delete=models.DO_NOTHING)
     donator = models.ForeignKey(UserProfile, null=True, related_name='donator', on_delete=models.CASCADE)
-    create_date = models.DateTimeField(auto_now=True)
+    create_date = models.DateField(auto_now=True)
     transferee = models.ForeignKey(UserProfile, null=True, default=None, related_name='transferee', on_delete=models.DO_NOTHING)
 
     # ExpDate (optional)
@@ -144,7 +151,7 @@ class DonatesIn(models.Model):
             return "Quantity: " + str(self.quantity) + "/ Product_id: " + str(self.product.id)
 
 
-class DonatesOut(): # models.Model
+class DonatesOut():  # models.Model
     quantity = models.IntegerField(
         null=True,
         default=-1
@@ -183,3 +190,10 @@ class NeedRequest(models.Model):
 
     def __str__(self):
         return "Title: " + self.title
+
+
+class ExpiredTokens(models.Model):
+    token = models.CharField(max_length=128, null=True, default="")
+
+    def __str__(self):
+        return "Token: " + self.token

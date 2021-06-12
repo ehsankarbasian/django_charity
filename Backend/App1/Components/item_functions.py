@@ -98,56 +98,44 @@ def transaction_item(transaction):
     try:
         donate_in = DonatesIn.objects.get(transaction=transaction)
         event = donate_in.event
+        event_id = event.id
         event_title = event.title
-        if event is not None:
-            event_id = event.id
-        else:
-            event_id = None
     except Exception:
         event_id = None
         event_title = ""
 
-    user = User.objects.get(user=transaction.donatorOrNeedy)
+    userProfile = transaction.donatorOrNeedy
+    user_id = [userProfile.user.id if userProfile is not None else None][0]
+    username = [userProfile.user.username if userProfile is not None else None][0]
 
     item = {"id": transaction.id,
             "is_in": transaction.is_in,
             "amount": transaction.amount,
             "create_date": transaction.create_date,
-            "user_id": transaction.donatorOrNeedy.id,
-            "username": user.username,
+            "user_id": user_id,
+            "username": username,
             "event_id": event_id,
             "event_title": event_title}
     return item
 
 
 def donateIn_item(donate):
+    donator = donate.donator
+    melli_code = [donator.melli_code if donator is not None else None][0]
+    donator_fname = [donator.first_name if donator is not None else None][0]
+    donator_lname = [donator.last_name if donator is not None else None][0]
+
     product = donate.product
-    if product is not None:
-        donator = donate.donator
-        try:
-            m = donate.melli_code
-        except:
-            m = ""
-        item = {"donate_id": donate.id,
-                "product_name": product.title,
-                "product_id": product.id,
-                "quantity": donate.quantity,
-                "melli_code": m,
-                "donator_fname": donator.first_name,
-                "donator_lname": donator.last_name}
-    else:
-        donator = donate.donator
-        try:
-            m = donate.melli_code
-        except:
-            m = ""
-        item = {"donate_id": donate.id,
-                "product_name": "None",
-                "product_id": "None",
-                "quantity": donate.quantity,
-                "melli_code": m,
-                "donator_fname": donator.first_name,
-                "donator_lname": donator.last_name}
+    product_name = [product.title if product is not None else None][0]
+    product_id = [product.id if product is not None else None][0]
+
+    item = {"donate_id": donate.id,
+            "product_name": product_name,
+            "product_id": product_id,
+            "quantity": donate.quantity,
+            "melli_code": melli_code,
+            "donator_fname": donator_fname,
+            "donator_lname": donator_lname}
     return item
 
 

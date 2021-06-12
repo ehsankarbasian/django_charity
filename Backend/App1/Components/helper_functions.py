@@ -19,7 +19,6 @@ contains:
     pagination_bar_params
 """
 
-
 import sys
 
 from rest_framework.response import Response
@@ -29,6 +28,7 @@ from secrets import token_hex
 
 from django.contrib.auth.models import User
 from App1.models import UserProfile
+from App1.models import ExpiredTokens
 
 from django.test import Client
 from django.conf import settings
@@ -125,7 +125,12 @@ def unique_user_token():
     creates a unique 64-char token for signed up user
     """
     token = token_hex(64)
-    unique = not bool(len(UserProfile.objects.filter(token=token)))
+    notExpired = True
+    for expiredToken in ExpiredTokens.objects.all():
+        if token == expiredToken.token:
+            notExpired = False
+
+    unique = not bool(len(UserProfile.objects.filter(token=token))) and notExpired
 
     if unique:
         return token
