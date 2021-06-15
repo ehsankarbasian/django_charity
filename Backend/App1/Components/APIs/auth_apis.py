@@ -26,6 +26,7 @@ from rest_framework import status
 
 from django.contrib.auth import authenticate
 from django.template.loader import get_template
+from django.http import HttpResponse
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
@@ -215,21 +216,29 @@ def verifyEmailTokenBased(request):
         requiredParams
         privateTokenError
     """
+    result = "Your email verified successfully"
     try:
         private_token = request.data["token"]
         email = request.data["email"]
     except Exception:
-        return error("requiredParams")
+        result = "ERROR: requiredParams"
 
     userProfile = UserProfile.objects.get(email=email)
-    if userProfile.verify_email_token == private_token:
+    if userProfile.verified_email:
+        result = "ERROR: your email verified before"
+    elif userProfile.verify_email_token == private_token:
         userProfile.verified_email = True
         userProfile.save()
-        return Response({"message": "email verification was successful, you can login now!",
-                         "success": "1"},
-                        status=status.HTTP_200_OK)
     else:
-        return error("privateTokenError")
+        result = "ERROR: privateTokenError"
+
+    template = get_template('EmailVerificationDestination.html').render(context={
+        'HOST': HOST,
+        'PORT': PORT,
+        'result': result,
+    })
+
+    return HttpResponse(template)
 
 
 @api_view(['POST'])
