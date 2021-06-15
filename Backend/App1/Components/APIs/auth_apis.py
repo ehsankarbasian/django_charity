@@ -350,16 +350,16 @@ def resetPasswordTokenBased(request):
         differentPasswords
         privateTokenError
     """
+    result = "Your email verified successfully"
     try:
         pass1 = request.data["pass1"]
         pass2 = request.data["pass2"]
         token = request.data["token"]
         email = request.data["email"]
+        if pass1 != pass2:
+            result = "ERROR: differentPasswords"
     except Exception:
-        return error("requiredParams")
-
-    if pass1 != pass2:
-        return error("differentPasswords")
+        result = "ERROR: requiredParams"
 
     # Find user:
     userProfile = UserProfile.objects.get(email=email)
@@ -367,7 +367,7 @@ def resetPasswordTokenBased(request):
 
     # Check token:
     if not userProfile.reset_pass_token == token:
-        return error("privateTokenError")
+        result = "ERROR: privateTokenError"
     else:
         # Change private token and password
         userProfile.reset_pass_token = token_hex(64)
@@ -375,9 +375,13 @@ def resetPasswordTokenBased(request):
         user.set_password(pass1)
         user.save()
 
-    return Response({"message": "password changed",
-                     "success": "1"},
-                    status=status.HTTP_200_OK)
+    template = get_template('ChangePasswordDestination.html').render(context={
+        'HOST': HOST,
+        'PORT': PORT,
+        'result': result,
+    })
+
+    return HttpResponse(template)
 
 
 @api_view(['POST'])
