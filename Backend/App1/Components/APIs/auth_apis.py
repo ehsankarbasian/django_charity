@@ -232,10 +232,11 @@ def verifyEmailTokenBased(request):
     else:
         result = "ERROR: privateTokenError"
 
-    template = get_template('EmailVerificationDestination.html').render(context={
+    template = get_template('EmailDestination.html').render(context={
         'HOST': HOST,
         'PORT': PORT,
         'result': result,
+        'message': "you've submitted email verification using link"
     })
 
     return HttpResponse(template)
@@ -375,10 +376,11 @@ def resetPasswordTokenBased(request):
         user.set_password(pass1)
         user.save()
 
-    template = get_template('ChangePasswordDestination.html').render(context={
+    template = get_template('EmailDestination.html').render(context={
         'HOST': HOST,
         'PORT': PORT,
         'result': result,
+        'message': "you've submitted change password request using link"
     })
 
     return HttpResponse(template)

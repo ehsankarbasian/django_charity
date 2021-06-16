@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af27e988-ae8e-4f7b-97d5-75b5231538fe" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/App1/Components/init_test_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/Components/init_test_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App1/Components/APIs/auth_apis.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/Components/APIs/auth_apis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App1/templates/EmailVerificationDestination.html" beforeDir="false" afterPath="$PROJECT_DIR$/App1/templates/EmailVerificationDestination.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -107,7 +108,7 @@
       <workItem from="1623150134822" duration="1962000" />
       <workItem from="1623501439334" duration="641000" />
       <workItem from="1623775511812" duration="6205000" />
-      <workItem from="1623798588847" duration="7199000" />
+      <workItem from="1623798588847" duration="7558000" />
     </task>
     <servers />
   </component>
