@@ -73,7 +73,7 @@ def createEvent(request):
     list_of_needs = [[] if list_of_needs is None else list_of_needs][0]
 
     needs_string = ""
-    for (key, value) in list_of_needs.items():
+    for value in list_of_needs:
         needs_string += value + ","
     needs_string = needs_string[:len(needs_string) - 1]
 
