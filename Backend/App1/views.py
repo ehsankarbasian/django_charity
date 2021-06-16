@@ -77,7 +77,7 @@ class ImageView(APIView):
         image_serializer = ImageSerializer(data=request.data)
         if image_serializer.is_valid():
             image_serializer.save()
-            return Response({"image_url": HOST + ":" + PORT + image_serializer.data["image"]},
+            return Response({"image_url": image_serializer.data["image"]},
                             status=status.HTTP_200_OK)
         else:
             print('IMAGE SERIALIZER ERROR', image_serializer.errors)

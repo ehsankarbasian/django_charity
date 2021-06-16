@@ -155,7 +155,7 @@ def signup(request):
                 user_type=user_type,
                 verify_email_code=verify_email_code,
                 verify_email_token=verify_email_token,
-                profile_image_url=HOST + ":" + PORT + "/images/default_profile.png"
+                profile_image_url="/images/default_profile.png"
             )
 
             # Sending html based email to user to verify his/her email:

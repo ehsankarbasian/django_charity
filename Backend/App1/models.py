@@ -28,7 +28,7 @@ class UserProfile(models.Model):
     # TODO:image_url
     user = models.OneToOneField(User, related_name='user', null=True, on_delete=models.CASCADE)
     user_type = models.IntegerField(choices=USER_TYPE_CHOICES, default=-1)
-    profile_image_url = models.CharField(max_length=512, null=True, blank=True)
+    profile_image_url = models.CharField(max_length=512, null=True, blank=True, default="/images/default_profile.png")
     verified = models.BooleanField(default=False)
     first_name = models.CharField(max_length=127, blank=True)
     last_name = models.CharField(max_length=127, blank=True)
@@ -73,7 +73,7 @@ class Event(models.Model):
     enabled = models.BooleanField(default=False)
     create_date = models.DateField(auto_now=True)
     status = models.IntegerField(default=0, choices=STATUS_CHOICES)
-    image_url = models.CharField(max_length=512, null=True, blank=True)
+    image_url = models.CharField(max_length=512, null=True, blank=True, default="/images/default.png")
     feedback = models.TextField(default="", null=True)
     edited = models.BooleanField(default=False)
     edited_by = models.IntegerField(default=-1)  # The super admin PROFILE id

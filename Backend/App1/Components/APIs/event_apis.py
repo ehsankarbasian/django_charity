@@ -84,7 +84,7 @@ def createEvent(request):
             return error("MoneyTargetIntError")
 
     if image_url is None:
-        image_url = HOST + ":" + PORT + "/images/default.png"
+        image_url = "/images/default.png"
 
     # Create event:
     Event.objects.create(
