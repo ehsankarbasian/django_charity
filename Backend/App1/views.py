@@ -40,13 +40,7 @@ from App1.Components.APIs.admin_management_apis import *
 # API functions:
 @api_view(['POST'])
 def email(request):
-    """
-    It's an API to send email from ntm.patronage@gmail.com to a list
-    it can be used by front end too
-
-    potential error:
-        requiredParams
-    """
+    """ potential error: requiredParams """
     try:
         subject = request.data["subject"]
         message = request.data["message"]
