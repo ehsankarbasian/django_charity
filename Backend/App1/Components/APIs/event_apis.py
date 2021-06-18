@@ -143,7 +143,7 @@ def requestedEventList(request):
     if userProfile.user_type != 1:
         return error("NotSuperAdmin")
 
-    event_set = list(Event.objects.filter(status=0)).order_by("-id")
+    event_set = list(Event.objects.filter(status=0).order_by("-id"))
 
     return event_lister(event_set)
 
