@@ -33,6 +33,7 @@ SECRET_KEY = '&%u8gs8*kqi^x#a1+l%1=oj@i^u&pa&6lsbdx%gkzu(g%p5*&y'
 DEBUG = True
 
 ALLOWED_HOSTS = [
+    '185.208.175.227',
     '127.0.0.1',
     'localhost'
 ]
@@ -50,7 +51,6 @@ INSTALLED_APPS = [
     'App1',
     'rest_framework',
     'corsheaders',
-    'django_minio_backend.apps.DjangoMinioBackendConfig',
 ]
 
 

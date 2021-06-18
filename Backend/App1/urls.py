@@ -3,6 +3,7 @@ from . import views
 
 doing_urls = [
     path('UploadImage', views.ImageView.as_view(), name='upload_image'),
+    path('Invite', views.invite),
 ]
 
 auth_urls = [

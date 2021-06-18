@@ -82,16 +82,17 @@ class ImageView(APIView):
 def invite(request):
     try:
         subject = request.data["subject"]
-        message = request.data["message"]
+        message = get_data_or_none(request, "message")
         inviter_id = request.data["inviter_id"]
         invited_name = request.data["invited_name"]
         invited_email = request.data["invited_email"]
-        if len(message) == 0:
-            message = "Dear" + invited_name + "we've heard that you're a GEDA, Come and use our help!"
+        if message is None:
+            message = "Dear" + invited_name + "we've heard that you're a needy, Come and use our help!"
     except Exception:
         return error("requiredParams")
+
     send_text_email(subject, message, invited_email)
 
     return Response({"message": "email sent",
-                     "seccess": "1"},
+                     "success": "1"},
                     status=status.HTTP_200_OK)
