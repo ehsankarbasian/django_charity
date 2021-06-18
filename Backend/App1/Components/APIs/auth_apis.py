@@ -35,7 +35,7 @@ from re import search as validateRegex
 from django.db.models import Q
 from random import randint
 
-from Backend.settings import HOST, PORT
+from Backend.settings import HOST, PORT, FRONT_PORT
 
 from django.contrib.auth.models import User
 from App1.models import UserProfile
