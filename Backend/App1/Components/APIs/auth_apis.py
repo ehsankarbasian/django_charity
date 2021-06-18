@@ -135,8 +135,7 @@ def signup(request):
                 email_tags=email_tags_string,
                 user_type=user_type,
                 verify_email_code=verify_email_code,
-                verify_email_token=verify_email_token,
-                profile_image_url="/images/default_profile.png")
+                verify_email_token=verify_email_token)
 
             # Sending html based email to user to verify his/her email:
             html_content = get_template('EmailVerification.html').render(context={
