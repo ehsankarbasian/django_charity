@@ -138,7 +138,7 @@ def requestedEventList(request):
 
     if not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
-    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
 
     if userProfile.user_type != 1:
         return error("NotSuperAdmin")

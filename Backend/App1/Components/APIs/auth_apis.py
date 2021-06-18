@@ -202,7 +202,7 @@ def verifyEmailTokenBased(request):
 
     template = get_template('EmailDestination.html').render(context={
         'HOST': HOST,
-        'PORT': PORT,
+        'PORT': FRONT_PORT,
         'result': result,
         'message': "you've submitted email verification using link"})
 
@@ -316,7 +316,7 @@ def resetPasswordTokenBased(request):
 
     template = get_template('EmailDestination.html').render(context={
         'HOST': HOST,
-        'PORT': PORT,
+        'PORT': FRONT_PORT,
         'result': result,
         'message': "you've submitted change password request using link"})
 
