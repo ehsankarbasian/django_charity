@@ -143,7 +143,7 @@ def requestedEventList(request):
     if userProfile.user_type != 1:
         return error("NotSuperAdmin")
 
-    event_set = list(Event.objects.filter(status=0).order_by("id"))
+    event_set = list(Event.objects.filter(status=0).order_by("id")[::-1])
 
     return event_lister(event_set)
 
@@ -166,7 +166,7 @@ def searchEvent(request):
 
     search_query = Q(title__contains=search_key) | Q(description__contains=search_key)
     allowed_event_query = Q(enabled=1) & Q(status=1)
-    result_set = Event.objects.filter(search_query).filter(allowed_event_query).order_by("id")
+    result_set = Event.objects.filter(search_query).filter(allowed_event_query).order_by("id")[::-1]
 
     if not len(result_set):
         return error("noResultForSearch")
@@ -309,7 +309,7 @@ def userEvent(request):
     try:
         userProfile = UserProfile.objects.get(token=TOKEN_ID)
         user = userProfile.user
-        eventSet = Event.objects.filter(creator=user).order_by("id")
+        eventSet = Event.objects.filter(creator=user).order_by("id")[::-1]
         return event_lister(eventSet)
     except Exception:
         return error("noSuchUser")
