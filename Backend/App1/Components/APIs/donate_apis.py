@@ -25,18 +25,10 @@ def generalDonate(request):
     """
     donates money or product for not an event
 
-    potential errors:
-        requiredParams
-        howToDelivery
-        productQuantity
-        productNotFound
-        donateTypeError
-        userNotFound
-        userIsNeedy
-        userIsNotVerified
-        completeProfileFirstPlease
+    potential errors: requiredParams howToDelivery, productQuantity
+        productNotFound, donateTypeError, userNotFound
+        userIsNeedy, userIsNotVerified, completeProfileFirstPlease
     """
-
     try:
         known = int(request.data["known"])
         TOKEN_ID = get_data_or_none(request, "TOKEN_ID")
@@ -49,10 +41,9 @@ def generalDonate(request):
     if (product_id is not None) and (known == 0):
         return error("howToDelivery")
 
-    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
     if TOKEN_ID is None:
         userProfile = None
-    elif not len(userProfile):
+    elif not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
     else:
         userProfile = UserProfile.objects.get(token=TOKEN_ID)
@@ -67,20 +58,22 @@ def generalDonate(request):
         userProfile = None
 
     # Detect donate type (money/product) and then create donate:
-    if (product_id is not None) and (money_amount is not None):
+    both_passed = (product_id is not None) and (money_amount is not None)
+    product_donate = product_id is not None
+
+    if both_passed:
         return error("donateTypeError",
                      {"message": "product_id & money_amount can't be passed both"})
-    elif product_id is not None:
+    elif product_donate:
         product_id = int(product_id)
         if quantity is None:
             return error("productQuantity")
         else:
             quantity = int(quantity)
-        product = Product.objects.filter(id=product_id)
-        if not len(product):
+        if not len(Product.objects.filter(id=product_id)):
             return error("productNotFound")
         product = Product.objects.get(id=product_id)
-        # Donate product:
+
         DonatesIn.objects.create(donator=userProfile,
                                  product=product,
                                  quantity=quantity)
@@ -104,10 +97,9 @@ def generalDonate(request):
 def pendingDonates(request):
     """
     returns all pending donates list or pending donates according to donator melli_code
-     to delivery to admin or superAdmin
+    to delivery to admin or superAdmin
 
-    potential error:
-        donatorNotFound
+    potential error: donatorNotFound
     """
     melli_code = get_data_or_none(request, "melli_code")
 
@@ -115,8 +107,7 @@ def pendingDonates(request):
     donate_set = DonatesIn.objects.filter(pending_query).order_by('-create_date')
 
     if melli_code is not None:
-        donator = UserProfile.objects.filter(melli_code=melli_code)
-        if not len(donator):
+        if not len(UserProfile.objects.filter(melli_code=melli_code)):
             return error("donatorNotFound")
         donator = UserProfile.objects.get(melli_code=melli_code)
         donator_query = Q(donator=donator)
@@ -133,12 +124,8 @@ def delivery(request):
     """
     records delivery product by admin for a donate
 
-    potential errors:
-        requiredParams
-        userNotFound
-        userIsNotAdmin
-        donateNotFound
-        deliveredBefore
+    potential errors: requiredParams, userNotFound
+        userIsNotAdmin, donateNotFound, deliveredBefore
     """
     try:
         donate_id = int(request.data["donate_id"])
@@ -146,15 +133,13 @@ def delivery(request):
     except Exception:
         return error("requiredParams")
 
-    transferee = UserProfile.objects.filter(token=TOKEN_ID)
-    if not len(transferee):
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
     transferee = UserProfile.objects.get(token=TOKEN_ID)
     if transferee.user_type not in [1, 2]:
         return error("userIsNotAdmin")
 
-    donate = DonatesIn.objects.filter(id=donate_id)
-    if not len(donate):
+    if not len(DonatesIn.objects.filter(id=donate_id)):
         return error("donateNotFound")
     donate = DonatesIn.objects.get(id=donate_id)
     if donate.transferee is not None:

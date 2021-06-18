@@ -54,6 +54,7 @@ def event_lister(event_queryset, pagination_params=None):
     """
     # Create a json for an event:
     event_json = {}
+    event_queryset = event_queryset.order_by("-id")
     for event in event_queryset:
         event_json[event.id] = event_item(event)
 

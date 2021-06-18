@@ -1,7 +1,7 @@
 """
 APIs of auth and reset-pass, will be here
 
-contains:
+contains APIs:
     login
     signup
     logout
@@ -26,6 +26,7 @@ from rest_framework import status
 
 from django.contrib.auth import authenticate
 from django.template.loader import get_template
+from django.http import HttpResponse
 
 from App1.Components.helper_functions import *
 from App1.Components.custom_limiter import *
@@ -48,21 +49,13 @@ EMAIL_REGEX = r'^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
 @api_view(['POST'])
 @limiter([LoginLimiter])
 def login(request):
-    """
-    user login in sessions and pass a token to front
-
-    potential errors:
-        requiredParams
-        wrongUsernameOrPass
-        emailVerificationError
-    """
+    """ potential errors: requiredParams, wrongUsernameOrPass, emailVerificationError """
     try:
         username = request.data["username"]
         password = request.data["password"]
     except Exception:
         return error("requiredParams")
     else:
-        # Authenticate:
         user = authenticate(username=username,
                             password=password)
         if user is None:
@@ -71,7 +64,6 @@ def login(request):
         user = User.objects.get(username=username)
         userProfile = UserProfile.objects.get(user=user)
 
-        # Check verified_email:
         if not userProfile.verified_email:
             return error("emailVerificationError")
 
@@ -93,13 +85,8 @@ def signup(request):
     just to signup as donator or needy
     emails to user to verify it
 
-    potential errors:
-        requiredParams
-        invalidEmailError
-        emailUsernameError
-        usernameError
-        emailError
-        notAllowedUserTypeError
+    potential errors: requiredParams, invalidEmailError, emailUsernameError
+        usernameError, emailError, notAllowedUserTypeError
     """
     try:
         username = request.data["username"]
@@ -115,7 +102,6 @@ def signup(request):
         simple_email = simple_email_set['email']
         email_tags_string = simple_email_set['tags']
 
-        # Validate email using regex:
         if not validateRegex(EMAIL_REGEX, simple_email):
             return error("invalidEmailError")
 
@@ -124,13 +110,10 @@ def signup(request):
         email_error = bool(len(User.objects.filter(email=original_email))
                            or len(User.objects.filter(email=simple_email)))
         if username_error and email_error:
-            # before-used username and email:
             return error("emailUsernameError")
         elif username_error:
-            # before-used username:
             return error("usernameError")
         elif email_error:
-            # before-used email:
             return error("emailError")
 
         elif user_type not in [3, 4]:
@@ -144,8 +127,7 @@ def signup(request):
             user = User.objects.create_user(
                 username=username,
                 email=original_email,
-                password=password
-            )
+                password=password)
             UserProfile.objects.create(
                 user=user,
                 email=simple_email,
@@ -154,8 +136,7 @@ def signup(request):
                 user_type=user_type,
                 verify_email_code=verify_email_code,
                 verify_email_token=verify_email_token,
-                profile_image_url=HOST + ":" + PORT + "/images/default_profile.png"
-            )
+                profile_image_url="/images/default_profile.png")
 
             # Sending html based email to user to verify his/her email:
             html_content = get_template('EmailVerification.html').render(context={
@@ -165,8 +146,7 @@ def signup(request):
                 'email': simple_email,
                 'name': username,
                 'private_code': verify_email_code,
-                'private_token': verify_email_token
-            })
+                'private_token': verify_email_token})
             send_email(subject='NTM charity email verification',
                        message='Email verification',
                        to_list=[simple_email],
@@ -182,16 +162,12 @@ def signup(request):
 @api_view(['POST'])
 @limiter([LogOutLimiter])
 def logout(request):
-    """
-    logs out user from sessions
-    """
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
     except Exception:
         return error("requiredParams")
 
-    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
-    if not len(userProfile):
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
     userProfile = UserProfile.objects.get(token=TOKEN_ID)
 
@@ -208,77 +184,65 @@ def logout(request):
 @api_view(['POST'])
 @limiter([SignUpLimiter])
 def verifyEmailTokenBased(request):
-    """
-    verifies email using the link sent in email
-
-    potential errors:
-        requiredParams
-        privateTokenError
-    """
+    """ potential errors: requiredParams, privateTokenError """
+    result = "Your email verified successfully"
     try:
         private_token = request.data["token"]
         email = request.data["email"]
+        userProfile = UserProfile.objects.get(email=email)
+        if userProfile.verified_email:
+            result = "ERROR: your email verified before"
+        elif userProfile.verify_email_token == private_token:
+            userProfile.verified_email = True
+            userProfile.save()
+        else:
+            result = "ERROR: privateTokenError"
     except Exception:
-        return error("requiredParams")
+        result = "ERROR: requiredParams"
 
-    userProfile = UserProfile.objects.get(email=email)
-    if userProfile.verify_email_token == private_token:
-        userProfile.verified_email = True
-        userProfile.save()
-        return Response({"message": "email verification was successful, you can login now!",
-                         "success": "1"},
-                        status=status.HTTP_200_OK)
-    else:
-        return error("privateTokenError")
+    template = get_template('EmailDestination.html').render(context={
+        'HOST': HOST,
+        'PORT': PORT,
+        'result': result,
+        'message': "you've submitted email verification using link"})
+
+    return HttpResponse(template)
 
 
 @api_view(['POST'])
 @limiter([SignUpLimiter])
 def verifyEmailCodeBased(request):
-    """
-    verifies email using the code sent in email
-
-    potential errors:
-        requiredParams
-        NoUserForEmail
-        VerifiedBefore
-        privateCodeError
-    """
+    """ potential errors: requiredParams, NoUserForEmail, VerifiedBefore, privateCodeError """
     try:
         private_code = int(request.data["code"])
         email = request.data["email"]
     except Exception:
         return error("requiredParams")
-    else:
-        try:
-            userProfile = UserProfile.objects.get(email=email)
-        except Exception:
-            return error("NoUserForEmail")
 
-        if userProfile.verified_email:
-            return error("VerifiedBefore")
+    if not len(UserProfile.objects.filter(email=email)):
+        return error("NoUserForEmail")
+    userProfile = UserProfile.objects.get(email=email)
 
-        if userProfile.verify_email_code == private_code:
-            userProfile.verified_email = True
-            userProfile.save()
-            return Response({"message": "email verification was successful, you can login now!",
-                             "success": "1"},
-                            status=status.HTTP_200_OK)
-        else:
-            return error("privateCodeError")
+    if userProfile.verified_email:
+        return error("VerifiedBefore")
+
+    if userProfile.verify_email_code != private_code:
+        return error("privateCodeError")
+
+    userProfile.verified_email = True
+    userProfile.save()
+    return Response({"message": "email verification was successful, you can login now!",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 @limiter([ForgotPasswordLimiter])
 def forgotPassword(request):
     """
-    sends email user to reset his/her password
+    sends email to user to reset his/her password
 
-    potential errors:
-        requiredParams
-        invalidEmailError
-        noSuchUser
-        notVerifiedEmailError
+    potential errors: requiredParams, invalidEmailError, noSuchUser, notVerifiedEmailError
     """
     try:
         email = request.data["email"]
@@ -292,13 +256,9 @@ def forgotPassword(request):
 
     to_email = simple_email_set['email']
 
-    # Check if email verified:
-    userProfile = UserProfile.objects.filter(email=to_email)
-
-    if not len(userProfile):
+    if not len(UserProfile.objects.filter(email=to_email)):
         return error("noSuchUser")
-    else:
-        userProfile = UserProfile.objects.get(email=to_email)
+    userProfile = UserProfile.objects.get(email=to_email)
 
     if not userProfile.verified_email:
         return error("notVerifiedEmailError")
@@ -316,14 +276,11 @@ def forgotPassword(request):
         'email': to_email,
         'name': userProfile.user.username,
         'private_code': code,
-        'private_token': token
-    })
-
+        'private_token': token})
     send_email(subject='charity reset password',
                message='message',
                to_list=[to_email],
-               html_content=html_content
-               )
+               html_content=html_content)
 
     return Response({"message": "email sent",
                      "success": "1"},
@@ -333,55 +290,43 @@ def forgotPassword(request):
 @api_view(['POST'])
 @limiter([ResetPasswordLimiter])
 def resetPasswordTokenBased(request):
-    """
-    resets password using the form sent to user
-
-    potential errors:
-        requiredParams
-        differentPasswords
-        privateTokenError
-    """
+    """ potential errors: requiredParams, differentPasswords, privateTokenError """
+    result = "Your email verified successfully"
     try:
         pass1 = request.data["pass1"]
         pass2 = request.data["pass2"]
         token = request.data["token"]
         email = request.data["email"]
+
+        if pass1 != pass2:
+            result = "ERROR: differentPasswords"
+        userProfile = UserProfile.objects.get(email=email)
+        user = User.objects.get(user=userProfile)
+
+        if userProfile.reset_pass_token != token:
+            result = "ERROR: privateTokenError"
+        else:
+            userProfile.reset_pass_token = token_hex(64)
+            userProfile.save()
+            user.set_password(pass1)
+            user.save()
+
     except Exception:
-        return error("requiredParams")
+        result = "ERROR: requiredParams"
 
-    if pass1 != pass2:
-        return error("differentPasswords")
+    template = get_template('EmailDestination.html').render(context={
+        'HOST': HOST,
+        'PORT': PORT,
+        'result': result,
+        'message': "you've submitted change password request using link"})
 
-    # Find user:
-    userProfile = UserProfile.objects.get(email=email)
-    user = User.objects.get(user=userProfile)
-
-    # Check token:
-    if not userProfile.reset_pass_token == token:
-        return error("privateTokenError")
-    else:
-        # Change private token and password
-        userProfile.reset_pass_token = token_hex(64)
-        userProfile.save()
-        user.set_password(pass1)
-        user.save()
-
-    return Response({"message": "password changed",
-                     "success": "1"},
-                    status=status.HTTP_200_OK)
+    return HttpResponse(template)
 
 
 @api_view(['POST'])
 @limiter([ResetPasswordLimiter])
 def resetPasswordCodeBased(request):
-    """
-    resets password using the code sent to user in email
-
-    potential errors:
-        requiredParams
-        differentPasswords
-        privateCodeError
-    """
+    """ potential errors: requiredParams, differentPasswords, userNotFound, privateCodeError """
     try:
         pass1 = request.data["pass1"]
         pass2 = request.data["pass2"]
@@ -393,19 +338,18 @@ def resetPasswordCodeBased(request):
     if pass1 != pass2:
         return error("differentPasswords")
 
-    # Find user:
+    if not len(UserProfile.objects.filter(email=email)):
+        return error("userNotFound")
     userProfile = UserProfile.objects.get(email=email)
     user = User.objects.get(user=userProfile)
 
-    # Check code:
     if not userProfile.reset_pass_code == code:
         return error("privateCodeError")
-    else:
-        # Change private code and password
-        userProfile.reset_pass_code = randint(10000000, 99999999)
-        userProfile.save()
-        user.set_password(pass1)
-        user.save()
+
+    userProfile.reset_pass_code = randint(10000000, 99999999)
+    userProfile.save()
+    user.set_password(pass1)
+    user.save()
 
     return Response({"message": "password changed",
                      "success": "1"},
@@ -416,25 +360,20 @@ def resetPasswordCodeBased(request):
 @limiter([NotVerifiedUserSetLimiter])
 def notVerifiedUserSet(request):
     """
-    returns the list of not verified users to verify by super admin
-
-    potential errors:
-        requiredParams
-        adminNotFound
-        notSuperAdmin
+    returns the list of not verified donators and needies to verify by superAdmin
+    potential errors: requiredParams, adminNotFound, notAdminOrSuperAdmin
     """
     try:
         TOKEN_API = request.data["TOKEN_API"]
     except Exception:
         return error("requiredParams")
 
-    try:
-        adminProfile = UserProfile.objects.get(token=TOKEN_API)
-    except Exception:
+    if not len(UserProfile.objects.filter(token=TOKEN_API)):
         return error("adminNotFound")
+    adminProfile = UserProfile.objects.get(token=TOKEN_API)
 
-    if adminProfile.user_type != 1:
-        return error("notSuperAdmin")
+    if adminProfile.user_type not in [1, 2]:
+        return error("notAdminOrSuperAdmin")
 
     donator_list = UserProfile.objects.filter(verified=False).filter(user_type=3)
     needy_list = UserProfile.objects.filter(verified=False).filter(user_type=4)
@@ -445,20 +384,15 @@ def notVerifiedUserSet(request):
 @api_view(['POST'])
 def verifiedDonatorSet(request):
     """
-    returns the list of verified donators (verified by admin and verified email)
-
-    potential errors:
-        requiredParams
-        adminNotFound
-        notSuperAdminOrAdmin
+    the list of verified donators (verified by admin and verified email)
+    potential errors: requiredParams, adminNotFound, notSuperAdminOrAdmin
     """
     try:
         TOKEN_API = request.data["TOKEN_API"]
     except Exception:
         return error("requiredParams")
 
-    adminProfile = UserProfile.objects.filter(token=TOKEN_API)
-    if not len(adminProfile):
+    if not len(UserProfile.objects.filter(token=TOKEN_API)):
         return error("adminNotFound")
     adminProfile = UserProfile.objects.get(token=TOKEN_API)
 
@@ -474,21 +408,13 @@ def verifiedDonatorSet(request):
 
 @api_view(['POST'])
 def adminSet(request):
-    """
-    returns the list of verified donators (verified by admin and verified email)
-
-    potential errors:
-        requiredParams
-        adminNotFound
-        notSuperAdminOrAdmin
-    """
+    """ potential errors: requiredParams, adminNotFound, notSuperAdminOrAdmin """
     try:
         TOKEN_API = request.data["TOKEN_API"]
     except Exception:
         return error("requiredParams")
 
-    adminProfile = UserProfile.objects.filter(token=TOKEN_API)
-    if not len(adminProfile):
+    if not len(UserProfile.objects.filter(token=TOKEN_API)):
         return error("adminNotFound")
     adminProfile = UserProfile.objects.get(token=TOKEN_API)
 
@@ -506,20 +432,13 @@ def adminSet(request):
 @limiter([VerifyOrRejectUserLimiter])
 def verifyOrRejectUser(request):
     """
-    verifies or rejects user by superAdmin
-
-    potential errors:
-        requiredParams
-        notSuperAdmin
-        adminNotFound
-        verifiedBefore
-        userTypeError
-        userNotFound
+    potential errors: requiredParams, notSuperAdmin
+        adminNotFound, verifiedBefore, userTypeError, userNotFound
     """
     try:
         TOKEN_API = request.data["TOKEN_API"]
         user_id = int(request.data["user_id"])
-        action = int(request.data["action"])
+        accept = int(request.data["action"])
     except Exception:
         return error("requiredParams")
 
@@ -540,13 +459,13 @@ def verifyOrRejectUser(request):
     except Exception:
         return error("userNotFound")
 
-    if action:
+    if accept:
         userProfile.verified = True
         userProfile.save()
     else:
         userProfile.user.delete()
         userProfile.delete()
 
-    return Response({"message": "user " + str(["verified" if action else "rejected (deleted)"][0]) + " successfully",
+    return Response({"message": "user " + str(["verified" if accept else "rejected (deleted)"][0]) + " successfully",
                      "success": "1"},
                     status=status.HTTP_200_OK)

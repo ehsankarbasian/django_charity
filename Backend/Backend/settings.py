@@ -17,6 +17,7 @@ import os
 
 HOST = "127.0.0.1"
 PORT = "8000"
+FRONT_PORT = "3000"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,7 +33,6 @@ SECRET_KEY = '&%u8gs8*kqi^x#a1+l%1=oj@i^u&pa&6lsbdx%gkzu(g%p5*&y'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '185.231.115.150',
     '127.0.0.1',
     'localhost'
 ]

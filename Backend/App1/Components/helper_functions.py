@@ -121,9 +121,7 @@ def send_text_email(subject, message, to_list):
 
 
 def unique_user_token():
-    """
-    creates a unique 64-char token for signed up user
-    """
+    """ creates a unique 64-char token for signed up user """
     token = token_hex(64)
     notExpired = True
     for expiredToken in ExpiredTokens.objects.all():
@@ -139,9 +137,7 @@ def unique_user_token():
 
 
 def get_data_or_none(request, key):
-    """
-    returns None for not required fields
-    """
+    """ returns None for not required fields """
     try:
         return request.data[key]
     except Exception:
@@ -149,9 +145,7 @@ def get_data_or_none(request, key):
 
 
 def set_email_verified(username):
-    """
-    set userProfile.verified_email True
-    """
+    """ set userProfile.verified_email True """
     user = User.objects.get(username=username)
     profile = UserProfile.objects.get(user=user)
     profile.verified_email = True
@@ -199,13 +193,9 @@ def create_pagination_bar(page):
 
 
 def pagination_bar_params(page):
-    """
-    returns parameters of pagination ber to be used in UI
-    """
-
+    """ returns parameters of pagination ber to be used in UI """
     params = {
         "current_page": page.number,
         "the_last_page": page.paginator.num_pages,
-        "pagination_bar": create_pagination_bar(page)
-    }
+        "pagination_bar": create_pagination_bar(page)}
     return params
