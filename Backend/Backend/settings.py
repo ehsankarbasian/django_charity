@@ -15,7 +15,7 @@ from datetime import timedelta
 from typing import List, Tuple
 import os
 
-HOST = "127.0.0.1"
+HOST = "37.152.183.25"
 PORT = "8000"
 FRONT_PORT = "3000"
 
@@ -33,7 +33,7 @@ SECRET_KEY = '&%u8gs8*kqi^x#a1+l%1=oj@i^u&pa&6lsbdx%gkzu(g%p5*&y'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '185.208.175.227',
+    '37.152.183.25',
     '127.0.0.1',
     'localhost'
 ]
