@@ -9,7 +9,6 @@ contains:
     acceptedNeedRequestList
 """
 
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -125,3 +124,23 @@ def acceptedNeedRequestList(request):
     count = [int(count) if count is not None else 10][0]
     needRequestSet = NeedRequest.objects.filter(status=1)[:count]
     return needRequest_lister(needRequestSet)
+
+
+@api_view(['POST'])
+def allNeedRequestList(request):
+    """ potential errors: requiredParams, userNotFound, notSuperAdminOrAdmin """
+    try:
+        TOKEN_ID = request.data["TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
+        return error("userNotFound")
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
+
+    if userProfile.user_type not in [1, 2]:
+        return error("notSuperAdminOrAdmin")
+
+    needRequest_set = NeedRequest.objects.all()
+
+    return needRequest_lister(needRequest_set)

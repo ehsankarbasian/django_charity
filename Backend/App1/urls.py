@@ -74,6 +74,7 @@ needRequest_urls = [
     path('MyNeedRequestList', views.myNeedRequestList),
     path('AcceeptOrRejectNeedRequest', views.acceptOrRejectNeedRequest),
     path('AcceptedNeedRequestList', views.acceptedNeedRequestList),
+    path('AllNeedRequestList', views.allNeedRequestList),
 ]
 
 admin_management_urls = [
