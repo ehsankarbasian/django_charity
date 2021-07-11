@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="af27e988-ae8e-4f7b-97d5-75b5231538fe" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
+      <change beforePath="$PROJECT_DIR$/Backend/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/settings.py" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/App1/Components/APIs/need_request_apis.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/Components/APIs/need_request_apis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App1/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/App1/urls.py" afterDir="false" />
+>>>>>>> 00d4ddac99d120c00e803e8ec9cf341a2e1cbb3e
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="ProjectId" id="1rCdjkWqoAXO5Iqc6HG9hGuIlEa" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Backend" type="Python.DjangoServer" factoryName="Django server">
+      <module name="Backend" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="af27e988-ae8e-4f7b-97d5-75b5231538fe" name="Default Changelist" comment="" />
+      <created>1618484143072</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1618484143072</updated>
+      <workItem from="1618484144252" duration="17499000" />
+      <workItem from="1618655167671" duration="60720000" />
+      <workItem from="1618862972855" duration="8051000" />
+      <workItem from="1618880317577" duration="2236000" />
+      <workItem from="1618955507358" duration="134000" />
+      <workItem from="1619041892584" duration="8671000" />
+      <workItem from="1619104917338" duration="29901000" />
+      <workItem from="1619189758471" duration="26047000" />
+      <workItem from="1619227715831" duration="41000" />
+      <workItem from="1619227815604" duration="5433000" />
+      <workItem from="1619305815020" duration="3584000" />
+      <workItem from="1619319820564" duration="3322000" />
+      <workItem from="1619576374531" duration="41263000" />
+      <workItem from="1619714986384" duration="85000" />
+      <workItem from="1619804528364" duration="571000" />
+      <workItem from="1619807401386" duration="1754000" />
+      <workItem from="1619848145955" duration="78000" />
+      <workItem from="1619860949559" duration="7477000" />
+      <workItem from="1619967064636" duration="577000" />
+      <workItem from="1620031702753" duration="2009000" />
+      <workItem from="1620150239989" duration="17815000" />
+      <workItem from="1620256701744" duration="18725000" />
+      <workItem from="1620372158209" duration="3104000" />
+      <workItem from="1620438672808" duration="1017000" />
+      <workItem from="1620568733989" duration="8523000" />
+      <workItem from="1620620697411" duration="10237000" />
+      <workItem from="1620638097923" duration="28938000" />
+      <workItem from="1620884239513" duration="1698000" />
+      <workItem from="1620972059345" duration="775000" />
+      <workItem from="1621101258101" duration="4569000" />
+      <workItem from="1621153760976" duration="87178000" />
+      <workItem from="1621700690757" duration="18898000" />
+      <workItem from="1621844093311" duration="15151000" />
+      <workItem from="1622208492041" duration="3914000" />
+      <workItem from="1622553539901" duration="1742000" />
+      <workItem from="1622980339394" duration="3008000" />
+      <workItem from="1623062514742" duration="4272000" />
+      <workItem from="1623081087249" duration="1902000" />
+      <workItem from="1623150134822" duration="1962000" />
+      <workItem from="1623501439334" duration="641000" />
+      <workItem from="1623930145403" duration="2569000" />
+      <workItem from="1623996582020" duration="707000" />
+      <workItem from="1624018547469" duration="4819000" />
+<<<<<<< HEAD
+      <workItem from="1625773897330" duration="566000" />
+      <workItem from="1625831767850" duration="1244000" />
+      <workItem from="1625863490048" duration="3254000" />
+=======
+      <workItem from="1625862376615" duration="2609000" />
+>>>>>>> 00d4ddac99d120c00e803e8ec9cf341a2e1cbb3e
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
