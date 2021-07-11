@@ -133,6 +133,8 @@ def donateIn_item(donate):
             "product_name": product_name,
             "product_id": product_id,
             "quantity": donate.quantity,
+            "donator_email": donator.email,
+            "username": donator.user.username,
             "melli_code": melli_code,
             "donator_fname": donator_fname,
             "donator_lname": donator_lname}

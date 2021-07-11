@@ -40,13 +40,7 @@ from App1.Components.APIs.admin_management_apis import *
 # API functions:
 @api_view(['POST'])
 def email(request):
-    """
-    It's an API to send email from ntm.patronage@gmail.com to a list
-    it can be used by front end too
-
-    potential error:
-        requiredParams
-    """
+    """ potential error: requiredParams """
     try:
         subject = request.data["subject"]
         message = request.data["message"]
@@ -77,8 +71,28 @@ class ImageView(APIView):
         image_serializer = ImageSerializer(data=request.data)
         if image_serializer.is_valid():
             image_serializer.save()
-            return Response({"image_url": HOST + ":" + PORT + image_serializer.data["image"]},
+            return Response({"image_url": image_serializer.data["image"]},
                             status=status.HTTP_200_OK)
         else:
             print('IMAGE SERIALIZER ERROR', image_serializer.errors)
             return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def invite(request):
+    try:
+        subject = request.data["subject"]
+        message = get_data_or_none(request, "message")
+        inviter_id = request.data["inviter_id"]
+        invited_name = request.data["invited_name"]
+        invited_email = request.data["invited_email"]
+        if message is None:
+            message = "Dear" + invited_name + "we've heard that you're a needy, Come and use our help!"
+    except Exception:
+        return error("requiredParams")
+
+    send_text_email(subject, message, invited_email)
+
+    return Response({"message": "email sent",
+                     "success": "1"},
+                    status=status.HTTP_200_OK)

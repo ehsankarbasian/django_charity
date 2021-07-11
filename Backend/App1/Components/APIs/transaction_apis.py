@@ -22,14 +22,7 @@ from App1.Components.lister_functions import *
 
 @api_view(['POST'])
 def transactionList(request):
-    """
-    lists all or filtered money transactions
-
-    potential errors:
-        requiredParams
-        userNotFound
-        filteredUserNotFound
-    """
+    """ potential errors: requiredParams, userNotFound, filteredUserNotFound """
     SORT_BY = ["", "amount", "create_date"]
 
     try:
@@ -43,12 +36,11 @@ def transactionList(request):
     except Exception:
         return error("requiredParams")
 
-    user = UserProfile.objects.filter(token=TOKEN_ID)
-    if not len(user):
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
-    user = UserProfile.objects.get(token=TOKEN_ID)
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
 
-    if user.user_type in [3, 4]:
+    if userProfile.user_type in [3, 4]:
         user_filter = UserProfile.objects.filter(token=TOKEN_ID)
     else:
         if filter_by_user:
@@ -86,12 +78,7 @@ def transactionList(request):
 
 @api_view(['POST'])
 def recentTransactionList(request):
-    """
-    lists the most recent transactions
-
-    potential error:
-        countIsNotInt
-    """
+    """ potential error: countIsNotInt """
     try:
         count = get_data_or_none(request, "count")
         count = [int(count) if count is not None else 10][0]
@@ -104,12 +91,7 @@ def recentTransactionList(request):
 
 @api_view(['POST'])
 def biggestTransactionList(request):
-    """
-    lists the most big-amount transactions
-
-    potential error:
-        countIsNotInt
-    """
+    """ potential error: countIsNotInt """
     try:
         count = get_data_or_none(request, "count")
         count = [int(count) if count is not None else 10][0]

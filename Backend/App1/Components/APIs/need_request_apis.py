@@ -9,7 +9,6 @@ contains:
     acceptedNeedRequestList
 """
 
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -24,15 +23,7 @@ from App1.Components.lister_functions import *
 
 @api_view(['POST'])
 def createNeedRequest(request):
-    """
-    creates NeedRequest
-
-    potential errors:
-        requireParams
-        userNotFound
-        userTypeError
-        notVerifiedNeedy
-    """
+    """ potential errors: requireParams, userNotFound, userTypeError, notVerifiedNeedy """
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
         title = request.data["title"]
@@ -40,9 +31,7 @@ def createNeedRequest(request):
     except Exception:
         return error("requiredParams")
 
-    # Find user:
-    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
-    if not len(userProfile):
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
     userProfile = UserProfile.objects.get(token=TOKEN_ID)
 
@@ -51,7 +40,6 @@ def createNeedRequest(request):
     elif not userProfile.verified:
         return error("notVerifiedNeedy")
 
-    # Create NeedRequest:
     NeedRequest.objects.create(creator=userProfile,
                                title=title,
                                description=description)
@@ -63,30 +51,19 @@ def createNeedRequest(request):
 
 @api_view(['POST'])
 def requestedNeedRequestList(request):
-    """
-    list of NeedRequest with status 0
-
-    potential errors:
-        requiredParams
-        userNotFound
-        userNotSuperAdmin
-    """
+    """ potential errors: requiredParams, userNotFound, notSuperAdminOrAdmin """
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
     except Exception:
         return error("requiredParams")
 
-    # Find user:
-    try:
-        userProfile = UserProfile.objects.get(token=TOKEN_ID)
-    except Exception:
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
 
-    # Check whether superAdmin/admin or not:
     if userProfile.user_type not in [1, 2]:
-        return error("userNotSuperAdmin")
+        return error("notSuperAdminOrAdmin")
 
-    # Find NeedRequests with status 0:
     needRequest_set = NeedRequest.objects.filter(status=0)
 
     return needRequest_lister(needRequest_set)
@@ -94,21 +71,13 @@ def requestedNeedRequestList(request):
 
 @api_view(['POST'])
 def myNeedRequestList(request):
-    """
-    list of needRequested created by an specific needy
-
-    potential errors:
-        requiredParams
-        userNotFound
-        userIsNotNeedy
-    """
+    """ potential errors: requiredParams, userNotFound, userIsNotNeedy """
     try:
         TOKEN_ID = request.data["TOKEN_ID"]
     except Exception:
         return error("requiredParams")
 
-    userProfile = UserProfile.objects.filter(token=TOKEN_ID)
-    if not len(userProfile):
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
     userProfile = UserProfile.objects.get(token=TOKEN_ID)
 
@@ -122,15 +91,7 @@ def myNeedRequestList(request):
 
 @api_view(['POST'])
 def acceptOrRejectNeedRequest(request):
-    """
-    accept or reject a needRequest by admin
-
-    potential errors:
-        requiredParams
-        needRequestNotFound
-        userIsNotSuperAdmin
-        userNotFound
-    """
+    """ potential errors: requiredParams, needRequestNotFound, notSuperAdminOrAdmin, userNotFound """
     try:
         needRequest_id = request.data["NeedRequest_id"]
         TOKEN_ID = request.data["TOKEN_ID"]
@@ -138,17 +99,16 @@ def acceptOrRejectNeedRequest(request):
     except Exception:
         return error("requiredParams")
 
-    needRequest = NeedRequest.objects.filter(id=needRequest_id)
-    if not len(needRequest):
+    if not len(NeedRequest.objects.filter(id=needRequest_id)):
         return error("needRequestNotFound")
     needRequest = NeedRequest.objects.get(id=needRequest_id)
 
-    try:
-        userProfile = UserProfile.objects.get(token=TOKEN_ID)
-        if userProfile.user_type not in [1, 2]:
-            return error("userIsNotSuperAdmin")
-    except Exception:
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
         return error("userNotFound")
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
+
+    if userProfile.user_type not in [1, 2]:
+        return error("notSuperAdminOrAdmin")
 
     needRequest.status = [1 if action else -1][0]
     needRequest.save()
@@ -164,3 +124,23 @@ def acceptedNeedRequestList(request):
     count = [int(count) if count is not None else 10][0]
     needRequestSet = NeedRequest.objects.filter(status=1)[:count]
     return needRequest_lister(needRequestSet)
+
+
+@api_view(['POST'])
+def allNeedRequestList(request):
+    """ potential errors: requiredParams, userNotFound, notSuperAdminOrAdmin """
+    try:
+        TOKEN_ID = request.data["TOKEN_ID"]
+    except Exception:
+        return error("requiredParams")
+
+    if not len(UserProfile.objects.filter(token=TOKEN_ID)):
+        return error("userNotFound")
+    userProfile = UserProfile.objects.get(token=TOKEN_ID)
+
+    if userProfile.user_type not in [1, 2]:
+        return error("notSuperAdminOrAdmin")
+
+    needRequest_set = NeedRequest.objects.all()
+
+    return needRequest_lister(needRequest_set)

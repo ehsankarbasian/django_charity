@@ -44,13 +44,7 @@ from App1.models import Category, SubCategory, Product
 
 @api_view(['POST'])
 def create_category(request):
-    """
-    creates a new category with a title
-
-    potential errors:
-        requiredParams
-        notUniqueTitle
-    """
+    """ potential errors: requiredParams, notUniqueTitle """
     try:
         title = request.data["title"]
     except Exception:
@@ -69,14 +63,7 @@ def create_category(request):
 
 @api_view(['POST'])
 def create_subcategory(request):
-    """
-    creates a new subcategory with a title in a category
-
-    potential errors:
-        requiredParams
-        notUniqueTitle
-        categoryNotFound
-    """
+    """ potential errors: requiredParams, notUniqueTitle, categoryNotFound """
     try:
         title = request.data["title"]
         category_id = request.data["category_id"]
@@ -99,14 +86,7 @@ def create_subcategory(request):
 
 @api_view(['POST'])
 def create_product(request):
-    """
-    creates a new product with a title in a subcategory
-
-    potential errors:
-        requiredParams
-        notUniqueTitle
-        subcategoryNotFound
-    """
+    """ potential errors: requiredParams, notUniqueTitle, subcategoryNotFound """
     try:
         title = request.data["title"]
         quantity = int(request.data["quantity"])
@@ -120,7 +100,8 @@ def create_product(request):
     if not len(SubCategory.objects.filter(id=subcategory_id)):
         return error("subcategoryNotFound")
     subcategory = SubCategory.objects.get(id=subcategory_id)
-    product = Product.objects.create(title=title, quantity=quantity,
+    product = Product.objects.create(title=title,
+                                     quantity=quantity,
                                      subCategory=subcategory)
 
     return Response({"message": "product created successfully",
@@ -134,8 +115,8 @@ def category_list(request):
     """
     It returns categories as a JSON
     it has 2 modes: search or all:
-        search: return categories which title contains 'search_key'
-        all: returns all of categories
+        1.search: return categories which title contains 'search_key'
+        2.all: returns all of categories
     """
 
     search_key = get_data_or_none(request, "search_key")
@@ -152,10 +133,10 @@ def subcategory_list(request):
     """
     It returns subcategories as a JSON
     it has 4 modes: (search), (category-based), (search & category-based) and (all):
-        search: return subcategories which title contains 'search_key'
-        category-based: takes the 'id' of category and returns it's subcategories
-        search & subcategory-based: selects according to tho both of 'search_key' and 'category_id'
-        all: returns all of subcategories
+        1.search: return subcategories which title contains 'search_key'
+        2.category-based: takes the 'id' of category and returns it's subcategories
+        3.search & subcategory-based: selects according to tho both of 'search_key' and 'category_id'
+        4.all: returns all of subcategories
     """
 
     search_key = get_data_or_none(request, "search_key")
@@ -179,14 +160,12 @@ def product_list(request):
     It returns products as a JSON
     it has 6 modes: (search), (category-based), (subcategory-based),
                     (search & category-based), (search & subcategory-based) and (all):
-        search: return products which title contains 'search_key'
-        category-based: takes the 'id' of category and returns it's products
-        subcategory-based: takes the 'id' of subcategory and returns it's products
-
-        search & category-based: selects according to tho both of 'search_key' and 'category_id'
-        search & subcategory-based: selects according to tho both of 'search_key' and 'subcategory_id'
-
-        all: returns all of products
+        1.search: return products which title contains 'search_key'
+        2.category-based: takes the 'id' of category and returns it's products
+        3.subcategory-based: takes the 'id' of subcategory and returns it's products
+        4.search & category-based: selects according to tho both of 'search_key' and 'category_id'
+        5.search & subcategory-based: selects according to tho both of 'search_key' and 'subcategory_id'
+        6.all: returns all of products
     """
 
     search_key = get_data_or_none(request, "search_key")
@@ -210,14 +189,7 @@ def product_list(request):
 
 @api_view(['POST'])
 def edit_category(request):
-    """
-    edits the title of a category
-
-    potential errors:
-        requiredParams
-        notUniqueTitle
-        categoryNotFound
-    """
+    """ potential errors: requiredParams, notUniqueTitle, categoryNotFound """
     try:
         category_id = int(request.data["category_id"])
         title = request.data["title"]
@@ -240,15 +212,7 @@ def edit_category(request):
 
 @api_view(['POST'])
 def edit_subcategory(request):
-    """
-    edits the title and category of a subcategory
-
-    potential errors:
-        requiredParams
-        notUniqueTitle
-        subcategoryNotFound
-        categoryNotFound
-    """
+    """ potential errors: requiredParams, notUniqueTitle, subcategoryNotFound, categoryNotFound """
     try:
         subcategory_id = int(request.data["subcategory_id"])
         title = get_data_or_none(request, "title")
@@ -268,6 +232,7 @@ def edit_subcategory(request):
     if category_id:
         if not len(Category.objects.filter(id=category_id)):
             return error("categoryNotFound")
+
     subcategory = SubCategory.objects.get(id=subcategory_id)
     subcategory.title = [title if title else subcategory.title][0]
     subcategory.category = [Category.objects.get(id=category_id) if category_id
@@ -284,11 +249,7 @@ def edit_product(request):
     """
     edits the title, subcategory and quantity of a product
 
-    potential errors:
-        requiredParams
-        notUniqueTitle
-        productNotFound
-        subcategoryNotFound
+    potential errors: requiredParams, notUniqueTitle, productNotFound, subcategoryNotFound
     """
     try:
         product_id = int(request.data["product_id"])
@@ -310,6 +271,7 @@ def edit_product(request):
     if subcategory_id:
         if not len(SubCategory.objects.filter(id=subcategory_id)):
             return error("subcategoryNotFound")
+
     product = Product.objects.get(id=product_id)
     product.title = [title if title else product.title][0]
     product.quantity = [quantity if quantity else product.quantity][0]
@@ -324,13 +286,7 @@ def edit_product(request):
 
 @api_view(['POST'])
 def delete_category(request):
-    """
-    Find category by id and DELETE it
-
-    potential errors:
-        requiredParams
-        categoryNotFound
-    """
+    """ potential errors: requiredParams, categoryNotFound """
     try:
         id = int(request.data["id"])
     except Exception:
@@ -348,13 +304,7 @@ def delete_category(request):
 
 @api_view(['POST'])
 def delete_subcategory(request):
-    """
-    Find subcategory by id and DELETE it
-
-    potential errors:
-        requiredParams
-        subcategoryNotFound
-    """
+    """ potential errors: requiredParams, subcategoryNotFound """
     try:
         id = int(request.data["id"])
     except Exception:
@@ -372,13 +322,7 @@ def delete_subcategory(request):
 
 @api_view(['POST'])
 def delete_product(request):
-    """
-    Find product by id and DELETE it
-
-    potential errors:
-        requiredParams
-        productNotFound
-    """
+    """ potential errors: requiredParams, productNotFound """
     try:
         id = int(request.data["id"])
     except Exception:
@@ -396,13 +340,7 @@ def delete_product(request):
 
 @api_view(['POST'])
 def the_category(request):
-    """
-    passes an specific category according to it's id
-
-    potential errors:
-        requiredParams
-        categoryNotFound
-    """
+    """ potential errors: requiredParams, categoryNotFound """
     try:
         id = int(request.data["id"])
     except Exception:
@@ -418,13 +356,7 @@ def the_category(request):
 
 @api_view(['POST'])
 def the_subcategory(request):
-    """
-    passes an specific subcategory according to it's id
-
-    potential errors:
-        requiredParams
-        subcategoryNotFound
-    """
+    """ potential errors: requiredParams, subcategoryNotFound """
     try:
         id = int(request.data["id"])
     except Exception:
@@ -440,13 +372,7 @@ def the_subcategory(request):
 
 @api_view(['POST'])
 def the_product(request):
-    """
-    passes an specific product according to it's id
-
-    potential errors:
-        requiredParams
-        productNotFound
-    """
+    """ potential errors: requiredParams, productNotFound """
     try:
         id = int(request.data["id"])
     except Exception:
@@ -462,9 +388,7 @@ def the_product(request):
 
 @api_view(['POST'])
 def dataAnalyze(request):
-    """
-    Analyzes store data for diagrams of frontend
-    """
+    """ Analyzes store data for diagrams of frontend """
     category_number = len(Category.objects.all())
     subcategory_number = len(SubCategory.objects.all())
     category_product = {}
